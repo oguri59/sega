@@ -120,6 +120,12 @@ function calculate() {
     const addCrit = parseFloat(document.getElementById("stat-add-crit").value) || 0;
     const bonusDmg = parseFloat(document.getElementById("stat-bonus-dmg").value) || 0;
     const arcanaBonusDmg = parseFloat(document.getElementById("stat-arcana-bonus-dmg").value) || 0;
+    const charPiercing = Math.max(0, parseInt(document.getElementById("stat-piercing").value) || 0);
+
+    // 적 정보 설정 파싱
+    const targetProt = Math.max(0, parseFloat(document.getElementById("target-prot").value) || 0);
+    const targetDef = Math.max(0, parseFloat(document.getElementById("target-def").value) || 0);
+    const targetPiercingRes = Math.max(0, parseInt(document.getElementById("target-piercing-res").value) || 0);
 
     // 무기 및 방패 효과
     const weaponKey = document.getElementById("equip-weapon").value;
@@ -231,6 +237,39 @@ function calculate() {
     document.getElementById("smash-final-mult-label").textContent = `${Math.round(baseSmashMult * 100)}%`;
     document.getElementById("bash-final-mult-label").textContent = `${Math.round(baseBashMult * 100)}%`;
 
+    // 피어싱 및 방어/보호 감소 연산
+    const getProtReduction = (level) => level * 5;
+    const getDefReduction = (level) => {
+        const defTable = [0, 6, 12, 20, 30, 40, 50, 60, 70, 80];
+        if (level <= 9) return defTable[level];
+        return 80 + (level - 9) * 10;
+    };
+
+    // 실적용 피어싱 레벨 계산 (캐릭터 피어싱 - 적 저항)
+    const netPiercing = Math.max(0, charPiercing - targetPiercingRes);
+
+    // 1) 일반/표준 피어싱 (최대 9레벨 제한)
+    const normalPiercingLevel = Math.min(9, netPiercing);
+    const reducedProtNormal = Math.max(0, targetProt - getProtReduction(normalPiercingLevel));
+    const reducedDefNormal = Math.max(0, targetDef - getDefReduction(normalPiercingLevel));
+
+    // 보호에 따른 댐감율 공식: Y = 100/sqrt(2) * log10((x + 10*sqrt(2))/(10*sqrt(2))) / 100
+    const sqrt2 = Math.sqrt(2);
+    const getDmgRedFromProt = (prot) => {
+        if (prot <= 0) return 0;
+        let red = (100 / sqrt2) * Math.log10((prot + 10 * sqrt2) / (10 * sqrt2)) / 100;
+        return Math.min(0.90, Math.max(0.0, red));
+    };
+
+    const normalProtMult = 1 - getDmgRedFromProt(reducedProtNormal);
+
+    // 2) 아르카나 스킬 내 일반재능계수 적용 피어싱 (이중 피어싱적용, 최대 18레벨 제한)
+    const doublePiercingLevel = Math.min(18, 2 * netPiercing);
+    const reducedProtDouble = Math.max(0, targetProt - getProtReduction(doublePiercingLevel));
+    const reducedDefDouble = Math.max(0, targetDef - getDefReduction(doublePiercingLevel));
+    
+    const doubleProtMult = 1 - getDmgRedFromProt(reducedProtDouble);
+
     // 보너스 대미지 배율 상세 정의 (DC인사이드 분석글 기반 카테고리 분리 곱연산)
     const equipBonusDmgMult = 1 + (weapon.bonusDmg + shieldBonusDmgApply) / 100; // 장비보댐효과
     const normalBonusDmgMult = 1 + bonusDmg / 100; // 일반보댐효과
@@ -246,7 +285,7 @@ function calculate() {
         (1 + bashVal) * 
         ladecaMult;
     
-    const windmillDmg = rawWindmillDmg * talentBonusDmgMult;
+    const windmillDmg = Math.max(0, rawWindmillDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal);
 
     // 기저 돌진 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawChargeDmg = res0 * 
@@ -254,7 +293,7 @@ function calculate() {
         (1 + bashVal) * 
         ladecaMult;
 
-    const chargeDmg = rawChargeDmg * talentBonusDmgMult;
+    const chargeDmg = Math.max(0, rawChargeDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal);
 
     // 기저 스매시 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawSmashDmg = res0 * 
@@ -264,14 +303,14 @@ function calculate() {
         (1 + bashVal) * 
         ladecaMult;
 
-    const smashDmg = rawSmashDmg * talentBonusDmgMult;
+    const smashDmg = Math.max(0, rawSmashDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal);
 
     // 기저 배쉬 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawBashSkillDmg = res0 * 
         baseBashMult * 
         ladecaMult;
 
-    const bashSkillDmg = rawBashSkillDmg * talentBonusDmgMult;
+    const bashSkillDmg = Math.max(0, rawBashSkillDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal);
 
     // 6. 세이크리드 가드 5대 스킬 데미지 연산 (아르카나 곱연산보댐 공식 적용)
     // 크리티컬 배율 공통 정의
@@ -279,42 +318,42 @@ function calculate() {
 
     // [1] 성역 전개:
     const rawSanctuary = res0 * 3.0 + finalDef * 1.5 + finalHp * 0.2;
-    const sanctuaryNormal = equipBonusDmgMult * (rawSanctuary * arcanaBonusDmgMult) * arcanaBonusDmgMult;
+    const sanctuaryNormal = Math.max(0, equipBonusDmgMult * (rawSanctuary * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal);
     const sanctuaryCrit = sanctuaryNormal * critMult;
 
     // [2] 철벽 강타:
     const rawIronwallArcana = res0 * 12.0 + finalDef * 6.0 + finalHp * 1.0;
-    const ironwallNormal = equipBonusDmgMult * ( (rawWindmillDmg * 1.5) * normalBonusDmgMult + rawIronwallArcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
+    const ironwallNormal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const ironwallCrit = ironwallNormal * critMult;
 
     // [2.5] 단죄의 일격 1단계:
     const rawCondemnation1Arcana = res0 * 15.0 + finalDef * 9.0 + finalHp * 1.5;
-    const condemnation1Normal = equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult + rawCondemnation1Arcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
+    const condemnation1Normal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const condemnation1Crit = condemnation1Normal * critMult;
 
     // [2.6] 단죄의 일격 2단계:
     const rawCondemnation2Arcana = res0 * 22.5 + finalDef * 13.5 + finalHp * 2.25;
-    const condemnation2Normal = equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult + rawCondemnation2Arcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
+    const condemnation2Normal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const condemnation2Crit = condemnation2Normal * critMult;
 
     // [2.7] 단죄의 일격 3단계:
     const rawCondemnation3Arcana = res0 * 30.0 + finalDef * 18.0 + finalHp * 3.0;
-    const condemnation3Normal = equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult + rawCondemnation3Arcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
+    const condemnation3Normal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const condemnation3Crit = condemnation3Normal * critMult;
 
     // [3] 심판의 일격:
     const rawJudgmentArcana = res0 * 35.0 + finalDef * 20.0 + finalHp * 5.0;
-    const judgmentNormal = equipBonusDmgMult * ( (rawWindmillDmg * 2.0) * normalBonusDmgMult + rawJudgmentArcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
+    const judgmentNormal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const judgmentCrit = judgmentNormal * critMult;
 
     // [4] 격돌:
     const rawClashArcana = res0 * 8.0 + finalDef * 6.0 + finalHp * 0.5;
-    const clashNormal = equipBonusDmgMult * ( (rawChargeDmg * 1.5) * normalBonusDmgMult + rawClashArcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
+    const clashNormal = Math.max(0, equipBonusDmgMult * ( (rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const clashCrit = clashNormal * critMult;
 
     // [5] 희생의 응징:
     const rawRetributionArcana = (res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
-    const retributionNormal = equipBonusDmgMult * (rawRetributionArcana * arcanaBonusDmgMult) * arcanaBonusDmgMult;
+    const retributionNormal = Math.max(0, equipBonusDmgMult * (rawRetributionArcana * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal);
     const retributionCrit = retributionNormal * critMult;
 
     // 7. UI 결과값 업데이트
@@ -340,45 +379,45 @@ function calculate() {
 
     // 8. 데미지 공식 상세 분해 렌더링
     document.getElementById("math-sanctuary").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawSanctuary).toLocaleString()} [성역계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `{ ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawSanctuary).toLocaleString()} [성역계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] } &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(sanctuaryNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-ironwall").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 1.5).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawIronwallArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.5).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawIronwallArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(ironwallNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-condemnation1").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawCondemnation1Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation1Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(condemnation1Normal).toLocaleString()}</strong>`;
 
     document.getElementById("math-condemnation2").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawCondemnation2Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation2Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(condemnation2Normal).toLocaleString()}</strong>`;
 
     document.getElementById("math-condemnation3").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawCondemnation3Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation3Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(condemnation3Normal).toLocaleString()}</strong>`;
 
     document.getElementById("math-judgment").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 2.0).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawJudgmentArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 2.0).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawJudgmentArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(judgmentNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-clash").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawChargeDmg * 1.5).toLocaleString()} [돌진계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawClashArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawChargeDmg * 1.5).toLocaleString()} [돌진계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawClashArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(clashNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-retribution").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawRetributionArcana).toLocaleString()} [응징계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `{ ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawRetributionArcana).toLocaleString()} [응징계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] } &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(retributionNormal).toLocaleString()}</strong>`;
 
     // 스매시 분해
     document.getElementById("math-smash").innerHTML = 
-        `${Math.floor(rawSmashDmg).toLocaleString()} [기저데미지] &times; ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐]<br>` +
+        `( ${Math.floor(rawSmashDmg).toLocaleString()} [기저데미지] &times; ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] ) &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(smashDmg).toLocaleString()}</strong>`;
 
     // 배쉬 분해
     document.getElementById("math-bash").innerHTML = 
-        `${Math.floor(rawBashSkillDmg).toLocaleString()} [기저데미지] &times; ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐]<br>` +
+        `( ${Math.floor(rawBashSkillDmg).toLocaleString()} [기저데미지] &times; ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] ) &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(bashSkillDmg).toLocaleString()}</strong>`;
 
     // 9. 빌드 비교 렌더링 수행
