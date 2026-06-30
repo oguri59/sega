@@ -127,6 +127,24 @@ function setupEventListeners() {
     // 빌드 비교 제어 버튼 리스너
     document.getElementById("btn-save-build").addEventListener("click", saveCurrentBuild);
     document.getElementById("btn-reset-build").addEventListener("click", resetBuildComparison);
+
+    // 상지/급관 택1 제어
+    const buffSangji = document.getElementById("buff-sangji");
+    const buffGupkwan = document.getElementById("buff-gupkwan");
+    if (buffSangji && buffGupkwan) {
+        buffSangji.addEventListener("change", () => {
+            if (buffSangji.checked && buffGupkwan.checked) {
+                buffGupkwan.checked = false;
+                calculate();
+            }
+        });
+        buffGupkwan.addEventListener("change", () => {
+            if (buffGupkwan.checked && buffSangji.checked) {
+                buffSangji.checked = false;
+                calculate();
+            }
+        });
+    }
 }
 
 
@@ -140,7 +158,7 @@ function calculate() {
     const addCrit = parseFloat(document.getElementById("stat-add-crit").value) || 0;
     const bonusDmg = parseFloat(document.getElementById("stat-bonus-dmg").value) || 0;
     const arcanaBonusDmg = parseFloat(document.getElementById("stat-arcana-bonus-dmg").value) || 0;
-    const charPiercing = Math.max(0, parseInt(document.getElementById("stat-piercing").value) || 0);
+    let charPiercing = Math.max(0, parseInt(document.getElementById("stat-piercing").value) || 0);
 
     // 적 정보 설정 파싱 (TARGET_DATA 연동)
     const targetKey = document.getElementById("target-monster").value;
@@ -167,13 +185,15 @@ function calculate() {
     const debuffMomo = document.getElementById("debuff-momo").checked;
 
     // 데스 마커 및 어퍼 라벨 동적 갱신
-    const deathmarkerValueTotal = 53 + debuffDeathmarkerValue + (debuffDeathmarkerSaren ? 3 : 0);
+    // 데스마커: 세공 1레벨당 0.25% 증가, 스아렌 체크 시 3% 추가
+    const deathmarkerValueTotal = 53 + (debuffDeathmarkerValue * 0.25) + (debuffDeathmarkerSaren ? 3 : 0);
     const deathmarkerTotalValEl = document.getElementById("deathmarker-total-val");
     if (deathmarkerTotalValEl) {
-        deathmarkerTotalValEl.textContent = deathmarkerValueTotal;
+        deathmarkerTotalValEl.textContent = parseFloat(deathmarkerValueTotal.toFixed(2));
     }
 
-    const upperValueTotal = 23 + debuffUpperValue;
+    // 어퍼: 세공 1레벨당 1 감소
+    const upperValueTotal = 23 + (debuffUpperValue * 1);
     const upperTotalFlatEl = document.getElementById("upper-total-flat");
     if (upperTotalFlatEl) {
         upperTotalFlatEl.textContent = upperValueTotal;
@@ -213,6 +233,8 @@ function calculate() {
     const ladeca = document.getElementById("buff-ladeca").value;
     const bfo = parseFloat(document.getElementById("buff-bfo").value) || 0;
     const buffSebaBonus = document.getElementById("buff-seba-bonus").checked;
+    const buffSangji = document.getElementById("buff-sangji").checked;
+    const buffGupkwan = document.getElementById("buff-gupkwan").checked;
 
     // 물공포 체크
     const potionActive = document.querySelector("input[name='buff-potion']:checked").value === "1";
@@ -279,7 +301,10 @@ function calculate() {
     // 4. 최종 스탯 연산
     // 최종 보정 맥댐 (물공포 + 전장의 서곡 적용)
     const potionFactor = potionActive ? 1.2 : 1.0;
-    const res0 = maxDmg * potionFactor * (1 + (bfo / 100) * potionFactor);
+    let res0 = maxDmg * potionFactor * (1 + (bfo / 100) * potionFactor);
+    if (buffSangji) {
+        res0 = res0 * 1.12;
+    }
 
     // 최종 방어력 (기본 방어력 + 최종 맥댐의 3% 자동 합산)
     const bonusDef = res0 * 0.03;
@@ -333,6 +358,9 @@ function calculate() {
     };
 
     // 실적용 피어싱 레벨 계산 (캐릭터 피어싱 - 적 저항)
+    if (buffGupkwan) {
+        charPiercing += 1;
+    }
     const netPiercing = Math.max(0, charPiercing - targetPiercingRes);
 
     // 디버프 적용 후 적의 보호 수치 (비율감소 → 고정감소 순서)
@@ -399,7 +427,8 @@ function calculate() {
     const leimMult = buffLeim ? (buffLeimMagigraff ? 1.18 : 1.15) : 1.0;
     const proPackMult = buffProPack ? 1.01 : 1.0;
     const deathmarkerMultiplier = 1 + deathmarkerValueTotal / 100;
-    const finalDmgMultiplier = (debuffDeathmarker ? deathmarkerMultiplier : 1.0) * (debuffMomo ? 1.15 : 1.0) * masterAbrasiveMult * leimMult * proPackMult;
+    const gupkwanMult = buffGupkwan ? 1.15 : 1.0;
+    const finalDmgMultiplier = (debuffDeathmarker ? deathmarkerMultiplier : 1.0) * (debuffMomo ? 1.15 : 1.0) * masterAbrasiveMult * leimMult * proPackMult * gupkwanMult;
 
     // 성찰의 흔적 데미지 증가배율 (희생의 응징 유물 레벨당 *0.5% 증가, 기본 10%)
     const reflectionTracePct = 10 + relicRetribution * 0.5;
@@ -545,6 +574,9 @@ function calculate() {
         if (buffProPack) {
             mults.push(`1.01 [프플팩]`);
         }
+        if (buffGupkwan) {
+            mults.push(`1.15 [급소 관통]`);
+        }
 
         if (mults.length > 0) {
             step3Text += `<br>- 최종 데미지 = ${Math.floor(baseFinalDmg).toLocaleString()} &times; ${mults.join(' &times; ')} = <strong>${Math.floor(finalVal).toLocaleString()}</strong>`;
@@ -606,6 +638,9 @@ function calculate() {
         if (buffProPack) {
             mults.push(`1.01 [프플팩]`);
         }
+        if (buffGupkwan) {
+            mults.push(`1.15 [급소 관통]`);
+        }
 
         if (mults.length > 0) {
             step3Text += `<br>- 최종 데미지 = ${Math.floor(baseFinalDmg).toLocaleString()} &times; ${mults.join(' &times; ')} = <strong>${Math.floor(finalVal).toLocaleString()}</strong>`;
@@ -657,6 +692,9 @@ function calculate() {
         }
         if (buffProPack) {
             mults.push(`1.01 [프플팩]`);
+        }
+        if (buffGupkwan) {
+            mults.push(`1.15 [급소 관통]`);
         }
 
         if (mults.length > 0) {

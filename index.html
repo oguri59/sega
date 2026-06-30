@@ -148,6 +148,16 @@
                                 </label>
                                 <label class="checkbox-label"
                                     style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="debuff-jack" class="debuff-item" checked>
+                                    <span>잭 [보호 -4]</span>
+                                </label>
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="debuff-momo" class="debuff-item" checked>
+                                    <span>모모 [증댐 15%]</span>
+                                </label>
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
                                     <input type="checkbox" id="debuff-praga" class="debuff-item" checked>
                                     <span>프라가라흐 [보호 -15]</span>
                                 </label>
@@ -157,21 +167,10 @@
                                         <span>어퍼 [보호 -<span id="upper-total-flat">28</span>, -11%]</span>
                                     </label>
                                     <div style="display: flex; align-items: center; gap: 0.4rem; margin-left: 1.4rem;">
-                                        <span style="font-size: 0.75rem; color: var(--text-secondary);">세공:</span>
-                                        <input type="number" id="debuff-upper-value" value="5" min="0" max="100" step="1"
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary);">세공 lv:</span>
+                                        <input type="number" id="debuff-upper-value" value="5" min="0" max="7" step="1"
                                             style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
                                     </div>
-                                </div>
-                                <label class="checkbox-label"
-                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-                                    <input type="checkbox" id="debuff-jack" class="debuff-item" checked>
-                                    <span>잭 [보호 -4]</span>
-                                </label>
-                                <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                    <input type="checkbox" id="debuff-sonic" class="debuff-item" checked>
-                                    <span>음파의 세례</span>
-                                    <input type="number" id="debuff-sonic-value" value="4" min="0" max="100" step="1"
-                                        style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 0.2rem; grid-column: span 1;">
                                     <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; margin: 0;">
@@ -179,8 +178,8 @@
                                         <span>데스 마커 [증댐 <span id="deathmarker-total-val">58</span>%]</span>
                                     </label>
                                     <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-left: 1.4rem;">
-                                        <span style="font-size: 0.75rem; color: var(--text-secondary);">세공:</span>
-                                        <input type="number" id="debuff-deathmarker-value" value="5" min="0" max="100" step="1"
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary);">세공 lv:</span>
+                                        <input type="number" id="debuff-deathmarker-value" value="20" min="0" max="25" step="1"
                                             style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
                                         <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.2rem; cursor: pointer; margin: 0 0 0 0.4rem; font-size: 0.75rem; color: #a0a0ff;">
                                             <input type="checkbox" id="debuff-deathmarker-saren">
@@ -188,11 +187,12 @@
                                         </label>
                                     </div>
                                 </div>
-                                <label class="checkbox-label"
-                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-                                    <input type="checkbox" id="debuff-momo" class="debuff-item" checked>
-                                    <span>모모 [증댐 15%]</span>
-                                </label>
+                                <div style="display: flex; align-items: center; gap: 0.4rem; grid-column: span 2;">
+                                    <input type="checkbox" id="debuff-sonic" class="debuff-item" checked>
+                                    <span>음파의 세례</span>
+                                    <input type="number" id="debuff-sonic-value" value="4" min="0" max="100" step="1"
+                                        style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -359,6 +359,14 @@
                             <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
                                 <input type="checkbox" id="buff-pro-pack" checked>
                                 <span style="color: #ffd700; font-weight: 600;">프플팩 (최종 데미지 *1.01)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
+                                <input type="checkbox" id="buff-sangji">
+                                <span style="color: #ff9d00; font-weight: 600;">상지 (맥댐 12% 증가)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
+                                <input type="checkbox" id="buff-gupkwan">
+                                <span style="color: #ff9d00; font-weight: 600;">급소 관통 (스킬댐 15%, 피어싱 +1)</span>
                             </label>
                         </div>
                     </div>
