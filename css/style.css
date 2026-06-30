@@ -564,7 +564,7 @@ input:checked + .slider:before {
 }
 
 .spec-tooltip::after {
-    content: "아르카나 링크 효과: 방어력에 최종 맥댐의 10%가 자동 합산됩니다.";
+    content: "아르카나 링크 효과: 방어력에 최종 맥댐의 3%가 자동 합산됩니다.";
 }
 
 .spec-value {

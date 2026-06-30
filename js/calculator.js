@@ -253,8 +253,8 @@ function calculate() {
     const potionFactor = potionActive ? 1.2 : 1.0;
     const res0 = maxDmg * potionFactor * (1 + (bfo / 100) * potionFactor);
 
-    // 최종 방어력 (기본 방어력 + 최종 맥댐의 10% 자동 합산)
-    const bonusDef = res0 * 0.1;
+    // 최종 방어력 (기본 방어력 + 최종 맥댐의 3% 자동 합산)
+    const bonusDef = res0 * 0.03;
     const finalDef = baseDef + bonusDef;
 
     // 최종 생명력
@@ -268,7 +268,7 @@ function calculate() {
     document.getElementById("summary-final-max-dmg").textContent = Math.floor(res0).toLocaleString();
     document.getElementById("summary-final-defense").textContent = Math.floor(finalDef).toLocaleString();
     document.getElementById("summary-defense-breakdown").textContent =
-        `(기본 ${baseDef.toLocaleString()} + 맥댐 10% 보너스 ${Math.floor(bonusDef).toLocaleString()})`;
+        `(기본 ${baseDef.toLocaleString()} + 맥댐 3% 보너스 ${Math.floor(bonusDef).toLocaleString()})`;
     document.getElementById("summary-final-hp").textContent = Math.floor(finalHp).toLocaleString();
 
     // 5. 베이스 스킬 데미지 연산
