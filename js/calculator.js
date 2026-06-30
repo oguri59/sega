@@ -208,6 +208,8 @@ function calculate() {
     const relicRetribution = parseInt(document.getElementById("relic-retribution").value) || 0;
     const relicJudgment = parseInt(document.getElementById("relic-judgment").value) || 0;
     const buffReflectionTrace = document.getElementById("buff-reflection-trace").checked;
+    const buffLeim = document.getElementById("buff-leim").checked;
+    const buffLeimMagigraff = document.getElementById("buff-leim-magigraff").checked;
 
     // 베이스 스킬 입력
     const windmillRankVal = parseFloat(document.getElementById("skill-windmill-rank").value) || 0;
@@ -348,7 +350,8 @@ function calculate() {
     // 최종데미지 증댐 디버프 배율 (곱연산)
     const weaknessAnalysisMult = buffWeaknessAnalysis ? 1.10 : 1.0;
     const masterAbrasiveMult = buffMasterAbrasive ? 1.03 : 1.0;
-    const finalDmgMultiplier = (debuffDeathmarker ? 1.58 : 1.0) * (debuffMomo ? 1.15 : 1.0) * masterAbrasiveMult;
+    const leimMult = buffLeim ? (buffLeimMagigraff ? 1.18 : 1.15) : 1.0;
+    const finalDmgMultiplier = (debuffDeathmarker ? 1.58 : 1.0) * (debuffMomo ? 1.15 : 1.0) * masterAbrasiveMult * leimMult;
 
     // 성찰의 흔적 데미지 증가배율 (희생의 응징 유물 레벨당 *0.5% 증가, 기본 10%)
     const reflectionTracePct = 10 + relicRetribution * 0.5;
@@ -489,6 +492,9 @@ function calculate() {
         if (buffMasterAbrasive) {
             mults.push(`1.03 [명장의 연마재]`);
         }
+        if (buffLeim) {
+            mults.push(`${leimMult.toFixed(2)} [레임${buffLeimMagigraff ? ' (마기그래프)' : ''}]`);
+        }
 
         if (mults.length > 0) {
             step3Text += `<br>- 최종 데미지 = ${Math.floor(baseFinalDmg).toLocaleString()} &times; ${mults.join(' &times; ')} = <strong>${Math.floor(finalVal).toLocaleString()}</strong>`;
@@ -544,6 +550,9 @@ function calculate() {
         if (buffMasterAbrasive) {
             mults.push(`1.03 [명장의 연마재]`);
         }
+        if (buffLeim) {
+            mults.push(`${leimMult.toFixed(2)} [레임${buffLeimMagigraff ? ' (마기그래프)' : ''}]`);
+        }
 
         if (mults.length > 0) {
             step3Text += `<br>- 최종 데미지 = ${Math.floor(baseFinalDmg).toLocaleString()} &times; ${mults.join(' &times; ')} = <strong>${Math.floor(finalVal).toLocaleString()}</strong>`;
@@ -589,6 +598,9 @@ function calculate() {
         }
         if (buffMasterAbrasive) {
             mults.push(`1.03 [명장의 연마재]`);
+        }
+        if (buffLeim) {
+            mults.push(`${leimMult.toFixed(2)} [레임${buffLeimMagigraff ? ' (마기그래프)' : ''}]`);
         }
 
         if (mults.length > 0) {

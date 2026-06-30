@@ -239,7 +239,7 @@
                                 <div class="form-group" style="margin: 0;">
                                     <label for="relic-retribution" style="font-size: 0.78rem; color: #ccc; font-family: 'Noto Sans KR', sans-serif;">희생의 응징 유물</label>
                                     <select id="relic-retribution" class="select-sm">
-                                        <option value="0" selected>없음</option>
+                                        <option value="0">없음</option>
                                         <option value="1">1레벨 (+0.5%)</option>
                                         <option value="2">2레벨 (+1.0%)</option>
                                         <option value="3">3레벨 (+1.5%)</option>
@@ -249,13 +249,13 @@
                                         <option value="7">7레벨 (+3.5%)</option>
                                         <option value="8">8레벨 (+4.0%)</option>
                                         <option value="9">9레벨 (+4.5%)</option>
-                                        <option value="10">10레벨 (+5.0%)</option>
+                                        <option value="10" selected>10레벨 (+5.0%)</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0;">
                                     <label for="relic-judgment" style="font-size: 0.78rem; color: #ccc; font-family: 'Noto Sans KR', sans-serif;">심판의 일격 유물</label>
                                     <select id="relic-judgment" class="select-sm">
-                                        <option value="0" selected>없음</option>
+                                        <option value="0">없음</option>
                                         <option value="1">1레벨 (+100%)</option>
                                         <option value="2">2레벨 (+200%)</option>
                                         <option value="3">3레벨 (+300%)</option>
@@ -265,7 +265,7 @@
                                         <option value="7">7레벨 (+700%)</option>
                                         <option value="8">8레벨 (+800%)</option>
                                         <option value="9">9레벨 (+900%)</option>
-                                        <option value="10">10레벨 (+1000%)</option>
+                                        <option value="10" selected>10레벨 (+1000%)</option>
                                     </select>
                                 </div>
                             </div>
@@ -327,6 +327,10 @@
                             <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
                                 <input type="checkbox" id="buff-master-abrasive">
                                 <span style="color: #ffd700; font-weight: 600;">명장의 연마재 (최종 데미지 *1.03)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
+                                <input type="checkbox" id="buff-leim-magigraff">
+                                <span style="color: #ffd700; font-weight: 600;">레임 마기그래프 (최종 데미지 *1.18)</span>
                             </label>
                         </div>
                     </div>
@@ -483,10 +487,16 @@
                 <div class="results-group">
                     <div class="group-title" style="display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; padding-right: 0.5rem;">
                         <span>세이크리드 가드 아르카나 스킬</span>
-                        <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 4px; padding: 0.2rem 0.5rem; text-shadow: none; font-weight: normal; margin-left: auto;">
-                            <input type="checkbox" id="buff-reflection-trace" checked>
-                            <span style="color: #ffd700; font-weight: 600;">성찰의 흔적</span>
-                        </label>
+                        <div style="display: flex; gap: 0.5rem; margin-left: auto;">
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 4px; padding: 0.2rem 0.5rem; text-shadow: none; font-weight: normal;">
+                                <input type="checkbox" id="buff-reflection-trace" checked>
+                                <span style="color: #ffd700; font-weight: 600;">성찰의 흔적</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; background: rgba(160, 220, 255, 0.1); border: 1px solid rgba(160, 220, 255, 0.3); border-radius: 4px; padding: 0.2rem 0.5rem; text-shadow: none; font-weight: normal;">
+                                <input type="checkbox" id="buff-leim" checked>
+                                <span style="color: #a0dcff; font-weight: 600;">레임</span>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- 성역 전개 결과 카드 -->
