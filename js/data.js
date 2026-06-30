@@ -94,6 +94,24 @@ const SHIELD_DATA = {
     }
 };
 
+// 대상 몬스터 목록 정의
+const TARGET_DATA = {
+    "target_raccoon": {
+        "name": "너구리 / 목인 (보호 0, 방어 0, 피어싱저항 0)",
+        "prot": 0,
+        "def": 0,
+        "piercingRes": 0,
+        "description": "보호와 방어가 없는 기본 샌드백 대상입니다."
+    },
+    "target_miir": {
+        "name": "미이르 / 목인 (보호 297, 방어 150, 피어싱저항 2)",
+        "prot": 297,
+        "def": 150,
+        "piercingRes": 2,
+        "description": "보호 297, 피어싱 저항 2가 설정된 연습모드 미이르 대상입니다."
+    }
+};
+
 // 윈드밀 랭크별 계수 정의
 const WINDMILL_RANK_DATA = [
     { "rank": "3단", "value": 5.0 },

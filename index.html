@@ -107,32 +107,17 @@
                 <div class="card input-card">
                     <div class="card-header">
                         <div class="card-icon">🎯</div>
-                        <h2>적 정보 설정 (보호/방어)</h2>
+                        <h2>대상 몬스터 설정</h2>
                     </div>
-                    <div class="card-body grid-2col">
+                    <div class="card-body">
                         <div class="form-group">
-                            <label for="target-prot">적 보호</label>
-                            <div class="input-wrapper">
-                                <input type="number" id="target-prot" min="0" placeholder="0" value="150">
-                                <span class="unit">Prot</span>
-                            </div>
-                            <small class="helper-text">대미지를 % 비율로 감소시킵니다.</small>
+                            <label for="target-monster">대상 몬스터 선택</label>
+                            <select id="target-monster">
+                                <!-- JavaScript가 TARGET_DATA를 바인딩합니다. -->
+                            </select>
                         </div>
-                        <div class="form-group">
-                            <label for="target-def">적 방어력</label>
-                            <div class="input-wrapper">
-                                <input type="number" id="target-def" min="0" placeholder="0" value="100">
-                                <span class="unit">DEF</span>
-                            </div>
-                            <small class="helper-text">대미지를 고정 수치만큼 감산합니다.</small>
-                        </div>
-                        <div class="form-group grid-span-2">
-                            <label for="target-piercing-res">피어싱 저항</label>
-                            <div class="input-wrapper">
-                                <input type="number" id="target-piercing-res" min="0" max="9" placeholder="0" value="0">
-                                <span class="unit">Res</span>
-                            </div>
-                            <small class="helper-text">캐릭터의 피어싱 레벨을 차감합니다. (예: 미이르는 2)</small>
+                        <div class="weapon-desc-box" id="target-desc" style="margin-top: 0.5rem;">
+                            선택한 대상의 보호, 방어력, 피어싱 저항 수치가 데미지 계산에 자동 적용됩니다.
                         </div>
                     </div>
                 </div>

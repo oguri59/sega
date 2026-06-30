@@ -35,6 +35,16 @@ function initDropdowns() {
         shieldSelect.appendChild(option);
     });
 
+    // 1.6. 대상 몬스터 목록 바인딩
+    const targetSelect = document.getElementById("target-monster");
+    targetSelect.innerHTML = "";
+    Object.keys(TARGET_DATA).forEach(key => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = TARGET_DATA[key].name;
+        targetSelect.appendChild(option);
+    });
+
     // 2. 윈드밀 랭크 바인딩
     const windmillSelect = document.getElementById("skill-windmill-rank");
     windmillSelect.innerHTML = "";
@@ -122,10 +132,14 @@ function calculate() {
     const arcanaBonusDmg = parseFloat(document.getElementById("stat-arcana-bonus-dmg").value) || 0;
     const charPiercing = Math.max(0, parseInt(document.getElementById("stat-piercing").value) || 0);
 
-    // 적 정보 설정 파싱
-    const targetProt = Math.max(0, parseFloat(document.getElementById("target-prot").value) || 0);
-    const targetDef = Math.max(0, parseFloat(document.getElementById("target-def").value) || 0);
-    const targetPiercingRes = Math.max(0, parseInt(document.getElementById("target-piercing-res").value) || 0);
+    // 적 정보 설정 파싱 (TARGET_DATA 연동)
+    const targetKey = document.getElementById("target-monster").value;
+    const target = TARGET_DATA[targetKey];
+    document.getElementById("target-desc").textContent = target.description;
+
+    const targetProt = target.prot;
+    const targetDef = target.def;
+    const targetPiercingRes = target.piercingRes;
 
     // 무기 및 방패 효과
     const weaponKey = document.getElementById("equip-weapon").value;
