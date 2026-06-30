@@ -393,35 +393,35 @@ function calculate() {
 
     // 8. 데미지 공식 상세 분해 렌더링
     document.getElementById("math-sanctuary").innerHTML = 
-        `{ ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawSanctuary).toLocaleString()} [성역계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] } &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
+        `{ ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawSanctuary).toLocaleString()} [성역 기저데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] } &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(sanctuaryNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-ironwall").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.5).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawIronwallArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.5).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawIronwallArcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(ironwallNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-condemnation1").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation1Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation1Arcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(condemnation1Normal).toLocaleString()}</strong>`;
 
     document.getElementById("math-condemnation2").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation2Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation2Arcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(condemnation2Normal).toLocaleString()}</strong>`;
 
     document.getElementById("math-condemnation3").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation3Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation3Arcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(condemnation3Normal).toLocaleString()}</strong>`;
 
     document.getElementById("math-judgment").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 2.0).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawJudgmentArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 2.0).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawJudgmentArcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(judgmentNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-clash").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawChargeDmg * 1.5).toLocaleString()} [돌진계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawClashArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawChargeDmg * 1.5).toLocaleString()} [돌진 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawClashArcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(clashNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-retribution").innerHTML = 
-        `{ ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawRetributionArcana).toLocaleString()} [응징계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] } &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
+        `{ ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawRetributionArcana).toLocaleString()} [응징 기저데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] } &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
         `= <strong>${Math.floor(retributionNormal).toLocaleString()}</strong>`;
 
     // 스매시 분해
