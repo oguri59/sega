@@ -8,67 +8,67 @@
 // 무기 목록 및 특수 옵션 정의
 const WEAPON_DATA = {
     "axe_soul_liberate": {
-        "name": "소울리버레이트 액스 (도끼 1)",
+        "name": "소울리버레이트 액스",
         "type": "axe",
         "twoHandedSmashBonus": 0.0,
-        "setSmash": 0.0,
-        "setWindmill": 0.0,
+        "smashBonus": 0.0,
+        "bashBonus": 0.10,
         "bonusDmg": 56.0, // 보너스 대미지 +56.0% (곱연산)
-        "description": "한손 도끼 계열 무기입니다."
+        "description": ""
     },
     "axe_nightbringer_viking": {
-        "name": "나이트브링어 바이킹 (도끼 2)",
+        "name": "나이트브링어 바이킹",
         "type": "axe",
         "twoHandedSmashBonus": 0.0,
-        "setSmash": 0.0,
-        "setWindmill": 0.0,
+        "smashBonus": 0.0,
+        "bashBonus": 0.05,
         "bonusDmg": 42.0, // 보너스 대미지 +42.0% (곱연산)
-        "description": "세이크리드 가드 종결급 한손 도끼 무기입니다."
+        "description": ""
     },
     "sword_soluna": {
-        "name": "태양과 달의 검 (양검 1)",
+        "name": "태양과 달의 검",
         "type": "twohanded",
         "twoHandedSmashBonus": 0.20,
-        "setSmash": 0.25,
-        "setWindmill": 0.15,
-        "bonusDmg": 120.0, // 보너스 대미지 +120.0% (곱연산)
-        "description": "마비노기 최고 존엄 양손검 무기입니다."
+        "smashBonus": 0.25,
+        "bashBonus": 0.0,
+        "bonusDmg": 112.0, // 보너스 대미지 +112.0% (곱연산)
+        "description": ""
     },
     "sword_soul_liberate": {
-        "name": "소울리버레이트 블레이드 (양검 2)",
+        "name": "소울리버레이트 블레이드",
         "type": "twohanded",
         "twoHandedSmashBonus": 0.20,
-        "setSmash": 0.0,
-        "setWindmill": 0.0,
+        "smashBonus": 0.20,
+        "bashBonus": 0.0,
         "bonusDmg": 112.0, // 보너스 대미지 +112.0% (곱연산)
-        "description": "양손검 계열 무기입니다."
+        "description": ""
     },
     "sword_nightbringer_warlord": {
-        "name": "나이트브링어 워로드 (양검 3)",
+        "name": "나이트브링어 워로드",
         "type": "twohanded",
         "twoHandedSmashBonus": 0.20,
-        "setSmash": 0.15,
-        "setWindmill": 0.15,
+        "smashBonus": 0.15,
+        "bashBonus": 0.0,
         "bonusDmg": 84.0, // 보너스 대미지 +84.0% (곱연산)
-        "description": "엘리트 양손검 무기입니다."
+        "description": ""
     },
     "custom_onehanded": {
         "name": "기타 일반 한손 무기",
         "type": "onehanded",
         "twoHandedSmashBonus": 0.0,
-        "setSmash": 0.0,
-        "setWindmill": 0.0,
+        "smashBonus": 0.0,
+        "bashBonus": 0.0,
         "bonusDmg": 0.0,
-        "description": "수치가 적용되지 않는 기본 한손 무기입니다."
+        "description": "Temp"
     },
     "custom_twohanded": {
         "name": "기타 일반 양손 무기",
         "type": "twohanded",
         "twoHandedSmashBonus": 0.20,
-        "setSmash": 0.0,
-        "setWindmill": 0.0,
+        "smashBonus": 0.0,
+        "bashBonus": 0.0,
         "bonusDmg": 0.0,
-        "description": "양손검 스매시 20% 보너스만 적용되는 양손 무기입니다."
+        "description": "Temp"
     }
 };
 
@@ -78,19 +78,19 @@ const SHIELD_DATA = {
         "name": "뱅가드 (나이트브링어 뱅가드)",
         "drr": 35.0, // 방패 데미지 감소율 35%
         "bonusDmg": 42.0, // 보너스 데미지 +42.0% (곱연산)
-        "description": "나이트브링어 뱅가드 방패입니다."
+        "description": "나이트브링어 뱅가드"
     },
     "shield_soul_liberate": {
         "name": "소울리버레이트 실드",
         "drr": 40.0, // 방패 데미지 감소율 40%
         "bonusDmg": 56.0, // 보너스 데미지 +56.0% (곱연산)
-        "description": "소울리버레이트 대형 방패입니다."
+        "description": "소울리버레이트 실드"
     },
     "shield_none": {
         "name": "기타 일반 방패 (미적용)",
         "drr": 0.0,
         "bonusDmg": 0.0,
-        "description": "수치가 적용되지 않는 기본 방패입니다."
+        "description": "Temp"
     }
 };
 
@@ -101,7 +101,7 @@ const TARGET_DATA = {
         "prot": 0,
         "def": 0,
         "piercingRes": 0,
-        "description": "보호와 방어가 없는 기본 샌드백 대상입니다."
+        "description": "기본 목인 대상입니다."
     },
     "target_miir": {
         "name": "미이르 / 목인 (보호 297, 방어 150, 피어싱저항 2)",

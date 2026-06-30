@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="마비노기 아르카나 세이크리드 가드 전용 스킬 데미지 계산기입니다. 맥댐, 방어력, 생명력, 윈드밀 및 돌진 데미지를 기반으로 한 실시간 연산을 제공합니다.">
+    <meta name="description"
+        content="마비노기 아르카나 세이크리드 가드 전용 스킬 데미지 계산기입니다. 맥댐, 방어력, 생명력, 윈드밀 및 돌진 데미지를 기반으로 한 실시간 연산을 제공합니다.">
     <title>마비노기 세이크리드 가드 데미지 계산기</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <!-- JavaScript Data & Logic -->
     <script src="js/data.js" defer></script>
     <script src="js/calculator.js" defer></script>
 </head>
+
 <body>
     <div id="app-container">
         <!-- 헤더 영역 -->
         <header>
             <div class="header-logo">
                 <svg class="shield-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L4 5V11C4 16.18 7.41 21.1 12 22C16.59 21.1 20 16.18 20 11V5L12 2Z" fill="url(#shield-grad)" stroke="#D4AF37" stroke-width="1.5"/>
-                    <path d="M12 5V19M8 9H16M9 13H15" stroke="#FFFFFF" stroke-dasharray="1" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M12 2L4 5V11C4 16.18 7.41 21.1 12 22C16.59 21.1 20 16.18 20 11V5L12 2Z"
+                        fill="url(#shield-grad)" stroke="#D4AF37" stroke-width="1.5" />
+                    <path d="M12 5V19M8 9H16M9 13H15" stroke="#FFFFFF" stroke-dasharray="1" stroke-width="1.5"
+                        stroke-linecap="round" />
                     <defs>
                         <linearGradient id="shield-grad" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
                             <stop offset="0%" stop-color="#4A3B12" />
@@ -50,36 +57,37 @@
                         <div class="form-group">
                             <label for="stat-max-dmg">기본 맥댐 (최대 공격력)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="stat-max-dmg" min="0" placeholder="0" value="1500">
+                                <input type="number" id="stat-max-dmg" min="0" placeholder="0" value="2500">
                                 <span class="unit">물리</span>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="stat-defense">기본 방어력</label>
                             <div class="input-wrapper">
-                                <input type="number" id="stat-defense" min="0" placeholder="0" value="250">
+                                <input type="number" id="stat-defense" min="0" placeholder="0" value="2500">
                                 <span class="unit">DEF</span>
                             </div>
+                            <small class="helper-text">방보, 마방보의 합</small>
                         </div>
                         <div class="form-group">
                             <label for="stat-max-hp">최대 생명력 (HP)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="stat-max-hp" min="0" placeholder="0" value="3500">
+                                <input type="number" id="stat-max-hp" min="0" placeholder="0" value="16000">
                                 <span class="unit">HP</span>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="stat-add-crit">추가 크리티컬 대미지 (%)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="stat-add-crit" min="0" placeholder="0" value="62">
+                                <input type="number" id="stat-add-crit" min="0" placeholder="0" value="100">
                                 <span class="unit">%</span>
                             </div>
-                            <small class="helper-text">R강 특개, 이보나, 낭농 등</small>
+                            <small class="helper-text">특개,낭농, 주화 등</small>
                         </div>
                         <div class="form-group">
                             <label for="stat-bonus-dmg">보너스 대미지 (%)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="stat-bonus-dmg" min="0" placeholder="0" value="15">
+                                <input type="number" id="stat-bonus-dmg" min="0" placeholder="0" value="4">
                                 <span class="unit">%</span>
                             </div>
                             <small class="helper-text">낭농 토템, 엑스트라 토템, 정령 옵션 등</small>
@@ -87,15 +95,15 @@
                         <div class="form-group">
                             <label for="stat-arcana-bonus-dmg">아르카나 보너스 대미지 (%)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="stat-arcana-bonus-dmg" min="0" placeholder="0" value="2">
+                                <input type="number" id="stat-arcana-bonus-dmg" min="0" placeholder="0" value="0">
                                 <span class="unit">%</span>
                             </div>
-                            <small class="helper-text">아르카나 링크 보너스 대미지</small>
+                            <small class="helper-text">아르카나 각성, 헤일로, 주화</small>
                         </div>
                         <div class="form-group grid-span-2">
                             <label for="stat-piercing">피어싱 레벨</label>
                             <div class="input-wrapper">
-                                <input type="number" id="stat-piercing" min="0" max="15" placeholder="0" value="9">
+                                <input type="number" id="stat-piercing" min="0" max="15" placeholder="0" value="11">
                                 <span class="unit">Lv</span>
                             </div>
                             <small class="helper-text">무기, 인챈트, 타이틀 등으로 적용되는 캐릭터 피어싱 수치</small>
@@ -119,45 +127,57 @@
                         <div class="weapon-desc-box" id="target-desc" style="margin-top: 0.5rem;">
                             선택한 대상의 보호, 방어력, 피어싱 저항 수치가 데미지 계산에 자동 적용됩니다.
                         </div>
-                        <div class="debuff-section" style="margin-top: 1.5rem; border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 1rem;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
-                                <h3 style="font-size: 0.9rem; color: #ffd700; display: flex; align-items: center; gap: 0.3rem; font-family: 'Noto Sans KR', sans-serif; margin: 0;">
+                        <div class="debuff-section"
+                            style="margin-top: 1.5rem; border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 1rem;">
+                            <div
+                                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
+                                <h3
+                                    style="font-size: 0.9rem; color: #ffd700; display: flex; align-items: center; gap: 0.3rem; font-family: 'Noto Sans KR', sans-serif; margin: 0;">
                                     <span>🧪</span> 디버프 설정
                                 </h3>
-                                <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 4px; padding: 0.2rem 0.5rem;">
+                                <label
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 4px; padding: 0.2rem 0.5rem;">
                                     <input type="checkbox" id="debuff-all" checked>
                                     <span style="color: #ffd700; font-weight: 600;">ALL</span>
                                 </label>
                             </div>
-                            <div class="checkbox-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem; font-family: 'Noto Sans KR', sans-serif;">
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                            <div class="checkbox-grid"
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem; font-family: 'Noto Sans KR', sans-serif;">
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
                                     <input type="checkbox" id="debuff-corgi" class="debuff-item" checked>
                                     <span>야옹 [보호 -15]</span>
                                 </label>
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
                                     <input type="checkbox" id="debuff-hades" class="debuff-item" checked>
                                     <span>케라 [보호 -10]</span>
                                 </label>
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
                                     <input type="checkbox" id="debuff-cart" class="debuff-item" checked>
                                     <span>물풍선 [보호 -3]</span>
                                 </label>
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
                                     <input type="checkbox" id="debuff-praga" class="debuff-item" checked>
                                     <span>프라가라흐 [보호 -15]</span>
                                 </label>
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
                                     <input type="checkbox" id="debuff-upper" class="debuff-item" checked>
-                                    <span>어퍼+급소 [보호 -28, -11%]</span>
+                                    <span>어퍼 [보호 -28, -11%]</span>
                                 </label>
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
                                     <input type="checkbox" id="debuff-jack" class="debuff-item" checked>
                                     <span>잭 [보호 -4]</span>
                                 </label>
                                 <div style="display: flex; align-items: center; gap: 0.4rem;">
                                     <input type="checkbox" id="debuff-sonic" class="debuff-item" checked>
                                     <span>음파의 세례</span>
-                                    <input type="number" id="debuff-sonic-value" value="4" min="0" max="100" step="1" style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
+                                    <input type="number" id="debuff-sonic-value" value="4" min="0" max="100" step="1"
+                                        style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
                                 </div>
                             </div>
                         </div>
@@ -177,9 +197,9 @@
                                 <!-- JavaScript가 WEAPON_DATA를 바인딩합니다. -->
                             </select>
                         </div>
-                        
+
                         <div class="weapon-desc-box" id="weapon-desc">
-                            선택한 무기에 대한 세부 세트 효과는 하단의 자바스크립트 데이터를 통해 커스텀 가능합니다.
+                            선택한 무기에 대한 세부 세트 효과는 하단의 체크박스를 통해 커스텀 가능합니다.
                         </div>
 
                         <div class="form-group" style="margin-top: 1rem;">
@@ -188,9 +208,9 @@
                                 <!-- JavaScript가 SHIELD_DATA를 바인딩합니다. -->
                             </select>
                         </div>
-                        
+
                         <div class="shield-desc-box" id="shield-desc" style="margin-top: 0.5rem; margin-bottom: 1rem;">
-                            선택한 방패에 대한 감소율 및 맥뎀 보너스가 계산에 자동 연동됩니다.
+                            선택한 방패에 대한 감소율 및 보너스 대미지 가 계산에 자동 연동됩니다.
                         </div>
 
                         <div class="set-effects-grid">
@@ -227,7 +247,7 @@
                     </div>
                     <div class="card-body grid-2col">
                         <div class="form-group grid-span-2">
-                            <label for="buff-ladeca">라데카 스킬 (종족 버프)</label>
+                            <label for="buff-ladeca">라데카 </label>
                             <select id="buff-ladeca" class="highlight-select">
                                 <option value="none">없음 (엘프 / 비활성)</option>
                                 <option value="breath">브레스 오브 라데카 (인간: 근접 5% 증가)</option>
@@ -237,7 +257,7 @@
                         <div class="form-group">
                             <label for="buff-bfo">전장의 서곡 비율 (%)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="buff-bfo" min="0" max="100" placeholder="0" value="45">
+                                <input type="number" id="buff-bfo" min="0" max="100" placeholder="0" value="70">
                                 <span class="unit">%</span>
                             </div>
                         </div>
@@ -264,118 +284,130 @@
                                 <option value="0.08">4스택 (8%)</option>
                                 <option value="0.10" selected>5스택 (10%)</option>
                             </select>
-                        
+
+                        </div>
                     </div>
-                </div>
 
-                <!-- 4. 베이스 스킬 랭크 및 세공 -->
-                <div class="card input-card">
-                    <div class="card-header">
-                        <div class="card-icon">⚡</div>
-                        <h2>재능 스킬 설정</h2>
+                    <!-- 4. 베이스 스킬 랭크 및 세공 -->
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <div class="card-icon">⚡</div>
+                            <h2>재능 스킬 설정</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- 윈드밀 설정 -->
+                            <fieldset class="skill-fieldset">
+                                <legend>윈드밀 (Windmill) <span class="legend-badge"
+                                        id="windmill-final-mult-label">500%</span></legend>
+                                <div class="grid-4col">
+                                    <div class="form-group">
+                                        <label for="skill-windmill-rank">스킬 랭크</label>
+                                        <select id="skill-windmill-rank">
+                                            <!-- JavaScript 바인딩 -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-windmill-reforge">세공 Lv</label>
+                                        <input type="number" id="skill-windmill-reforge" min="0" max="32" value="16">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-windmill-erg">에르그 강화 (%)</label>
+                                        <input type="number" id="skill-windmill-erg" min="0" max="100" value="100"
+                                            placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-windmill-darkerg">어둠의 에르그 (%)</label>
+                                        <input type="number" id="skill-windmill-darkerg" min="0" max="100" value="100"
+                                            placeholder="0">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- 돌진 설정 -->
+                            <fieldset class="skill-fieldset">
+                                <legend>돌진 (Charge) <span class="legend-badge" id="charge-final-mult-label">300%</span>
+                                </legend>
+                                <div class="grid-4col">
+                                    <div class="form-group">
+                                        <label for="skill-charge-rank">스킬 랭크</label>
+                                        <select id="skill-charge-rank">
+                                            <!-- JavaScript 바인딩 -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-charge-reforge">세공 Lv</label>
+                                        <input type="number" id="skill-charge-reforge" min="0" max="32" value="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-charge-erg">에르그 강화 (%)</label>
+                                        <input type="number" id="skill-charge-erg" min="0" max="500" value="0"
+                                            placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-charge-darkerg">어둠의 에르그 (%)</label>
+                                        <input type="number" id="skill-charge-darkerg" min="0" max="500" value="0"
+                                            placeholder="0">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- 스매시 설정 -->
+                            <fieldset class="skill-fieldset">
+                                <legend>스매시 (Smash) <span class="legend-badge" id="smash-final-mult-label">620%</span>
+                                </legend>
+                                <div class="grid-4col">
+                                    <div class="form-group">
+                                        <label for="skill-smash-rank">스킬 랭크</label>
+                                        <select id="skill-smash-rank">
+                                            <!-- JavaScript 바인딩 -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-smash-reforge">세공 Lv</label>
+                                        <input type="number" id="skill-smash-reforge" min="0" max="32" value="20">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-smash-erg">에르그 강화 (%)</label>
+                                        <input type="number" id="skill-smash-erg" min="0" max="500" value="0"
+                                            placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-smash-darkerg">어둠의 에르그 (%)</label>
+                                        <input type="number" id="skill-smash-darkerg" min="0" max="500" value="0"
+                                            placeholder="0">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- 배쉬 설정 -->
+                            <fieldset class="skill-fieldset">
+                                <legend>배쉬 (Bash) <span class="legend-badge" id="bash-final-mult-label">500%</span>
+                                </legend>
+                                <div class="grid-4col">
+                                    <div class="form-group">
+                                        <label for="skill-bash-rank">스킬 랭크</label>
+                                        <select id="skill-bash-rank">
+                                            <!-- JavaScript 바인딩 -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-bash-reforge">세공 Lv</label>
+                                        <input type="number" id="skill-bash-reforge" min="0" max="25" value="20">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-bash-erg">에르그 강화 (%)</label>
+                                        <input type="number" id="skill-bash-erg" min="0" max="500" value="0"
+                                            placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skill-bash-darkerg">어둠의 에르그 (%)</label>
+                                        <input type="number" id="skill-bash-darkerg" min="0" max="500" value="0"
+                                            placeholder="0">
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <!-- 윈드밀 설정 -->
-                        <fieldset class="skill-fieldset">
-                            <legend>윈드밀 (Windmill) <span class="legend-badge" id="windmill-final-mult-label">500%</span></legend>
-                            <div class="grid-4col">
-                                <div class="form-group">
-                                    <label for="skill-windmill-rank">스킬 랭크</label>
-                                    <select id="skill-windmill-rank">
-                                        <!-- JavaScript 바인딩 -->
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-windmill-reforge">세공 Lv</label>
-                                    <input type="number" id="skill-windmill-reforge" min="0" max="25" value="20">
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-windmill-erg">에르그 강화 (%)</label>
-                                    <input type="number" id="skill-windmill-erg" min="0" max="500" value="0" placeholder="0">
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-windmill-darkerg">어둠의 에르그 (%)</label>
-                                    <input type="number" id="skill-windmill-darkerg" min="0" max="500" value="0" placeholder="0">
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <!-- 돌진 설정 -->
-                        <fieldset class="skill-fieldset">
-                            <legend>돌진 (Charge) <span class="legend-badge" id="charge-final-mult-label">300%</span></legend>
-                            <div class="grid-4col">
-                                <div class="form-group">
-                                    <label for="skill-charge-rank">스킬 랭크</label>
-                                    <select id="skill-charge-rank">
-                                        <!-- JavaScript 바인딩 -->
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-charge-reforge">세공 Lv</label>
-                                    <input type="number" id="skill-charge-reforge" min="0" max="25" value="0">
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-charge-erg">에르그 강화 (%)</label>
-                                    <input type="number" id="skill-charge-erg" min="0" max="500" value="0" placeholder="0">
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-charge-darkerg">어둠의 에르그 (%)</label>
-                                    <input type="number" id="skill-charge-darkerg" min="0" max="500" value="0" placeholder="0">
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <!-- 스매시 설정 -->
-                        <fieldset class="skill-fieldset">
-                            <legend>스매시 (Smash) <span class="legend-badge" id="smash-final-mult-label">620%</span></legend>
-                            <div class="grid-4col">
-                                <div class="form-group">
-                                    <label for="skill-smash-rank">스킬 랭크</label>
-                                    <select id="skill-smash-rank">
-                                        <!-- JavaScript 바인딩 -->
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-smash-reforge">세공 Lv</label>
-                                    <input type="number" id="skill-smash-reforge" min="0" max="25" value="20">
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-smash-erg">에르그 강화 (%)</label>
-                                    <input type="number" id="skill-smash-erg" min="0" max="500" value="0" placeholder="0">
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-smash-darkerg">어둠의 에르그 (%)</label>
-                                    <input type="number" id="skill-smash-darkerg" min="0" max="500" value="0" placeholder="0">
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <!-- 배쉬 설정 -->
-                        <fieldset class="skill-fieldset">
-                            <legend>배쉬 (Bash) <span class="legend-badge" id="bash-final-mult-label">500%</span></legend>
-                            <div class="grid-4col">
-                                <div class="form-group">
-                                    <label for="skill-bash-rank">스킬 랭크</label>
-                                    <select id="skill-bash-rank">
-                                        <!-- JavaScript 바인딩 -->
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-bash-reforge">세공 Lv</label>
-                                    <input type="number" id="skill-bash-reforge" min="0" max="25" value="20">
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-bash-erg">에르그 강화 (%)</label>
-                                    <input type="number" id="skill-bash-erg" min="0" max="500" value="0" placeholder="0">
-                                </div>
-                                <div class="form-group">
-                                    <label for="skill-bash-darkerg">어둠의 에르그 (%)</label>
-                                    <input type="number" id="skill-bash-darkerg" min="0" max="500" value="0" placeholder="0">
-                                </div>
-                            </div>
-                        </fieldset>
-                    </div>
-                </div>
             </section>
 
             <!-- 오른쪽: 출력 결과 섹션 -->
@@ -393,8 +425,7 @@
                         </div>
                         <div class="spec-item highlighted-spec">
                             <div class="spec-label-row">
-                                <span class="spec-label">최종 방어력 (자동 합산)</span>
-                                <span class="spec-tooltip">기본 방어력 + 최종 맥댐의 10% 아르카나 링크 보너스 합산</span>
+                                <span class="spec-label">최종 방어력 (링크 보너스 합산)</span>
                             </div>
                             <span class="spec-value" id="summary-final-defense">0</span>
                             <span class="spec-sub" id="summary-defense-breakdown">(기본 0 + 보너스 0)</span>
@@ -409,7 +440,7 @@
                 <!-- 2. 세이크리드 가드 액티브 스킬 결과 -->
                 <div class="results-group">
                     <div class="group-title">🛡️ 세이크리드 가드 아르카나 스킬</div>
-                    
+
                     <!-- 성역 전개 결과 카드 -->
                     <div class="skill-result-card theme-sanctuary">
                         <div class="skill-info">
@@ -562,7 +593,8 @@
                     <div class="skill-result-card theme-sacrifice">
                         <div class="skill-info">
                             <span class="skill-name">희생의 응징 (Retribution)</span>
-                            <span class="skill-formula-summary">계수: (맥댐 6000% + 방어 4000% + 생명 1500%) * (1 + 방패감소율)</span>
+                            <span class="skill-formula-summary">계수: (맥댐 6000% + 방어 4000% + 생명 1500%) * (1 +
+                                방패감소율)</span>
                         </div>
                         <div class="dmg-values">
                             <div class="dmg-col">
@@ -583,7 +615,7 @@
                 <!-- 3. 베이스 스킬 결과 -->
                 <div class="results-group">
                     <div class="group-title">⚔️ 재능 스킬</div>
-                    
+
                     <!-- 윈드밀 결과 카드 -->
                     <div class="skill-result-card theme-base">
                         <div class="skill-info">
@@ -609,7 +641,7 @@
                     <div class="skill-result-card theme-base">
                         <div class="skill-info">
                             <span class="skill-name">돌진 (Charge)</span>
-                            <span class="skill-formula-summary">격돌 연산의 뼈대가 되는 기본 돌진 대미지</span>
+                            <span class="skill-formula-summary">돌진 대미지</span>
                         </div>
                         <div class="dmg-values">
                             <div class="dmg-col">
@@ -630,7 +662,7 @@
                     <div class="skill-result-card theme-base">
                         <div class="skill-info">
                             <span class="skill-name">스매시 (Smash)</span>
-                            <span class="skill-formula-summary">전투 딜링 연계의 기본이 되는 스매시 대미지</span>
+                            <span class="skill-formula-summary">스매시 대미지</span>
                         </div>
                         <div class="dmg-values">
                             <div class="dmg-col">
@@ -651,7 +683,7 @@
                     <div class="skill-result-card theme-base">
                         <div class="skill-info">
                             <span class="skill-name">배쉬 (Bash)</span>
-                            <span class="skill-formula-summary">스택을 쌓아 자가 버프 및 주력 타격을 가하는 배쉬 대미지</span>
+                            <span class="skill-formula-summary">배쉬 대미지</span>
                         </div>
                         <div class="dmg-values">
                             <div class="dmg-col">
@@ -699,7 +731,8 @@
                         <div class="breakdown-item">
                             <h3>성역 전개</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (맥댐 * 3.0 + 방어 * 1.5 + 생명 * 0.2) * 아르카나보댐 ] * 아르카나보댐</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (맥댐 * 3.0 + 방어 * 1.5 + 생명 * 0.2) * 아르카나보댐 ]
+                                    * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-sanctuary">
                                     0 * 3.0 + 0 * 1.5 + 0 * 0.2 = 0
                                 </div>
@@ -709,7 +742,8 @@
                         <div class="breakdown-item">
                             <h3>철벽 강타</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.5) * 일반보댐 + (맥댐 * 12.0 + 방어 * 6.0 + 생명 * 1.0) * 아르카나보댐 ] * 아르카나보댐</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.5) * 일반보댐 + (맥댐 * 12.0 + 방어 * 6.0
+                                    + 생명 * 1.0) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-ironwall">
                                     0 * 1.5 + 0 * 12.0 + 0 * 6.0 + 0 * 1.0 = 0
                                 </div>
@@ -719,7 +753,8 @@
                         <div class="breakdown-item">
                             <h3>단죄의 일격 1단계</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 15.0 + 방어 * 9.0 + 생명 * 1.5) * 아르카나보댐 ] * 아르카나보댐</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 15.0 + 방어 * 9.0
+                                    + 생명 * 1.5) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-condemnation1">
                                     0 * 1.75 + 0 * 15.0 + 0 * 9.0 + 0 * 1.5 = 0
                                 </div>
@@ -729,7 +764,8 @@
                         <div class="breakdown-item">
                             <h3>단죄의 일격 2단계</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 22.5 + 방어 * 13.5 + 생명 * 2.25) * 아르카나보댐 ] * 아르카나보댐</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 22.5 + 방어 *
+                                    13.5 + 생명 * 2.25) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-condemnation2">
                                     0 * 1.75 + 0 * 22.5 + 0 * 13.5 + 0 * 2.25 = 0
                                 </div>
@@ -739,7 +775,8 @@
                         <div class="breakdown-item">
                             <h3>단죄의 일격 3단계</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 30.0 + 방어 * 18.0 + 생명 * 3.0) * 아르카나보댐 ] * 아르카나보댐</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 30.0 + 방어 *
+                                    18.0 + 생명 * 3.0) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-condemnation3">
                                     0 * 1.75 + 0 * 30.0 + 0 * 18.0 + 0 * 3.0 = 0
                                 </div>
@@ -749,7 +786,8 @@
                         <div class="breakdown-item">
                             <h3>심판의 일격</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 2.0) * 일반보댐 + (맥댐 * 35.0 + 방어 * 20.0 + 생명 * 5.0) * 아르카나보댐 ] * 아르카나보댐</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 2.0) * 일반보댐 + (맥댐 * 35.0 + 방어 * 20.0
+                                    + 생명 * 5.0) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-judgment">
                                     0 * 2.0 + 0 * 35.0 + 0 * 20.0 + 0 * 5.0 = 0
                                 </div>
@@ -759,7 +797,8 @@
                         <div class="breakdown-item">
                             <h3>격돌</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (돌진 * 1.5) * 일반보댐 + (맥댐 * 8.0 + 방어 * 6.0 + 생명 * 0.5) * 아르카나보댐 ] * 아르카나보댐</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (돌진 * 1.5) * 일반보댐 + (맥댐 * 8.0 + 방어 * 6.0 +
+                                    생명 * 0.5) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-clash">
                                     0 * 1.5 + 0 * 8.0 + 0 * 6.0 + 0 * 0.5 = 0
                                 </div>
@@ -769,7 +808,8 @@
                         <div class="breakdown-item">
                             <h3>희생의 응징</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ ((맥댐 * 60.0 + 방어 * 40.0 + 생명 * 15.0) * (1 + 방패감소율)) * 아르카나보댐 ] * 아르카나보댐</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ ((맥댐 * 60.0 + 방어 * 40.0 + 생명 * 15.0) * (1 +
+                                    방패감소율)) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-retribution">
                                     0 * 60.0 + 0 * 40.0 + 0 * 15.0 = 0
                                 </div>
@@ -779,7 +819,8 @@
                         <div class="breakdown-item">
                             <h3>스매시</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 맥댐 * 스매시배율 * 양손검보너스 * 스매강세트 * 배쉬 * 라데카 * 장비보댐 * 일반보댐</span>
+                                <span class="formula-text">최종 대미지 = 맥댐 * 스매시배율 * 양손검보너스 * 스매강세트 * 배쉬 * 라데카 * 장비보댐 *
+                                    일반보댐</span>
                                 <div class="math-resolve" id="math-smash">
                                     0 * 6.2 * 1.0 * 1.0 * 1.0 * 1.0 * 1.0 = 0
                                 </div>
@@ -807,4 +848,5 @@
         </footer>
     </div>
 </body>
+
 </html>
