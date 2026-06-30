@@ -304,16 +304,28 @@ input[type="number"] {
     color: var(--text-dark);
 }
 
-/* 하이라이트 선택 박스 */
+/* 하이라이트 선택 박스 (네이티브 브라우저 버그 방지를 위해 단색 배경 사용) */
 .highlight-select {
     border-color: rgba(212, 175, 55, 0.25);
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(10, 8, 15, 0.6) 100%);
+    background: rgba(45, 38, 25, 0.75);
     color: var(--gold-glow);
 }
 
 .highlight-select:focus {
     border-color: var(--gold);
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(20, 16, 30, 0.8) 100%);
+    background: rgba(60, 50, 30, 0.85);
+}
+
+/* 네이티브 select 드롭다운 옵션 스타일 통일 */
+select option {
+    background-color: #1a1525;
+    color: #ffffff;
+}
+
+/* 소형 select 요소 스타일 */
+select.select-sm {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
 }
 
 /* 필드셋 스타일 */
