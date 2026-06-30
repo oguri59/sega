@@ -132,6 +132,7 @@ function setupEventListeners() {
 
 // 데미지 및 스탯 핵심 연산
 function calculate() {
+    const f = (val, maxDec = 4) => parseFloat(val.toFixed(maxDec)).toString();
     // 1. 입력 수치 파싱
     const maxDmg = Math.max(0, parseFloat(document.getElementById("stat-max-dmg").value) || 0);
     const baseDef = Math.max(0, parseFloat(document.getElementById("stat-defense").value) || 0);
@@ -430,43 +431,43 @@ function calculate() {
 
     // [1] 성역 전개: (링크보너스 최종데미지 100% 증가 즉 2.0배 곱)
     const rawSanctuary = res0 * 3.0 + finalDef * 1.5 + finalHp * 0.2;
-    const sanctuaryNormal = Math.max(1, Math.floor(Math.max(0, equipBonusDmgMult * rawSanctuary * arcanaBonusDmgMult * normalProtMult * arcanaNormalBonusDmgMult - reducedDefNormal) * 2.0 * finalDmgMultiplier * reflectionTraceMult));
+    const sanctuaryNormal = Math.max(1, Math.floor(Math.max(0, (rawSanctuary * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 2.0 * finalDmgMultiplier * reflectionTraceMult));
     const sanctuaryCrit = Math.max(1, Math.floor(sanctuaryNormal * critMult));
 
     // [2] 철벽 강타:
     const rawIronwallArcana = res0 * 12.0 + finalDef * 6.0 + finalHp * 1.0;
-    const ironwallNormal = Math.max(1, Math.floor(Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * normalProtMult * arcanaNormalBonusDmgMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
+    const ironwallNormal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
     const ironwallCrit = Math.max(1, Math.floor(ironwallNormal * critMult));
 
     // [2.5] 단죄의 일격 1단계:
     const rawCondemnation1Arcana = res0 * 15.0 + finalDef * 9.0 + finalHp * 1.5;
-    const condemnation1Normal = Math.max(1, Math.floor(Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * normalProtMult * arcanaNormalBonusDmgMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
+    const condemnation1Normal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
     const condemnation1Crit = Math.max(1, Math.floor(condemnation1Normal * critMult));
 
     // [2.6] 단죄의 일격 2단계:
     const rawCondemnation2Arcana = res0 * 22.5 + finalDef * 13.5 + finalHp * 2.25;
-    const condemnation2Normal = Math.max(1, Math.floor(Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * normalProtMult * arcanaNormalBonusDmgMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
+    const condemnation2Normal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
     const condemnation2Crit = Math.max(1, Math.floor(condemnation2Normal * critMult));
 
     // [2.7] 단죄의 일격 3단계:
     const rawCondemnation3Arcana = res0 * 30.0 + finalDef * 18.0 + finalHp * 3.0;
-    const condemnation3Normal = Math.max(1, Math.floor(Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * normalProtMult * arcanaNormalBonusDmgMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
+    const condemnation3Normal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
     const condemnation3Crit = Math.max(1, Math.floor(condemnation3Normal * critMult));
 
     // [3] 심판의 일격: (링크보너스 최종데미지 20% 증가 즉 1.2배 곱, 심판 유물레벨당 맥댐계수 +100% 합산)
     const rawJudgmentArcana = res0 * (35.0 + relicJudgment * 1.0) + finalDef * 20.0 + finalHp * 5.0;
-    const judgmentNormal = Math.max(1, Math.floor(Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * normalProtMult * arcanaNormalBonusDmgMult) * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier * reflectionTraceMult));
+    const judgmentNormal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier * reflectionTraceMult));
     const judgmentCrit = Math.max(1, Math.floor(judgmentNormal * critMult));
 
     // [4] 격돌:
     const rawClashArcana = res0 * 8.0 + finalDef * 6.0 + finalHp * 0.5;
-    const clashNormal = Math.max(1, Math.floor(Math.max(0, equipBonusDmgMult * ((rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * normalProtMult * arcanaNormalBonusDmgMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
+    const clashNormal = Math.max(1, Math.floor(Math.max(0, ((rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
     const clashCrit = Math.max(1, Math.floor(clashNormal * critMult));
 
     // [5] 희생의 응징: (링크보너스 최종데미지 15% 증가 즉 1.15배 곱, 성찰의 흔적 버프 기본 적용)
     const retributionReflectionMult = 1 + (10 + relicRetribution * 0.5) / 100;
     const rawRetributionArcana = (res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
-    const retributionNormal = Math.max(1, Math.floor(Math.max(0, equipBonusDmgMult * rawRetributionArcana * arcanaBonusDmgMult * normalProtMult * arcanaNormalBonusDmgMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * retributionReflectionMult));
+    const retributionNormal = Math.max(1, Math.floor(Math.max(0, (rawRetributionArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * retributionReflectionMult));
     const retributionCrit = Math.max(1, Math.floor(retributionNormal * critMult));
 
     // 7. UI 결과값 업데이트
@@ -501,17 +502,16 @@ function calculate() {
         const talentPartBase = rawTalent; // (약점분석/브레스는 normalBonusDmgMult에 합산됨)
         const talentPartDmg = Math.floor(talentPartBase * talentMult * doubleProt);
         const arcanaPartDmg = Math.floor(rawArcana * normalProt * arcanaNormalBonusDmgMult);
-        const baseFinalDmg = Math.max(0, equipMult * (talentPartDmg + arcanaPartDmg) * arcanaDmgMult - Math.floor(normalDef));
-
-        let step3Text = `- 기본 최종 데미지 = ${equipMult.toFixed(4)} [장비보댐] &times; [ ${talentPartDmg.toLocaleString()} (재능) + ${arcanaPartDmg.toLocaleString()} (아르카나) ] &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(normalDef)} [적방어] = <strong>${Math.floor(baseFinalDmg).toLocaleString()}</strong>`;
+        const baseFinalDmg = Math.max(0, (talentPartDmg + arcanaPartDmg) * equipMult * arcanaDmgMult - Math.floor(normalDef));
+        let step3Text = `- 기본 최종 데미지 = [ ${talentPartDmg.toLocaleString()} (재능) + ${arcanaPartDmg.toLocaleString()} (아르카나) ] &times; ${f(equipMult)} [장비보댐] &times; ${f(arcanaDmgMult)} [아르카나보댐] - ${Math.floor(normalDef)} [적방어] = <strong>${Math.floor(baseFinalDmg).toLocaleString()}</strong>`;
 
         let mults = [];
         if (linkBonus !== 1.0) {
-            mults.push(`${linkBonus.toFixed(2)} [링크 보너스]`);
+            mults.push(`${f(linkBonus, 2)} [링크 보너스]`);
         }
         if (reflectionMult !== 1.0) {
             const pct = 10 + relicRetLevel * 0.5;
-            mults.push(`${reflectionMult.toFixed(3)} [성찰의 흔적 (+${pct}%)]`);
+            mults.push(`${f(reflectionMult, 3)} [성찰의 흔적 (+${f(pct, 1)}%)]`);
         }
         if (debuffDeathmarker) {
             mults.push(`1.58 [데스 마커]`);
@@ -544,8 +544,8 @@ function calculate() {
             <div class="math-step">
                 <span class="math-step-num">2단계 피어싱 보댐 적용</span>
                 <span class="math-step-text">
-                    - 재능 파트: ${Math.floor(talentPartBase).toLocaleString()} &times; ${talentMult.toFixed(4)} ${normalBonusDmgLabel} &times; ${doubleProt.toFixed(4)} [이중피어싱 댐감율] = <strong>${talentPartDmg.toLocaleString()}</strong><br>
-                    - 아르카나 파트: ${Math.floor(rawArcana).toLocaleString()} &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율]${arcanaNormalBonusDmgMult !== 1.0 ? ` &times; ${arcanaNormalBonusDmgMult.toFixed(4)} ${arcanaNormalBonusDmgLabel}` : ''} = <strong>${arcanaPartDmg.toLocaleString()}</strong>
+                    - 재능 파트: ${Math.floor(talentPartBase).toLocaleString()} &times; ${f(talentMult)} ${normalBonusDmgLabel} &times; ${f(doubleProt)} [이중피어싱 댐감율] = <strong>${talentPartDmg.toLocaleString()}</strong><br>
+                    - 아르카나 파트: ${Math.floor(rawArcana).toLocaleString()} &times; ${f(normalProt)} [기본피어싱 댐감율]${arcanaNormalBonusDmgMult !== 1.0 ? ` &times; ${f(arcanaNormalBonusDmgMult)} ${arcanaNormalBonusDmgLabel}` : ''} = <strong>${arcanaPartDmg.toLocaleString()}</strong>
                 </span>
             </div>
             <div class="math-step">
@@ -562,17 +562,17 @@ function calculate() {
 
     const formatArcanaOnlyMath = (rawArcana, arcanaFormula, arcanaDmgMult, normalProt, equipMult, normalDef, finalVal, linkBonus = 1.0, reflectionMult = 1.0, relicRetLevel = 0) => {
         const arcanaPartDmg = Math.floor(rawArcana * normalProt * arcanaNormalBonusDmgMult);
-        const baseFinalDmg = Math.max(0, equipMult * arcanaPartDmg * arcanaDmgMult - Math.floor(normalDef));
+        const baseFinalDmg = Math.max(0, arcanaPartDmg * equipMult * arcanaDmgMult - Math.floor(normalDef));
 
-        let step3Text = `- 기본 최종 데미지 = ${equipMult.toFixed(4)} [장비보댐] &times; ${arcanaPartDmg.toLocaleString()} &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(normalDef)} [적방어] = <strong>${Math.floor(baseFinalDmg).toLocaleString()}</strong>`;
+        let step3Text = `- 기본 최종 데미지 = ${arcanaPartDmg.toLocaleString()} &times; ${f(equipMult)} [장비보댐] &times; ${f(arcanaDmgMult)} [아르카나보댐] - ${Math.floor(normalDef)} [적방어] = <strong>${Math.floor(baseFinalDmg).toLocaleString()}</strong>`;
 
         let mults = [];
         if (linkBonus !== 1.0) {
-            mults.push(`${linkBonus.toFixed(2)} [링크 보너스]`);
+            mults.push(`${f(linkBonus, 2)} [링크 보너스]`);
         }
         if (reflectionMult !== 1.0) {
             const pct = 10 + relicRetLevel * 0.5;
-            mults.push(`${reflectionMult.toFixed(3)} [성찰의 흔적 (+${pct}%)]`);
+            mults.push(`${f(reflectionMult, 3)} [성찰의 흔적 (+${f(pct, 1)}%)]`);
         }
         if (debuffDeathmarker) {
             mults.push(`1.58 [데스 마커]`);
@@ -604,7 +604,7 @@ function calculate() {
             <div class="math-step">
                 <span class="math-step-num">2단계 피어싱 보댐 적용</span>
                 <span class="math-step-text">
-                    - 아르카나 파트: ${Math.floor(rawArcana).toLocaleString()} &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율]${arcanaNormalBonusDmgMult !== 1.0 ? ` &times; ${arcanaNormalBonusDmgMult.toFixed(4)} ${arcanaNormalBonusDmgLabel}` : ''} = <strong>${arcanaPartDmg.toLocaleString()}</strong>
+                    - 아르카나 파트: ${Math.floor(rawArcana).toLocaleString()} &times; ${f(normalProt)} [기본피어싱 댐감율]${arcanaNormalBonusDmgMult !== 1.0 ? ` &times; ${f(arcanaNormalBonusDmgMult)} ${arcanaNormalBonusDmgLabel}` : ''} = <strong>${arcanaPartDmg.toLocaleString()}</strong>
                 </span>
             </div>
             <div class="math-step">
@@ -623,7 +623,7 @@ function calculate() {
         const talentPartBase = rawTalent; // (약점분석/브레스는 normalBonusDmgMult에 합산됨)
         const baseFinalDmg = Math.max(0, talentPartBase * talentMult * normalProt - Math.floor(normalDef));
 
-        let step2Text = `- 기본 최종 데미지 = ${Math.floor(talentPartBase).toLocaleString()} &times; ${talentMult.toFixed(4)} ${normalBonusDmgLabel} &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] - ${Math.floor(normalDef)} [적방어] = <strong>${Math.floor(baseFinalDmg).toLocaleString()}</strong>`;
+        let step2Text = `- 기본 최종 데미지 = ${Math.floor(talentPartBase).toLocaleString()} &times; ${f(talentMult)} ${normalBonusDmgLabel} &times; ${f(normalProt)} [기본피어싱 댐감율] - ${Math.floor(normalDef)} [적방어] = <strong>${Math.floor(baseFinalDmg).toLocaleString()}</strong>`;
 
         let mults = [];
         if (debuffDeathmarker) {
@@ -668,10 +668,10 @@ function calculate() {
     // 각 스킬별 베이스데미지 수식 정의
     const sanctuaryFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 3.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 1.5 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 0.2 )`;
 
-    const ironwallTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseWindmillMult.toFixed(4)} [윈밀계수] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카] &times; 1.5 [철벽배율]`;
+    const ironwallTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 1.5 [철벽배율]`;
     const ironwallArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 12.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 6.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 1.0`;
 
-    const condemnation1TalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseWindmillMult.toFixed(4)} [윈밀계수] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카] &times; 1.75 [단죄배율]`;
+    const condemnation1TalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 1.75 [단죄배율]`;
     const condemnation1ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 15.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 9.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 1.5`;
 
     const condemnation2TalentFormula = condemnation1TalentFormula;
@@ -680,21 +680,21 @@ function calculate() {
     const condemnation3TalentFormula = condemnation1TalentFormula;
     const condemnation3ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 30.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 18.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 3.0`;
 
-    const judgmentTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseWindmillMult.toFixed(4)} [윈밀계수] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카] &times; 2.0 [심판배율]`;
-    const judgmentArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${(35.0 + relicJudgment * 1.0).toFixed(1)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 20.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 5.0`;
+    const judgmentTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 2.0 [심판배율]`;
+    const judgmentArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(35.0 + relicJudgment * 1.0, 1)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 20.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 5.0`;
 
-    const clashTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseChargeMult.toFixed(4)} [돌진계수] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카] &times; 1.5 [격돌배율]`;
+    const clashTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseChargeMult)} [돌진계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 1.5 [격돌배율]`;
     const clashArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 8.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 6.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 0.5`;
 
-    const retributionFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 60.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 40.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 15.0 ) &times; ${(1 + shield.drr / 100).toFixed(2)} [방패감소율]`;
+    const retributionFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 60.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 40.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 15.0 ) &times; ${f(1 + shield.drr / 100, 2)} [방패감소율]`;
 
-    const smashFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseSmashMult.toFixed(4)} [스매시배율] &times; ${(1 + weaponTwoHandedSmashBonus).toFixed(2)} [양손보너스] &times; ${(1 + weaponSmashBonus).toFixed(2)} [아이템 보너스] &times;  ${(1 + (setSmash ? 0.15 : 0)).toFixed(2)} [스매강] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카]`;
+    const smashFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseSmashMult)} [스매시배율] &times; ${f(1 + weaponTwoHandedSmashBonus, 2)} [양손보너스] &times; ${f(1 + weaponSmashBonus, 2)} [아이템 보너스] &times;  ${f(1 + (setSmash ? 0.15 : 0), 2)} [스매강] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카]`;
 
-    const bashFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseBashMult.toFixed(4)} [배쉬배율] &times; ${(1 + weaponBashBonus).toFixed(2)} [아이템 보너스] &times; ${ladecaMult.toFixed(2)} [라데카]`;
+    const bashFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseBashMult)} [배쉬배율] &times; ${f(1 + weaponBashBonus, 2)} [아이템 보너스] &times; ${f(ladecaMult, 2)} [라데카]`;
 
 
-    const windmillFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseWindmillMult.toFixed(4)} [윈밀배율] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카]`;
-    const chargeFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseChargeMult.toFixed(4)} [돌진배율] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카]`;
+    const windmillFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀배율] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카]`;
+    const chargeFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseChargeMult)} [돌진배율] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카]`;
 
     document.getElementById("card-math-sanctuary").innerHTML =
         formatArcanaOnlyMath(rawSanctuary, sanctuaryFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, sanctuaryNormal, 2.0, reflectionTraceMult, relicRetribution);
