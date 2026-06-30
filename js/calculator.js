@@ -392,47 +392,109 @@ function calculate() {
     });
 
     // 8. 데미지 공식 상세 분해 렌더링
+    const formatArcanaMath = (title, rawTalent, talentLabel, talentMult, doubleProt, rawArcana, arcanaLabel, arcanaDmgMult, normalProt, equipMult, normalDef, finalVal) => {
+        return `
+            <div class="math-step">
+                <span class="math-step-num">1단계 기저데미지</span>
+                <span class="math-step-text">
+                    - ${talentLabel} 파트: <strong>${Math.floor(rawTalent).toLocaleString()}</strong> 데미지<br>
+                    - 아르카나 파트: <strong>${Math.floor(rawArcana).toLocaleString()}</strong> 데미지
+                </span>
+            </div>
+            <div class="math-step">
+                <span class="math-step-num">2단계 피어싱 & 보댐 적용</span>
+                <span class="math-step-text">
+                    - ${talentLabel} 파트: ${Math.floor(rawTalent).toLocaleString()} &times; ${talentMult.toFixed(4)} [일반보댐] &times; ${doubleProt.toFixed(4)} [이중피어싱 댐감율] = <strong>${Math.floor(rawTalent * talentMult * doubleProt).toLocaleString()}</strong><br>
+                    - 아르카나 파트: ${Math.floor(rawArcana).toLocaleString()} &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] = <strong>${Math.floor(rawArcana * arcanaDmgMult * normalProt).toLocaleString()}</strong>
+                </span>
+            </div>
+            <div class="math-step">
+                <span class="math-step-num">3단계 최종 합산</span>
+                <span class="math-step-text">
+                    - 최종 데미지 = ${equipMult.toFixed(4)} [장비보댐] &times; [ ${Math.floor(rawTalent * talentMult * doubleProt).toLocaleString()} (재능) + ${Math.floor(rawArcana * arcanaDmgMult * normalProt).toLocaleString()} (아르카나) ] &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(normalDef)} [적방어]
+                </span>
+            </div>
+            <div class="math-final">
+                결과 = <strong>${Math.floor(finalVal).toLocaleString()}</strong>
+            </div>
+        `;
+    };
+
+    const formatArcanaOnlyMath = (title, rawArcana, arcanaLabel, normalProt, equipMult, arcanaDmgMult, normalDef, finalVal) => {
+        return `
+            <div class="math-step">
+                <span class="math-step-num">1단계 기저데미지</span>
+                <span class="math-step-text">
+                    - 아르카나 기저: <strong>${Math.floor(rawArcana).toLocaleString()}</strong> 데미지
+                </span>
+            </div>
+            <div class="math-step">
+                <span class="math-step-num">2단계 피어싱 & 보댐 적용</span>
+                <span class="math-step-text">
+                    - 아르카나 파트: ${Math.floor(rawArcana).toLocaleString()} &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] = <strong>${Math.floor(rawArcana * arcanaDmgMult * normalProt).toLocaleString()}</strong>
+                </span>
+            </div>
+            <div class="math-step">
+                <span class="math-step-num">3단계 최종 합산</span>
+                <span class="math-step-text">
+                    - 최종 데미지 = ${equipMult.toFixed(4)} [장비보댐] &times; ${Math.floor(rawArcana * arcanaDmgMult * normalProt).toLocaleString()} &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(normalDef)} [적방어]
+                </span>
+            </div>
+            <div class="math-final">
+                결과 = <strong>${Math.floor(finalVal).toLocaleString()}</strong>
+            </div>
+        `;
+    };
+
+    const formatTalentMath = (title, rawTalent, talentLabel, talentMult, normalProt, normalDef, finalVal) => {
+        return `
+            <div class="math-step">
+                <span class="math-step-num">1단계 기저데미지</span>
+                <span class="math-step-text">
+                    - ${talentLabel} 기저: <strong>${Math.floor(rawTalent).toLocaleString()}</strong> 데미지
+                </span>
+            </div>
+            <div class="math-step">
+                <span class="math-step-num">2단계 피어싱 & 보댐 적용</span>
+                <span class="math-step-text">
+                    - 최종 데미지 = ${Math.floor(rawTalent).toLocaleString()} &times; ${talentMult.toFixed(4)} [보너스대미지] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] - ${Math.floor(normalDef)} [적방어]
+                </span>
+            </div>
+            <div class="math-final">
+                결과 = <strong>${Math.floor(finalVal).toLocaleString()}</strong>
+            </div>
+        `;
+    };
+
     document.getElementById("math-sanctuary").innerHTML = 
-        `{ ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawSanctuary).toLocaleString()} [성역 기저데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] } &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(sanctuaryNormal).toLocaleString()}</strong>`;
+        formatArcanaOnlyMath("성역 전개", rawSanctuary, "성역", normalProtMult, equipBonusDmgMult, arcanaBonusDmgMult, reducedDefNormal, sanctuaryNormal);
 
     document.getElementById("math-ironwall").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.5).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawIronwallArcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(ironwallNormal).toLocaleString()}</strong>`;
+        formatArcanaMath("철벽 강타", rawWindmillDmg * 1.5, "윈드밀", normalBonusDmgMult, doubleProtMult, rawIronwallArcana, "아르카나", arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, ironwallNormal);
 
     document.getElementById("math-condemnation1").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation1Arcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(condemnation1Normal).toLocaleString()}</strong>`;
+        formatArcanaMath("단죄의 일격 1단계", rawWindmillDmg * 1.75, "윈드밀", normalBonusDmgMult, doubleProtMult, rawCondemnation1Arcana, "아르카나", arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation1Normal);
 
     document.getElementById("math-condemnation2").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation2Arcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(condemnation2Normal).toLocaleString()}</strong>`;
+        formatArcanaMath("단죄의 일격 2단계", rawWindmillDmg * 1.75, "윈드밀", normalBonusDmgMult, doubleProtMult, rawCondemnation2Arcana, "아르카나", arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation2Normal);
 
     document.getElementById("math-condemnation3").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawCondemnation3Arcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(condemnation3Normal).toLocaleString()}</strong>`;
+        formatArcanaMath("단죄의 일격 3단계", rawWindmillDmg * 1.75, "윈드밀", normalBonusDmgMult, doubleProtMult, rawCondemnation3Arcana, "아르카나", arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation3Normal);
 
     document.getElementById("math-judgment").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawWindmillDmg * 2.0).toLocaleString()} [윈밀 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawJudgmentArcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(judgmentNormal).toLocaleString()}</strong>`;
+        formatArcanaMath("심판의 일격", rawWindmillDmg * 2.0, "윈드밀", normalBonusDmgMult, doubleProtMult, rawJudgmentArcana, "아르카나", arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, judgmentNormal);
 
     document.getElementById("math-clash").innerHTML = 
-        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; { (${Math.floor(rawChargeDmg * 1.5).toLocaleString()} [돌진 파트 데미지]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] &times; ${doubleProtMult.toFixed(4)} [이중피어싱보호댐감] + (${Math.floor(rawClashArcana).toLocaleString()} [아르카나 파트 데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProtMult.toFixed(4)} [기본피어싱보호댐감] } &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(clashNormal).toLocaleString()}</strong>`;
+        formatArcanaMath("격돌", rawChargeDmg * 1.5, "돌진", normalBonusDmgMult, doubleProtMult, rawClashArcana, "아르카나", arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, clashNormal);
 
     document.getElementById("math-retribution").innerHTML = 
-        `{ ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawRetributionArcana).toLocaleString()} [응징 기저데미지]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] } &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(retributionNormal).toLocaleString()}</strong>`;
+        formatArcanaOnlyMath("희생의 응징", rawRetributionArcana, "응징", normalProtMult, equipBonusDmgMult, arcanaBonusDmgMult, reducedDefNormal, retributionNormal);
 
-    // 스매시 분해
     document.getElementById("math-smash").innerHTML = 
-        `( ${Math.floor(rawSmashDmg).toLocaleString()} [기저데미지] &times; ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] ) &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(smashDmg).toLocaleString()}</strong>`;
+        formatTalentMath("스매시", rawSmashDmg, "스매시", talentBonusDmgMult, normalProtMult, reducedDefNormal, smashDmg);
 
-    // 배쉬 분해
     document.getElementById("math-bash").innerHTML = 
-        `( ${Math.floor(rawBashSkillDmg).toLocaleString()} [기저데미지] &times; ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] ) &times; ${normalProtMult.toFixed(4)} [적보호댐감] - ${Math.floor(reducedDefNormal)} [적방어]<br>` +
-        `= <strong>${Math.floor(bashSkillDmg).toLocaleString()}</strong>`;
+        formatTalentMath("배쉬", rawBashSkillDmg, "배쉬", talentBonusDmgMult, normalProtMult, reducedDefNormal, bashSkillDmg);
 
     // 9. 빌드 비교 렌더링 수행
     updateComparisonUI(results);

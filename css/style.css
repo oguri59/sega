@@ -859,11 +859,43 @@ input:checked + .slider:before {
 }
 
 .math-resolve {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.5rem 0 0;
     font-size: 0.8rem;
-    font-weight: 600;
+    line-height: 1.4;
+    font-family: 'Outfit', 'Noto Sans KR', sans-serif;
     color: var(--text-primary);
-    font-family: 'Outfit', monospace;
-    word-break: break-all;
+}
+
+.math-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.math-step-num {
+    font-weight: 800;
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+
+.math-step-text {
+    word-break: keep-all;
+}
+
+.math-final {
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #ffffff;
 }
 
 /* 9. 푸터 */
