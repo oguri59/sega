@@ -165,13 +165,12 @@ function calculate() {
     const debuffPraga = document.getElementById("debuff-praga").checked;
     const debuffUpper = document.getElementById("debuff-upper").checked;
     const debuffJack = document.getElementById("debuff-jack").checked;
-    const debuffExploit = document.getElementById("debuff-exploit").checked;
     const debuffSonic = document.getElementById("debuff-sonic").checked;
-    const sonicStacks = parseInt(document.getElementById("debuff-sonic-stacks").value) || 0;
+    const sonicValue = parseFloat(document.getElementById("debuff-sonic-value").value) || 0;
 
-    // 급소 관통: 몬스터 보호의 11%를 감소 (비율 기반, 고정 깎기 전에 적용)
+    // 어퍼+급소 관통: 고정 -28 + 몬스터 보호의 11% 비율 감소
     let debuffProtPercent = 0;
-    if (debuffExploit) debuffProtPercent += 0.11;
+    if (debuffUpper) debuffProtPercent += 0.11;
     const protAfterPercent = Math.max(0, targetProt * (1 - debuffProtPercent));
 
     // 고정 보호 감소 디버프
@@ -182,7 +181,7 @@ function calculate() {
     if (debuffPraga) debuffProtFlat += 15;
     if (debuffUpper) debuffProtFlat += 28;
     if (debuffJack) debuffProtFlat += 4;
-    if (debuffSonic) debuffProtFlat += sonicStacks * 5;
+    if (debuffSonic) debuffProtFlat += sonicValue;
 
     // 무기 및 방패 효과
     const weaponKey = document.getElementById("equip-weapon").value;
