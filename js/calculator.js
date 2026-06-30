@@ -397,14 +397,14 @@ function calculate() {
         const arcanaPartDmg = Math.floor(rawArcana * arcanaDmgMult * normalProt);
         return `
             <div class="math-step">
-                <span class="math-step-num">1단계 기저데미지 계산</span>
+                <span class="math-step-num">1단계 계산</span>
                 <span class="math-step-text">
-                    - <strong>재능 파트 기저:</strong> ${talentFormula} = <strong>${Math.floor(rawTalent).toLocaleString()}</strong> 데미지<br>
-                    - <strong>아르카나 파트 기저:</strong> ${arcanaFormula} = <strong>${Math.floor(rawArcana).toLocaleString()}</strong> 데미지
+                    - <strong>재능 파트:</strong> ${talentFormula} = <strong>${Math.floor(rawTalent).toLocaleString()}</strong> 데미지<br>
+                    - <strong>아르카나 파트:</strong> ${arcanaFormula} = <strong>${Math.floor(rawArcana).toLocaleString()}</strong> 데미지
                 </span>
             </div>
             <div class="math-step">
-                <span class="math-step-num">2단계 피어싱 & 보댐 적용</span>
+                <span class="math-step-num">2단계 피어싱 보댐 적용</span>
                 <span class="math-step-text">
                     - 재능 파트: ${Math.floor(rawTalent).toLocaleString()} &times; ${talentMult.toFixed(4)} [일반보댐] &times; ${doubleProt.toFixed(4)} [이중피어싱 댐감율] = <strong>${talentPartDmg.toLocaleString()}</strong><br>
                     - 아르카나 파트: ${Math.floor(rawArcana).toLocaleString()} &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] = <strong>${arcanaPartDmg.toLocaleString()}</strong>
@@ -426,13 +426,13 @@ function calculate() {
         const arcanaPartDmg = Math.floor(rawArcana * arcanaDmgMult * normalProt);
         return `
             <div class="math-step">
-                <span class="math-step-num">1단계 기저데미지 계산</span>
+                <span class="math-step-num">1단계 계산</span>
                 <span class="math-step-text">
-                    - <strong>아르카나 기저:</strong> ${arcanaFormula} = <strong>${Math.floor(rawArcana).toLocaleString()}</strong> 데미지
+                    - <strong>아르카나 파트:</strong> ${arcanaFormula} = <strong>${Math.floor(rawArcana).toLocaleString()}</strong> 데미지
                 </span>
             </div>
             <div class="math-step">
-                <span class="math-step-num">2단계 피어싱 & 보댐 적용</span>
+                <span class="math-step-num">2단계 피어싱 보댐 적용</span>
                 <span class="math-step-text">
                     - 아르카나 파트: ${Math.floor(rawArcana).toLocaleString()} &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] = <strong>${arcanaPartDmg.toLocaleString()}</strong>
                 </span>
@@ -452,13 +452,13 @@ function calculate() {
     const formatTalentMath = (rawTalent, talentFormula, talentMult, normalProt, normalDef, finalVal) => {
         return `
             <div class="math-step">
-                <span class="math-step-num">1단계 기저데미지 계산</span>
+                <span class="math-step-num">1단계 계산</span>
                 <span class="math-step-text">
-                    - <strong>재능 기저:</strong> ${talentFormula} = <strong>${Math.floor(rawTalent).toLocaleString()}</strong> 데미지
+                    - <strong>재능 파트:</strong> ${talentFormula} = <strong>${Math.floor(rawTalent).toLocaleString()}</strong> 데미지
                 </span>
             </div>
             <div class="math-step">
-                <span class="math-step-num">2단계 피어싱 & 보댐 적용</span>
+                <span class="math-step-num">2단계 피어싱 보댐 적용</span>
                 <span class="math-step-text">
                     - 최종 데미지 = ${Math.floor(rawTalent).toLocaleString()} &times; ${talentMult.toFixed(4)} [보너스대미지] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] - ${Math.floor(normalDef)} [적방어]
                 </span>
