@@ -157,13 +157,29 @@ function calculate() {
     const debuffCart = document.getElementById("debuff-cart").checked;
     const debuffPraga = document.getElementById("debuff-praga").checked;
     const debuffUpper = document.getElementById("debuff-upper").checked;
+    const debuffUpperValue = parseFloat(document.getElementById("debuff-upper-value").value) || 0;
     const debuffJack = document.getElementById("debuff-jack").checked;
     const debuffSonic = document.getElementById("debuff-sonic").checked;
     const sonicValue = parseFloat(document.getElementById("debuff-sonic-value").value) || 0;
     const debuffDeathmarker = document.getElementById("debuff-deathmarker").checked;
+    const debuffDeathmarkerValue = parseFloat(document.getElementById("debuff-deathmarker-value").value) || 0;
+    const debuffDeathmarkerSaren = document.getElementById("debuff-deathmarker-saren").checked;
     const debuffMomo = document.getElementById("debuff-momo").checked;
 
-    // 어퍼+급소 관통: 고정 -28 + 몬스터 보호의 11% 비율 감소
+    // 데스 마커 및 어퍼 라벨 동적 갱신
+    const deathmarkerValueTotal = 53 + debuffDeathmarkerValue + (debuffDeathmarkerSaren ? 3 : 0);
+    const deathmarkerTotalValEl = document.getElementById("deathmarker-total-val");
+    if (deathmarkerTotalValEl) {
+        deathmarkerTotalValEl.textContent = deathmarkerValueTotal;
+    }
+
+    const upperValueTotal = 23 + debuffUpperValue;
+    const upperTotalFlatEl = document.getElementById("upper-total-flat");
+    if (upperTotalFlatEl) {
+        upperTotalFlatEl.textContent = upperValueTotal;
+    }
+
+    // 어퍼+급소 관통: 고정 -(23 + debuffUpperValue) + 몬스터 보호의 11% 비율 감소
     let debuffProtPercent = 0;
     if (debuffUpper) debuffProtPercent += 0.11;
     const protAfterPercent = Math.max(0, targetProt * (1 - debuffProtPercent));
@@ -174,13 +190,13 @@ function calculate() {
     if (debuffHades) debuffProtFlat += 10;
     if (debuffCart) debuffProtFlat += 3;
     if (debuffPraga) debuffProtFlat += 15;
-    if (debuffUpper) debuffProtFlat += 28;
+    if (debuffUpper) debuffProtFlat += upperValueTotal;
     if (debuffJack) debuffProtFlat += 4;
     if (debuffSonic) debuffProtFlat += sonicValue * 5;
 
     // 증댐 디버프
     let debuffgainFlat = 0;
-    if (debuffDeathmarker) debuffgainFlat += 58;
+    if (debuffDeathmarker) debuffgainFlat += deathmarkerValueTotal;
     if (debuffMomo) debuffgainFlat += 15;
 
     // 무기 및 방패 효과
@@ -382,7 +398,8 @@ function calculate() {
     const masterAbrasiveMult = buffMasterAbrasive ? 1.03 : 1.0;
     const leimMult = buffLeim ? (buffLeimMagigraff ? 1.18 : 1.15) : 1.0;
     const proPackMult = buffProPack ? 1.01 : 1.0;
-    const finalDmgMultiplier = (debuffDeathmarker ? 1.58 : 1.0) * (debuffMomo ? 1.15 : 1.0) * masterAbrasiveMult * leimMult * proPackMult;
+    const deathmarkerMultiplier = 1 + deathmarkerValueTotal / 100;
+    const finalDmgMultiplier = (debuffDeathmarker ? deathmarkerMultiplier : 1.0) * (debuffMomo ? 1.15 : 1.0) * masterAbrasiveMult * leimMult * proPackMult;
 
     // 성찰의 흔적 데미지 증가배율 (희생의 응징 유물 레벨당 *0.5% 증가, 기본 10%)
     const reflectionTracePct = 10 + relicRetribution * 0.5;
@@ -514,7 +531,7 @@ function calculate() {
             mults.push(`${f(reflectionMult, 3)} [성찰의 흔적 (+${f(pct, 1)}%)]`);
         }
         if (debuffDeathmarker) {
-            mults.push(`1.58 [데스 마커]`);
+            mults.push(`${f(deathmarkerMultiplier)} [데스 마커]`);
         }
         if (debuffMomo) {
             mults.push(`1.15 [모모]`);
@@ -575,7 +592,7 @@ function calculate() {
             mults.push(`${f(reflectionMult, 3)} [성찰의 흔적 (+${f(pct, 1)}%)]`);
         }
         if (debuffDeathmarker) {
-            mults.push(`1.58 [데스 마커]`);
+            mults.push(`${f(deathmarkerMultiplier)} [데스 마커]`);
         }
         if (debuffMomo) {
             mults.push(`1.15 [모모]`);
@@ -627,7 +644,7 @@ function calculate() {
 
         let mults = [];
         if (debuffDeathmarker) {
-            mults.push(`1.58 [데스 마커]`);
+            mults.push(`${f(deathmarkerMultiplier)} [데스 마커]`);
         }
         if (debuffMomo) {
             mults.push(`1.15 [모모]`);
