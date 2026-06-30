@@ -435,9 +435,10 @@ function calculate() {
     const clashNormal = Math.max(0, equipBonusDmgMult * ((rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const clashCrit = clashNormal * critMult;
 
-    // [5] 희생의 응징: (링크보너스 최종데미지 15% 증가 즉 1.15배 곱)
+    // [5] 희생의 응징: (링크보너스 최종데미지 15% 증가 즉 1.15배 곱, 성찰의 흔적 버프 기본 적용)
+    const retributionReflectionMult = 1 + (10 + relicRetribution * 0.5) / 100;
     const rawRetributionArcana = (res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
-    const retributionNormal = Math.max(0, equipBonusDmgMult * (rawRetributionArcana * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * reflectionTraceMult;
+    const retributionNormal = Math.max(0, equipBonusDmgMult * (rawRetributionArcana * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * retributionReflectionMult;
     const retributionCrit = retributionNormal * critMult;
 
     // 7. UI 결과값 업데이트
@@ -651,7 +652,7 @@ function calculate() {
         formatArcanaMath(rawChargeDmg * 1.5, clashTalentFormula, normalBonusDmgMult, doubleProtMult, rawClashArcana, clashArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, clashNormal, 1.0, reflectionTraceMult, relicRetribution);
 
     document.getElementById("math-retribution").innerHTML =
-        formatArcanaOnlyMath(rawRetributionArcana, retributionFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, retributionNormal, 1.15, reflectionTraceMult, relicRetribution);
+        formatArcanaOnlyMath(rawRetributionArcana, retributionFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, retributionNormal, 1.15, retributionReflectionMult, relicRetribution);
 
     document.getElementById("math-smash").innerHTML =
         formatTalentMath(rawSmashDmg, smashFormula, talentBonusDmgMult, normalProtMult, reducedDefNormal, smashDmg);
