@@ -212,6 +212,11 @@ function calculate() {
     const potionActive = document.querySelector("input[name='buff-potion']:checked").value === "1";
     const bashVal = parseFloat(document.getElementById("buff-bash").value) || 0;
 
+    // 유물 레벨 및 성찰의 흔적 파싱
+    const relicRetribution = parseInt(document.getElementById("relic-retribution").value) || 0;
+    const relicJudgment = parseInt(document.getElementById("relic-judgment").value) || 0;
+    const buffReflectionTrace = document.getElementById("buff-reflection-trace").checked;
+
     // 베이스 스킬 입력
     const windmillRankVal = parseFloat(document.getElementById("skill-windmill-rank").value) || 0;
     const windmillReforge = parseFloat(document.getElementById("skill-windmill-reforge").value) || 0;
@@ -350,6 +355,10 @@ function calculate() {
     // 최종데미지 증댐 디버프 배율 (곱연산)
     const finalDmgMultiplier = (debuffDeathmarker ? 1.58 : 1.0) * (debuffMomo ? 1.15 : 1.0);
 
+    // 성찰의 흔적 데미지 증가배율 (희생의 응징 유물 레벨당 *0.5% 증가, 기본 10%)
+    const reflectionTracePct = 10 + relicRetribution * 0.5;
+    const reflectionTraceMult = buffReflectionTrace ? (1 + reflectionTracePct / 100) : 1.0;
+
     // 윈드밀 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawWindmillDmg = res0 *
         baseWindmillMult *
@@ -393,42 +402,42 @@ function calculate() {
 
     // [1] 성역 전개: (링크보너스 최종데미지 100% 증가 즉 2.0배 곱)
     const rawSanctuary = res0 * 3.0 + finalDef * 1.5 + finalHp * 0.2;
-    const sanctuaryNormal = Math.max(0, equipBonusDmgMult * (rawSanctuary * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal) * 2.0 * finalDmgMultiplier;
+    const sanctuaryNormal = Math.max(0, equipBonusDmgMult * (rawSanctuary * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal) * 2.0 * finalDmgMultiplier * reflectionTraceMult;
     const sanctuaryCrit = sanctuaryNormal * critMult;
 
     // [2] 철벽 강타:
     const rawIronwallArcana = res0 * 12.0 + finalDef * 6.0 + finalHp * 1.0;
-    const ironwallNormal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier;
+    const ironwallNormal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const ironwallCrit = ironwallNormal * critMult;
 
     // [2.5] 단죄의 일격 1단계:
     const rawCondemnation1Arcana = res0 * 15.0 + finalDef * 9.0 + finalHp * 1.5;
-    const condemnation1Normal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier;
+    const condemnation1Normal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const condemnation1Crit = condemnation1Normal * critMult;
 
     // [2.6] 단죄의 일격 2단계:
     const rawCondemnation2Arcana = res0 * 22.5 + finalDef * 13.5 + finalHp * 2.25;
-    const condemnation2Normal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier;
+    const condemnation2Normal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const condemnation2Crit = condemnation2Normal * critMult;
 
     // [2.7] 단죄의 일격 3단계:
     const rawCondemnation3Arcana = res0 * 30.0 + finalDef * 18.0 + finalHp * 3.0;
-    const condemnation3Normal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier;
+    const condemnation3Normal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const condemnation3Crit = condemnation3Normal * critMult;
 
-    // [3] 심판의 일격: (링크보너스 최종데미지 20% 증가 즉 1.2배 곱)
-    const rawJudgmentArcana = res0 * 35.0 + finalDef * 20.0 + finalHp * 5.0;
-    const judgmentNormal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier;
+    // [3] 심판의 일격: (링크보너스 최종데미지 20% 증가 즉 1.2배 곱, 심판 유물레벨당 맥댐계수 +100% 합산)
+    const rawJudgmentArcana = res0 * (35.0 + relicJudgment * 1.0) + finalDef * 20.0 + finalHp * 5.0;
+    const judgmentNormal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier * reflectionTraceMult;
     const judgmentCrit = judgmentNormal * critMult;
 
     // [4] 격돌:
     const rawClashArcana = res0 * 8.0 + finalDef * 6.0 + finalHp * 0.5;
-    const clashNormal = Math.max(0, equipBonusDmgMult * ((rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier;
+    const clashNormal = Math.max(0, equipBonusDmgMult * ((rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * arcanaBonusDmgMult * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const clashCrit = clashNormal * critMult;
 
     // [5] 희생의 응징: (링크보너스 최종데미지 15% 증가 즉 1.15배 곱)
     const rawRetributionArcana = (res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
-    const retributionNormal = Math.max(0, equipBonusDmgMult * (rawRetributionArcana * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal) * 1.15 * finalDmgMultiplier;
+    const retributionNormal = Math.max(0, equipBonusDmgMult * (rawRetributionArcana * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * reflectionTraceMult;
     const retributionCrit = retributionNormal * critMult;
 
     // 7. UI 결과값 업데이트
@@ -453,7 +462,7 @@ function calculate() {
     });
 
     // 8. 데미지 공식 상세 분해 렌더링
-    const formatArcanaMath = (rawTalent, talentFormula, talentMult, doubleProt, rawArcana, arcanaFormula, arcanaDmgMult, normalProt, equipMult, normalDef, finalVal, linkBonus = 1.0) => {
+    const formatArcanaMath = (rawTalent, talentFormula, talentMult, doubleProt, rawArcana, arcanaFormula, arcanaDmgMult, normalProt, equipMult, normalDef, finalVal, linkBonus = 1.0, reflectionMult = 1.0, relicRetLevel = 0) => {
         const talentPartDmg = Math.floor(rawTalent * talentMult * doubleProt);
         const arcanaPartDmg = Math.floor(rawArcana * arcanaDmgMult * normalProt);
         const baseFinalDmg = Math.max(0, equipMult * (talentPartDmg + arcanaPartDmg) * arcanaDmgMult - Math.floor(normalDef));
@@ -463,6 +472,10 @@ function calculate() {
         let mults = [];
         if (linkBonus !== 1.0) {
             mults.push(`${linkBonus.toFixed(2)} [링크 보너스]`);
+        }
+        if (reflectionMult !== 1.0) {
+            const pct = 10 + relicRetLevel * 0.5;
+            mults.push(`${reflectionMult.toFixed(3)} [성찰의 흔적 (+${pct}%)]`);
         }
         if (debuffDeathmarker) {
             mults.push(`1.58 [데스 마커]`);
@@ -502,7 +515,7 @@ function calculate() {
         `;
     };
 
-    const formatArcanaOnlyMath = (rawArcana, arcanaFormula, arcanaDmgMult, normalProt, equipMult, normalDef, finalVal, linkBonus = 1.0) => {
+    const formatArcanaOnlyMath = (rawArcana, arcanaFormula, arcanaDmgMult, normalProt, equipMult, normalDef, finalVal, linkBonus = 1.0, reflectionMult = 1.0, relicRetLevel = 0) => {
         const arcanaPartDmg = Math.floor(rawArcana * arcanaDmgMult * normalProt);
         const baseFinalDmg = Math.max(0, equipMult * arcanaPartDmg * arcanaDmgMult - Math.floor(normalDef));
 
@@ -511,6 +524,10 @@ function calculate() {
         let mults = [];
         if (linkBonus !== 1.0) {
             mults.push(`${linkBonus.toFixed(2)} [링크 보너스]`);
+        }
+        if (reflectionMult !== 1.0) {
+            const pct = 10 + relicRetLevel * 0.5;
+            mults.push(`${reflectionMult.toFixed(3)} [성찰의 흔적 (+${pct}%)]`);
         }
         if (debuffDeathmarker) {
             mults.push(`1.58 [데스 마커]`);
@@ -600,7 +617,7 @@ function calculate() {
     const condemnation3ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 30.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 18.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 3.0`;
 
     const judgmentTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseWindmillMult.toFixed(4)} [윈밀계수] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카] &times; 2.0 [심판배율]`;
-    const judgmentArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 35.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 20.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 5.0`;
+    const judgmentArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${(35.0 + relicJudgment * 1.0).toFixed(1)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 20.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 5.0`;
 
     const clashTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseChargeMult.toFixed(4)} [돌진계수] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카] &times; 1.5 [격돌배율]`;
     const clashArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 8.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 6.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 0.5`;
@@ -613,28 +630,28 @@ function calculate() {
 
 
     document.getElementById("math-sanctuary").innerHTML =
-        formatArcanaOnlyMath(rawSanctuary, sanctuaryFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, sanctuaryNormal, 2.0);
+        formatArcanaOnlyMath(rawSanctuary, sanctuaryFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, sanctuaryNormal, 2.0, reflectionTraceMult, relicRetribution);
 
     document.getElementById("math-ironwall").innerHTML =
-        formatArcanaMath(rawWindmillDmg * 1.5, ironwallTalentFormula, normalBonusDmgMult, doubleProtMult, rawIronwallArcana, ironwallArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, ironwallNormal);
+        formatArcanaMath(rawWindmillDmg * 1.5, ironwallTalentFormula, normalBonusDmgMult, doubleProtMult, rawIronwallArcana, ironwallArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, ironwallNormal, 1.0, reflectionTraceMult, relicRetribution);
 
     document.getElementById("math-condemnation1").innerHTML =
-        formatArcanaMath(rawWindmillDmg * 1.75, condemnation1TalentFormula, normalBonusDmgMult, doubleProtMult, rawCondemnation1Arcana, condemnation1ArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation1Normal);
+        formatArcanaMath(rawWindmillDmg * 1.75, condemnation1TalentFormula, normalBonusDmgMult, doubleProtMult, rawCondemnation1Arcana, condemnation1ArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation1Normal, 1.0, reflectionTraceMult, relicRetribution);
 
     document.getElementById("math-condemnation2").innerHTML =
-        formatArcanaMath(rawWindmillDmg * 1.75, condemnation2TalentFormula, normalBonusDmgMult, doubleProtMult, rawCondemnation2Arcana, condemnation2ArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation2Normal);
+        formatArcanaMath(rawWindmillDmg * 1.75, condemnation2TalentFormula, normalBonusDmgMult, doubleProtMult, rawCondemnation2Arcana, condemnation2ArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation2Normal, 1.0, reflectionTraceMult, relicRetribution);
 
     document.getElementById("math-condemnation3").innerHTML =
-        formatArcanaMath(rawWindmillDmg * 1.75, condemnation3TalentFormula, normalBonusDmgMult, doubleProtMult, rawCondemnation3Arcana, condemnation3ArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation3Normal);
+        formatArcanaMath(rawWindmillDmg * 1.75, condemnation3TalentFormula, normalBonusDmgMult, doubleProtMult, rawCondemnation3Arcana, condemnation3ArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation3Normal, 1.0, reflectionTraceMult, relicRetribution);
 
     document.getElementById("math-judgment").innerHTML =
-        formatArcanaMath(rawWindmillDmg * 2.0, judgmentTalentFormula, normalBonusDmgMult, doubleProtMult, rawJudgmentArcana, judgmentArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, judgmentNormal, 1.2);
+        formatArcanaMath(rawWindmillDmg * 2.0, judgmentTalentFormula, normalBonusDmgMult, doubleProtMult, rawJudgmentArcana, judgmentArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, judgmentNormal, 1.2, reflectionTraceMult, relicRetribution);
 
     document.getElementById("math-clash").innerHTML =
-        formatArcanaMath(rawChargeDmg * 1.5, clashTalentFormula, normalBonusDmgMult, doubleProtMult, rawClashArcana, clashArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, clashNormal);
+        formatArcanaMath(rawChargeDmg * 1.5, clashTalentFormula, normalBonusDmgMult, doubleProtMult, rawClashArcana, clashArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, clashNormal, 1.0, reflectionTraceMult, relicRetribution);
 
     document.getElementById("math-retribution").innerHTML =
-        formatArcanaOnlyMath(rawRetributionArcana, retributionFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, retributionNormal, 1.15);
+        formatArcanaOnlyMath(rawRetributionArcana, retributionFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, retributionNormal, 1.15, reflectionTraceMult, relicRetribution);
 
     document.getElementById("math-smash").innerHTML =
         formatTalentMath(rawSmashDmg, smashFormula, talentBonusDmgMult, normalProtMult, reducedDefNormal, smashDmg);

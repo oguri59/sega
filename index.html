@@ -246,6 +246,45 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="relic-section" style="margin-top: 1rem; border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 1rem;">
+                            <h3 style="font-size: 0.9rem; color: #ffd700; display: flex; align-items: center; gap: 0.3rem; font-family: 'Noto Sans KR', sans-serif; margin: 0 0 0.8rem 0;">
+                                <span>🏺</span> 유물 레벨 설정
+                            </h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label for="relic-retribution" style="font-size: 0.78rem; color: #ccc; font-family: 'Noto Sans KR', sans-serif;">희생의 응징 유물</label>
+                                    <select id="relic-retribution" style="padding: 0.2rem; font-size: 0.8rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; width: 100%;">
+                                        <option value="0" selected>없음</option>
+                                        <option value="1">1레벨 (+0.5%)</option>
+                                        <option value="2">2레벨 (+1.0%)</option>
+                                        <option value="3">3레벨 (+1.5%)</option>
+                                        <option value="4">4레벨 (+2.0%)</option>
+                                        <option value="5">5레벨 (+2.5%)</option>
+                                        <option value="6">6레벨 (+3.0%)</option>
+                                        <option value="7">7레벨 (+3.5%)</option>
+                                        <option value="8">8레벨 (+4.0%)</option>
+                                        <option value="9">9레벨 (+4.5%)</option>
+                                        <option value="10">10레벨 (+5.0%)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label for="relic-judgment" style="font-size: 0.78rem; color: #ccc; font-family: 'Noto Sans KR', sans-serif;">심판의 일격 유물</label>
+                                    <select id="relic-judgment" style="padding: 0.2rem; font-size: 0.8rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; width: 100%;">
+                                        <option value="0" selected>없음</option>
+                                        <option value="1">1레벨 (+100%)</option>
+                                        <option value="2">2레벨 (+200%)</option>
+                                        <option value="3">3레벨 (+300%)</option>
+                                        <option value="4">4레벨 (+400%)</option>
+                                        <option value="5">5레벨 (+500%)</option>
+                                        <option value="6">6레벨 (+600%)</option>
+                                        <option value="7">7레벨 (+700%)</option>
+                                        <option value="8">8레벨 (+800%)</option>
+                                        <option value="9">9레벨 (+900%)</option>
+                                        <option value="10">10레벨 (+1000%)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -449,7 +488,13 @@
 
                 <!-- 2. 세이크리드 가드 액티브 스킬 결과 -->
                 <div class="results-group">
-                    <div class="group-title">🛡️ 세이크리드 가드 아르카나 스킬</div>
+                    <div class="group-title" style="display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; padding-right: 0.5rem;">
+                        <span>🛡️ 세이크리드 가드 아르카나 스킬</span>
+                        <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 4px; padding: 0.2rem 0.5rem; text-shadow: none; font-weight: normal; margin-left: auto;">
+                            <input type="checkbox" id="buff-reflection-trace" checked>
+                            <span style="color: #ffd700; font-weight: 600;">성찰의 흔적</span>
+                        </label>
+                    </div>
 
                     <!-- 성역 전개 결과 카드 -->
                     <div class="skill-result-card theme-sanctuary">
