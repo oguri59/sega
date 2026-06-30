@@ -742,23 +742,16 @@ input:checked + .slider:before {
 /* 비교 뱃지 */
 .compare-badge {
     position: absolute;
-    right: 1.5rem;
-    top: 0.75rem;
+    right: 0.75rem;
+    top: 0.5rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 0.25rem 0.5rem;
+    padding: 0.15rem 0.35rem;
     border-radius: var(--border-radius-sm);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 800;
     font-family: 'Outfit', sans-serif;
-}
-
-@media (min-width: 640px) {
-    .compare-badge {
-        position: relative;
-        right: 0;
-        top: 0;
-    }
+    z-index: 5;
 }
 
 .compare-badge.positive {
