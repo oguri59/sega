@@ -619,8 +619,16 @@ input:checked + .slider:before {
     cursor: pointer;
 }
 
+/* 카드 내부 메인 요약 영역 레이아웃 */
+.card-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
 @media (min-width: 640px) {
-    .skill-result-card {
+    .card-main-content {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
@@ -632,6 +640,27 @@ input:checked + .slider:before {
     transform: translateY(-2px);
     border-color: rgba(var(--card-theme-color), 0.3);
     box-shadow: 0 8px 24px rgba(var(--card-theme-color), 0.08);
+}
+
+/* 확장 상태의 결과 카드 스타일 */
+.skill-result-card.expanded {
+    border-color: rgba(var(--card-theme-color), 0.5) !important;
+    background: rgba(30, 24, 45, 0.6) !important;
+    box-shadow: 0 8px 24px rgba(var(--card-theme-color), 0.15) !important;
+}
+
+/* 카드 내부 상세 분해 아코디언 */
+.card-breakdown {
+    width: 100%;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .skill-result-card::before {

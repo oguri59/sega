@@ -480,172 +480,195 @@
 
                     <!-- 성역 전개 결과 카드 -->
                     <div class="skill-result-card theme-sanctuary" data-skill="sanctuary">
-                        <div class="skill-info">
-                            <span class="skill-name">성역 전개 (Sanctuary)</span>
-                            <span class="skill-formula-summary">계수: 맥댐 300% + 방어 150% + 생명 20%</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-sanctuary-normal">0</span>
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">성역 전개 (Sanctuary)</span>
+                                <span class="skill-formula-summary">계수: 맥댐 300% + 방어 150% + 생명 20%</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-sanctuary-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-sanctuary-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-sanctuary-crit">0</span>
+                                </div>
+                            </div>
+                            <!-- 빌드 비교치 수치 -->
+                            <div class="compare-badge hidden" id="compare-sanctuary">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <!-- 빌드 비교치 수치 -->
-                        <div class="compare-badge hidden" id="compare-sanctuary">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-sanctuary"></div>
                     </div>
 
                     <!-- 철벽 강타 결과 카드 -->
                     <div class="skill-result-card theme-ironwall" data-skill="ironwall">
-                        <div class="skill-info">
-                            <span class="skill-name">철벽 강타 (Iron Wall Strike)</span>
-                            <span class="skill-formula-summary">계수: 윈드밀 150% + 맥댐 1200% + 방어 600% + 생명 100%</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-ironwall-normal">0</span>
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">철벽 강타 (Iron Wall Strike)</span>
+                                <span class="skill-formula-summary">계수: 윈드밀 150% + 맥댐 1200% + 방어 600% + 생명 100%</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-ironwall-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-ironwall-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-ironwall-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-ironwall">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-ironwall">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-ironwall"></div>
                     </div>
 
                     <!-- 단죄의 일격 1단계 결과 카드 -->
                     <div class="skill-result-card theme-condemnation" data-skill="condemnation1">
-                        <div class="skill-info">
-                            <span class="skill-name">단죄의 일격 1단계 (Condemnation 1)</span>
-                            <span class="skill-formula-summary">계수: 윈드밀 175% + 맥댐 1500% + 방어 900% + 생명 150%</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-condemnation1-normal">0</span>
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">단죄의 일격 1단계 (Condemnation 1)</span>
+                                <span class="skill-formula-summary">계수: 윈드밀 175% + 맥댐 1500% + 방어 900% + 생명 150%</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-condemnation1-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-condemnation1-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-condemnation1-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-condemnation1">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-condemnation1">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-condemnation1"></div>
                     </div>
 
                     <!-- 단죄의 일격 2단계 결과 카드 -->
                     <div class="skill-result-card theme-condemnation" data-skill="condemnation2">
-                        <div class="skill-info">
-                            <span class="skill-name">단죄의 일격 2단계 (Condemnation 2)</span>
-                            <span class="skill-formula-summary">계수: 윈드밀 175% + 맥댐 2250% + 방어 1350% + 생명 225%</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-condemnation2-normal">0</span>
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">단죄의 일격 2단계 (Condemnation 2)</span>
+                                <span class="skill-formula-summary">계수: 윈드밀 175% + 맥댐 2250% + 방어 1350% + 생명 225%</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-condemnation2-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-condemnation2-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-condemnation2-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-condemnation2">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-condemnation2">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-condemnation2"></div>
                     </div>
 
                     <!-- 단죄의 일격 3단계 결과 카드 -->
                     <div class="skill-result-card theme-condemnation" data-skill="condemnation3">
-                        <div class="skill-info">
-                            <span class="skill-name">단죄의 일격 3단계 (Condemnation 3)</span>
-                            <span class="skill-formula-summary">계수: 윈드밀 175% + 맥댐 3000% + 방어 1800% + 생명 300%</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-condemnation3-normal">0</span>
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">단죄의 일격 3단계 (Condemnation 3)</span>
+                                <span class="skill-formula-summary">계수: 윈드밀 175% + 맥댐 3000% + 방어 1800% + 생명 300%</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-condemnation3-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-condemnation3-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-condemnation3-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-condemnation3">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-condemnation3">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-condemnation3"></div>
                     </div>
 
                     <!-- 심판의 일격 결과 카드 -->
                     <div class="skill-result-card theme-judgment" data-skill="judgment">
-                        <div class="skill-info">
-                            <span class="skill-name">심판의 일격 (Judgment Strike)</span>
-                            <span class="skill-formula-summary">계수: 윈드밀 200% + 맥댐 3500% + 방어 2000% + 생명 500%</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-judgment-normal">0</span>
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">심판의 일격 (Judgment Strike)</span>
+                                <span class="skill-formula-summary">계수: 윈드밀 200% + 맥댐 3500% + 방어 2000% + 생명 500%</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-judgment-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-judgment-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-judgment-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-judgment">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-judgment">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-judgment"></div>
                     </div>
 
                     <!-- 격돌 결과 카드 -->
                     <div class="skill-result-card theme-clash" data-skill="clash">
-                        <div class="skill-info">
-                            <span class="skill-name">격돌 (Clash)</span>
-                            <span class="skill-formula-summary">계수: 돌진 150% + 맥댐 800% + 방어 600% + 생명 50%</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-clash-normal">0</span>
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">격돌 (Clash)</span>
+                                <span class="skill-formula-summary">계수: 돌진 150% + 맥댐 800% + 방어 600% + 생명 50%</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-clash-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-clash-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-clash-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-clash">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-clash">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-clash"></div>
                     </div>
 
                     <!-- 희생의 응징 결과 카드 -->
                     <div class="skill-result-card theme-sacrifice" data-skill="retribution">
-                        <div class="skill-info">
-                            <span class="skill-name">희생의 응징 (Retribution)</span>
-                            <span class="skill-formula-summary">계수: (맥댐 6000% + 방어 4000% + 생명 1500%) * (1 +
-                                방패감소율)</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-retribution-normal">0</span>
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">희생의 응징 (Retribution)</span>
+                                <span class="skill-formula-summary">계수: (맥댐 6000% + 방어 4000% + 생명 1500%) * (1 + 방패감소율)</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-retribution-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-retribution-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-retribution-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-retribution">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-retribution">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-retribution"></div>
                     </div>
                 </div>
 
@@ -654,87 +677,99 @@
                     <div class="group-title">재능 스킬</div>
 
                     <!-- 윈드밀 결과 카드 -->
-                    <div class="skill-result-card theme-base">
-                        <div class="skill-info">
-                            <span class="skill-name">윈드밀 (Windmill)</span>
-                            <span class="skill-formula-summary">세가 스킬 연산의 뼈대가 되는 기본 윈드밀 대미지</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-windmill-normal">0</span>
+                    <div class="skill-result-card theme-base" data-skill="windmill">
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">윈드밀 (Windmill)</span>
+                                <span class="skill-formula-summary">세가 스킬 연산의 뼈대가 되는 기본 윈드밀 대미지</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-windmill-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-windmill-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-windmill-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-windmill">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-windmill">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-windmill"></div>
                     </div>
 
                     <!-- 돌진 결과 카드 -->
-                    <div class="skill-result-card theme-base">
-                        <div class="skill-info">
-                            <span class="skill-name">돌진 (Charge)</span>
-                            <span class="skill-formula-summary">돌진 대미지</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-charge-normal">0</span>
+                    <div class="skill-result-card theme-base" data-skill="charge">
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">돌진 (Charge)</span>
+                                <span class="skill-formula-summary">돌진 대미지</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-charge-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-charge-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-charge-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-charge">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-charge">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-charge"></div>
                     </div>
 
                     <!-- 스매시 결과 카드 -->
-                    <div class="skill-result-card theme-base">
-                        <div class="skill-info">
-                            <span class="skill-name">스매시 (Smash)</span>
-                            <span class="skill-formula-summary">스매시 대미지</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-smash-normal">0</span>
+                    <div class="skill-result-card theme-base" data-skill="smash">
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">스매시 (Smash)</span>
+                                <span class="skill-formula-summary">스매시 대미지</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-smash-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-smash-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-smash-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-smash">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-smash">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-smash"></div>
                     </div>
 
                     <!-- 배쉬 결과 카드 -->
-                    <div class="skill-result-card theme-base">
-                        <div class="skill-info">
-                            <span class="skill-name">배쉬 (Bash)</span>
-                            <span class="skill-formula-summary">배쉬 대미지</span>
-                        </div>
-                        <div class="dmg-values">
-                            <div class="dmg-col">
-                                <span class="dmg-label">일반 대미지</span>
-                                <span class="dmg-val text-normal" id="dmg-bash-normal">0</span>
+                    <div class="skill-result-card theme-base" data-skill="bash">
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">배쉬 (Bash)</span>
+                                <span class="skill-formula-summary">배쉬 대미지</span>
                             </div>
-                            <div class="dmg-col">
-                                <span class="dmg-label text-crit-label">크리티컬</span>
-                                <span class="dmg-val text-crit" id="dmg-bash-crit">0</span>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label">일반 대미지</span>
+                                    <span class="dmg-val text-normal" id="dmg-bash-normal">0</span>
+                                </div>
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-bash-crit">0</span>
+                                </div>
+                            </div>
+                            <div class="compare-badge hidden" id="compare-bash">
+                                <span class="compare-val">0%</span>
                             </div>
                         </div>
-                        <div class="compare-badge hidden" id="compare-bash">
-                            <span class="compare-val">0%</span>
-                        </div>
+                        <div class="card-breakdown hidden" id="card-math-bash"></div>
                     </div>
                 </div>
 
@@ -755,124 +790,6 @@
                     </div>
                 </div>
 
-                <!-- 5. 데미지 공식 상세 분해 보기 (Accordion) -->
-                <div class="card breakdown-card">
-                    <div class="card-header collapse-trigger" id="breakdown-toggle">
-                        <h2>데미지 상세 연산 내역 보기 (공식 분해)</h2>
-                        <span class="arrow-icon">▼</span>
-                    </div>
-                    <div class="card-body collapse-content hidden" id="breakdown-content">
-                        <!-- 성역 전개 분해 -->
-                        <div class="breakdown-item">
-                            <h3>성역 전개</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (맥댐 * 3.0 + 방어 * 1.5 + 생명 * 0.2) * 아르카나보댐 ]
-                                    * 아르카나보댐</span>
-                                <div class="math-resolve" id="math-sanctuary">
-                                    0 * 3.0 + 0 * 1.5 + 0 * 0.2 = 0
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 철벽 강타 분해 -->
-                        <div class="breakdown-item">
-                            <h3>철벽 강타</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.5) * 일반보댐 + (맥댐 * 12.0 + 방어 * 6.0
-                                    + 생명 * 1.0) * 아르카나보댐 ] * 아르카나보댐</span>
-                                <div class="math-resolve" id="math-ironwall">
-                                    0 * 1.5 + 0 * 12.0 + 0 * 6.0 + 0 * 1.0 = 0
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 단죄의 일격 1단계 분해 -->
-                        <div class="breakdown-item">
-                            <h3>단죄의 일격 1단계</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 15.0 + 방어 * 9.0
-                                    + 생명 * 1.5) * 아르카나보댐 ] * 아르카나보댐</span>
-                                <div class="math-resolve" id="math-condemnation1">
-                                    0 * 1.75 + 0 * 15.0 + 0 * 9.0 + 0 * 1.5 = 0
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 단죄의 일격 2단계 분해 -->
-                        <div class="breakdown-item">
-                            <h3>단죄의 일격 2단계</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 22.5 + 방어 *
-                                    13.5 + 생명 * 2.25) * 아르카나보댐 ] * 아르카나보댐</span>
-                                <div class="math-resolve" id="math-condemnation2">
-                                    0 * 1.75 + 0 * 22.5 + 0 * 13.5 + 0 * 2.25 = 0
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 단죄의 일격 3단계 분해 -->
-                        <div class="breakdown-item">
-                            <h3>단죄의 일격 3단계</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 30.0 + 방어 *
-                                    18.0 + 생명 * 3.0) * 아르카나보댐 ] * 아르카나보댐</span>
-                                <div class="math-resolve" id="math-condemnation3">
-                                    0 * 1.75 + 0 * 30.0 + 0 * 18.0 + 0 * 3.0 = 0
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 심판의 일격 분해 -->
-                        <div class="breakdown-item">
-                            <h3>심판의 일격</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 2.0) * 일반보댐 + (맥댐 * 35.0 + 방어 * 20.0
-                                    + 생명 * 5.0) * 아르카나보댐 ] * 아르카나보댐</span>
-                                <div class="math-resolve" id="math-judgment">
-                                    0 * 2.0 + 0 * 35.0 + 0 * 20.0 + 0 * 5.0 = 0
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 격돌 분해 -->
-                        <div class="breakdown-item">
-                            <h3>격돌</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (돌진 * 1.5) * 일반보댐 + (맥댐 * 8.0 + 방어 * 6.0 +
-                                    생명 * 0.5) * 아르카나보댐 ] * 아르카나보댐</span>
-                                <div class="math-resolve" id="math-clash">
-                                    0 * 1.5 + 0 * 8.0 + 0 * 6.0 + 0 * 0.5 = 0
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 희생의 응징 분해 -->
-                        <div class="breakdown-item">
-                            <h3>희생의 응징</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 장비보댐 * [ ((맥댐 * 60.0 + 방어 * 40.0 + 생명 * 15.0) * (1 +
-                                    방패감소율)) * 아르카나보댐 ] * 아르카나보댐</span>
-                                <div class="math-resolve" id="math-retribution">
-                                    0 * 60.0 + 0 * 40.0 + 0 * 15.0 = 0
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 스매시 분해 -->
-                        <div class="breakdown-item">
-                            <h3>스매시</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 맥댐 * 스매시배율 * 양손검보너스 * 스매강세트 * 배쉬 * 라데카 * 장비보댐 *
-                                    일반보댐</span>
-                                <div class="math-resolve" id="math-smash">
-                                    0 * 6.2 * 1.0 * 1.0 * 1.0 * 1.0 * 1.0 = 0
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 배쉬 분해 -->
-                        <div class="breakdown-item">
-                            <h3>배쉬</h3>
-                            <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 맥댐 * 배쉬배율 * 라데카 * 장비보댐 * 일반보댐</span>
-                                <div class="math-resolve" id="math-bash">
-                                    0 * 5.0 * 1.0 * 1.0 = 0
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </section>
         </main>
 

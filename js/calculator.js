@@ -9,7 +9,6 @@ let savedBuild = null;
 document.addEventListener("DOMContentLoaded", () => {
     initDropdowns();
     setupEventListeners();
-    initAccordion();
     setupSkillCardBreakdownToggles();
     calculate(); // 초기 연산 수행
 });
@@ -128,20 +127,6 @@ function setupEventListeners() {
     document.getElementById("btn-reset-build").addEventListener("click", resetBuildComparison);
 }
 
-// 아코디언 토글
-function initAccordion() {
-    const trigger = document.getElementById("breakdown-toggle");
-    const content = document.getElementById("breakdown-content");
-
-    trigger.addEventListener("click", () => {
-        const isActive = trigger.classList.toggle("active");
-        if (isActive) {
-            content.classList.remove("hidden");
-        } else {
-            content.classList.add("hidden");
-        }
-    });
-}
 
 // 데미지 및 스탯 핵심 연산
 function calculate() {
@@ -631,34 +616,43 @@ function calculate() {
     const bashFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseBashMult.toFixed(4)} [배쉬배율] &times; ${(1 + weaponBashBonus).toFixed(2)} [아이템 보너스] &times; ${ladecaMult.toFixed(2)} [라데카]`;
 
 
-    document.getElementById("math-sanctuary").innerHTML =
+    const windmillFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseWindmillMult.toFixed(4)} [윈밀배율] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카]`;
+    const chargeFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${baseChargeMult.toFixed(4)} [돌진배율] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카]`;
+
+    document.getElementById("card-math-sanctuary").innerHTML =
         formatArcanaOnlyMath(rawSanctuary, sanctuaryFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, sanctuaryNormal, 2.0, reflectionTraceMult, relicRetribution);
 
-    document.getElementById("math-ironwall").innerHTML =
+    document.getElementById("card-math-ironwall").innerHTML =
         formatArcanaMath(rawWindmillDmg * 1.5, ironwallTalentFormula, normalBonusDmgMult, doubleProtMult, rawIronwallArcana, ironwallArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, ironwallNormal, 1.0, reflectionTraceMult, relicRetribution);
 
-    document.getElementById("math-condemnation1").innerHTML =
+    document.getElementById("card-math-condemnation1").innerHTML =
         formatArcanaMath(rawWindmillDmg * 1.75, condemnation1TalentFormula, normalBonusDmgMult, doubleProtMult, rawCondemnation1Arcana, condemnation1ArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation1Normal, 1.0, reflectionTraceMult, relicRetribution);
 
-    document.getElementById("math-condemnation2").innerHTML =
+    document.getElementById("card-math-condemnation2").innerHTML =
         formatArcanaMath(rawWindmillDmg * 1.75, condemnation2TalentFormula, normalBonusDmgMult, doubleProtMult, rawCondemnation2Arcana, condemnation2ArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation2Normal, 1.0, reflectionTraceMult, relicRetribution);
 
-    document.getElementById("math-condemnation3").innerHTML =
+    document.getElementById("card-math-condemnation3").innerHTML =
         formatArcanaMath(rawWindmillDmg * 1.75, condemnation3TalentFormula, normalBonusDmgMult, doubleProtMult, rawCondemnation3Arcana, condemnation3ArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, condemnation3Normal, 1.0, reflectionTraceMult, relicRetribution);
 
-    document.getElementById("math-judgment").innerHTML =
+    document.getElementById("card-math-judgment").innerHTML =
         formatArcanaMath(rawWindmillDmg * 2.0, judgmentTalentFormula, normalBonusDmgMult, doubleProtMult, rawJudgmentArcana, judgmentArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, judgmentNormal, 1.2, reflectionTraceMult, relicRetribution);
 
-    document.getElementById("math-clash").innerHTML =
+    document.getElementById("card-math-clash").innerHTML =
         formatArcanaMath(rawChargeDmg * 1.5, clashTalentFormula, normalBonusDmgMult, doubleProtMult, rawClashArcana, clashArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, clashNormal, 1.0, reflectionTraceMult, relicRetribution);
 
-    document.getElementById("math-retribution").innerHTML =
+    document.getElementById("card-math-retribution").innerHTML =
         formatArcanaOnlyMath(rawRetributionArcana, retributionFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, retributionNormal, 1.15, retributionReflectionMult, relicRetribution);
 
-    document.getElementById("math-smash").innerHTML =
+    document.getElementById("card-math-windmill").innerHTML =
+        formatTalentMath(rawWindmillDmg, windmillFormula, talentBonusDmgMult, normalProtMult, reducedDefNormal, windmillDmg);
+
+    document.getElementById("card-math-charge").innerHTML =
+        formatTalentMath(rawChargeDmg, chargeFormula, talentBonusDmgMult, normalProtMult, reducedDefNormal, chargeDmg);
+
+    document.getElementById("card-math-smash").innerHTML =
         formatTalentMath(rawSmashDmg, smashFormula, talentBonusDmgMult, normalProtMult, reducedDefNormal, smashDmg);
 
-    document.getElementById("math-bash").innerHTML =
+    document.getElementById("card-math-bash").innerHTML =
         formatTalentMath(rawBashSkillDmg, bashFormula, talentBonusDmgMult, normalProtMult, reducedDefNormal, bashSkillDmg);
 
     // 9. 빌드 비교 렌더링 수행
@@ -743,51 +737,41 @@ function updateComparisonUI(currentResults) {
     });
 }
 
-// 아르카나 스킬 카드 클릭 시 하단 데미지 공식 상세 분해 아코디언 토글 & 스크롤/하이라이트 연동
-let activeSkillBreakdown = null;
+// 아르카나 및 재능 스킬 카드 클릭 시 카드 자체를 아래로 확장하여 상세 데미지 공식 분해 노출
 function setupSkillCardBreakdownToggles() {
-    const breakdownToggle = document.getElementById("breakdown-toggle");
-    const breakdownContent = document.getElementById("breakdown-content");
-
     document.querySelectorAll(".skill-result-card").forEach(card => {
         card.addEventListener("click", () => {
             const skill = card.getAttribute("data-skill");
             if (!skill) return;
 
-            const isAccordionHidden = breakdownContent.classList.contains("hidden");
+            const breakdown = card.querySelector(".card-breakdown");
+            if (!breakdown) return;
 
-            // 1. 아코디언이 이미 열려 있고, 현재 강조된 스킬과 동일한 카드를 다시 누른 경우 -> 아코디언 접기
-            if (!isAccordionHidden && activeSkillBreakdown === skill) {
-                breakdownToggle.click(); // 아코디언 접기
-                activeSkillBreakdown = null;
-                return;
-            }
+            const isExpanded = card.classList.contains("expanded");
 
-            // 2. 아코디언이 닫혀 있다면 -> 아코디언 열기
-            if (isAccordionHidden) {
-                breakdownToggle.click(); // 아코디언 열기
-            }
-
-            activeSkillBreakdown = skill;
-
-            // 3. 해당하는 수식 상세 항목 찾기 및 하이라이트/스크롤
-            const mathElement = document.getElementById(`math-${skill}`);
-            if (mathElement) {
-                const breakdownItem = mathElement.closest(".breakdown-item");
-                if (breakdownItem) {
-                    // 기존 하이라이트 제거
-                    document.querySelectorAll(".breakdown-item").forEach(item => {
-                        item.classList.remove("highlighted-item");
-                    });
-
-                    // 신규 하이라이트 추가
-                    breakdownItem.classList.add("highlighted-item");
-
-                    // 400ms 딜레이 후 (아코디언 오픈 애니메이션 대기) 스크롤 수행
-                    setTimeout(() => {
-                        breakdownItem.scrollIntoView({ behavior: "smooth", block: "center" });
-                    }, 150);
+            // 1. 다른 모든 카드의 확장상태 초기화 (아코디언 연출)
+            document.querySelectorAll(".skill-result-card").forEach(otherCard => {
+                if (otherCard !== card) {
+                    otherCard.classList.remove("expanded");
+                    const otherBreakdown = otherCard.querySelector(".card-breakdown");
+                    if (otherBreakdown) {
+                        otherBreakdown.classList.add("hidden");
+                    }
                 }
+            });
+
+            // 2. 현재 카드 토글 수행
+            if (isExpanded) {
+                card.classList.remove("expanded");
+                breakdown.classList.add("hidden");
+            } else {
+                card.classList.add("expanded");
+                breakdown.classList.remove("hidden");
+
+                // 확장 완료 후 해당 카드가 화면 안에 완전히 보이도록 스크롤 정렬
+                setTimeout(() => {
+                    card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                }, 100);
             }
         });
     });
