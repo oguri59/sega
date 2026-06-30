@@ -195,6 +195,7 @@ function calculate() {
     // 도핑 및 버프
     const ladeca = document.getElementById("buff-ladeca").value;
     const bfo = parseFloat(document.getElementById("buff-bfo").value) || 0;
+    const buffSebaBonus = document.getElementById("buff-seba-bonus").checked;
 
     // 물공포 체크
     const potionActive = document.querySelector("input[name='buff-potion']:checked").value === "1";
@@ -346,22 +347,30 @@ function calculate() {
     // 보너스 대미지 배율 상세 정의 (DC인사이드 분석글 기반 카테고리 분리 곱연산)
     const equipBonusDmgMult = 1 + (weapon.bonusDmg + shieldBonusDmgApply) / 100; // 장비보댐효과
 
-    // 재능 파트 일반보댐: 입력값 + 브레스 + 약점분석 모두 합산
-    const normalBonusDmgMult = 1 + (bonusDmg + ladecaBreathBonus + (buffWeaknessAnalysis ? 10 : 0)) / 100;
-    // 아르카나 파트 일반보댐: 입력값만 (브레스/약분 제외)
-    const arcanaNormalBonusDmgMult = 1 + bonusDmg / 100;
+    // 재능 파트 일반보댐: 입력값 + 세바보댐 + 브레스 + 약점분석 모두 합산
+    const sebaBonusDmg = buffSebaBonus ? (bfo * 0.1) : 0;
+    const normalBonusDmgMult = 1 + (bonusDmg + sebaBonusDmg + ladecaBreathBonus + (buffWeaknessAnalysis ? 10 : 0)) / 100;
+    // 아르카나 파트 일반보댐: 입력값 + 세바보댐 (브레스/약분 제외)
+    const arcanaNormalBonusDmgMult = 1 + (bonusDmg + sebaBonusDmg) / 100;
 
     // 카드 breakdown용 레이블 (구성 항목 나열)
     const normalBonusDmgParts = [
         bonusDmg > 0 ? `입력 ${bonusDmg}%` : null,
+        sebaBonusDmg > 0 ? `세바보댐 ${sebaBonusDmg.toFixed(1)}%` : null,
         ladecaBreathBonus > 0 ? `브레스 ${ladecaBreathBonus}%` : null,
         buffWeaknessAnalysis ? `약분 10%` : null
     ].filter(Boolean);
     const normalBonusDmgLabel = normalBonusDmgParts.length > 0
         ? `[일반보댐: ${normalBonusDmgParts.join(' + ')}]`
         : `[일반보댐]`;
-    // 아르카나 파트 레이블: 입력값만
-    const arcanaNormalBonusDmgLabel = bonusDmg > 0 ? `[일반보댐: 입력 ${bonusDmg}%]` : `[일반보댐]`;
+    // 아르카나 파트 레이블: 입력값 + 세바보댐
+    const arcanaNormalBonusDmgParts = [
+        bonusDmg > 0 ? `입력 ${bonusDmg}%` : null,
+        sebaBonusDmg > 0 ? `세바보댐 ${sebaBonusDmg.toFixed(1)}%` : null
+    ].filter(Boolean);
+    const arcanaNormalBonusDmgLabel = arcanaNormalBonusDmgParts.length > 0
+        ? `[일반보댐: ${arcanaNormalBonusDmgParts.join(' + ')}]`
+        : `[일반보댐]`;
 
     const arcanaBonusDmgMult = 1 + arcanaBonusDmg / 100; // 아르카나보댐효과
 

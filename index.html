@@ -290,7 +290,13 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="buff-bfo">전장의 서곡 비율 (%)</label>
+                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                                <label for="buff-bfo">전장의 서곡 비율 (%)</label>
+                                <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif;">
+                                    <input type="checkbox" id="buff-seba-bonus" checked>
+                                    <span style="color: #a0dcff; font-weight: 600;">세바 보댐</span>
+                                </label>
+                            </div>
                             <div class="input-wrapper">
                                 <input type="number" id="buff-bfo" min="0" max="100" placeholder="0" value="70">
                                 <span class="unit">%</span>
