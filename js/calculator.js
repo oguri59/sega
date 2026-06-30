@@ -272,7 +272,7 @@ function calculate() {
     const getDmgRedFromProt = (prot) => {
         if (prot <= 0) return 0;
         let red = (100 / sqrt2) * Math.log10((prot + 10 * sqrt2) / (10 * sqrt2)) / 100;
-        return Math.min(0.90, Math.max(0.0, red));
+        return Math.min(1.0, Math.max(0.0, red));
     };
 
     const normalProtMult = 1 - getDmgRedFromProt(reducedProtNormal);
