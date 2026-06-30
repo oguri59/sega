@@ -51,6 +51,10 @@ Use this file as a style guide and reference when modifying calculations, UI str
 - Relic Retribution Bonus: Adds `+0.5%` per level (up to `+5.0%` at Level 10).
 - Applies to all Arcana active skills if `#buff-reflection-trace` is checked, and **always** applies to Retribution.
 
+### 4. Weakness Analysis (약점 분석) & Master's Abrasive (명장의 연마재)
+- **Weakness Analysis (약점 분석 보댐)**: Adds `* 1.10` multiplier exclusively to the talent damage portion (e.g., Windmill, Charge, Smash, Bash) inside calculations, if `#buff-weakness-analysis` is checked.
+- **Master's Abrasive (명장의 연마재)**: Adds `* 1.03` final multiplicative factor at the very end of all skill damage calculations (normal and crit), if `#buff-master-abrasive` is checked.
+
 ---
 
 ## 🖥️ UI & Interaction Guidelines

@@ -200,6 +200,10 @@ function calculate() {
     const potionActive = document.querySelector("input[name='buff-potion']:checked").value === "1";
     const bashVal = parseFloat(document.getElementById("buff-bash").value) || 0;
 
+    // 약점 분석 및 명장의 연마재 파싱
+    const buffWeaknessAnalysis = document.getElementById("buff-weakness-analysis").checked;
+    const buffMasterAbrasive = document.getElementById("buff-master-abrasive").checked;
+
     // 유물 레벨 및 성찰의 흔적 파싱
     const relicRetribution = parseInt(document.getElementById("relic-retribution").value) || 0;
     const relicJudgment = parseInt(document.getElementById("relic-judgment").value) || 0;
@@ -341,7 +345,9 @@ function calculate() {
     const talentBonusDmgMult = equipBonusDmgMult * normalBonusDmgMult;
 
     // 최종데미지 증댐 디버프 배율 (곱연산)
-    const finalDmgMultiplier = (debuffDeathmarker ? 1.58 : 1.0) * (debuffMomo ? 1.15 : 1.0);
+    const weaknessAnalysisMult = buffWeaknessAnalysis ? 1.10 : 1.0;
+    const masterAbrasiveMult = buffMasterAbrasive ? 1.03 : 1.0;
+    const finalDmgMultiplier = (debuffDeathmarker ? 1.58 : 1.0) * (debuffMomo ? 1.15 : 1.0) * masterAbrasiveMult;
 
     // 성찰의 흔적 데미지 증가배율 (희생의 응징 유물 레벨당 *0.5% 증가, 기본 10%)
     const reflectionTracePct = 10 + relicRetribution * 0.5;
@@ -353,7 +359,7 @@ function calculate() {
         (1 + bashVal) *
         ladecaMult;
 
-    const windmillDmg = Math.max(0, rawWindmillDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier;
+    const windmillDmg = Math.max(0, (rawWindmillDmg * weaknessAnalysisMult) * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier;
 
     // 돌진 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawChargeDmg = res0 *
@@ -361,7 +367,7 @@ function calculate() {
         (1 + bashVal) *
         ladecaMult;
 
-    const chargeDmg = Math.max(0, rawChargeDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier;
+    const chargeDmg = Math.max(0, (rawChargeDmg * weaknessAnalysisMult) * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier;
 
     // 스매시 스킬 데미지 (보너스 대미지 곱연산 이전)
     // 무기/아이템 증가 % 적용: 양손무기보너스(1+weaponTwoHandedSmashBonus) * 무기스매시보너스(1+weaponSmashBonus)
@@ -373,7 +379,7 @@ function calculate() {
         (1 + bashVal) *
         ladecaMult;
 
-    const smashDmg = Math.max(0, rawSmashDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier;
+    const smashDmg = Math.max(0, (rawSmashDmg * weaknessAnalysisMult) * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier;
 
     // 배쉬 스킬 데미지 (보너스 대미지 곱연산 이전)
     // 무기 배쉬보너스 적용: (1 + weaponBashBonus)
@@ -382,7 +388,7 @@ function calculate() {
         (1 + weaponBashBonus) *
         ladecaMult;
 
-    const bashSkillDmg = Math.max(0, rawBashSkillDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier;
+    const bashSkillDmg = Math.max(0, (rawBashSkillDmg * weaknessAnalysisMult) * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier;
 
     // 6. 세이크리드 가드 5대 스킬 데미지 연산 (아르카나 곱연산보댐 공식 적용)
     // 크리티컬 배율 공통 정의
@@ -395,32 +401,32 @@ function calculate() {
 
     // [2] 철벽 강타:
     const rawIronwallArcana = res0 * 12.0 + finalDef * 6.0 + finalHp * 1.0;
-    const ironwallNormal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
+    const ironwallNormal = Math.max(0, equipBonusDmgMult * (((rawWindmillDmg * weaknessAnalysisMult) * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const ironwallCrit = ironwallNormal * critMult;
 
     // [2.5] 단죄의 일격 1단계:
     const rawCondemnation1Arcana = res0 * 15.0 + finalDef * 9.0 + finalHp * 1.5;
-    const condemnation1Normal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
+    const condemnation1Normal = Math.max(0, equipBonusDmgMult * (((rawWindmillDmg * weaknessAnalysisMult) * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const condemnation1Crit = condemnation1Normal * critMult;
 
     // [2.6] 단죄의 일격 2단계:
     const rawCondemnation2Arcana = res0 * 22.5 + finalDef * 13.5 + finalHp * 2.25;
-    const condemnation2Normal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
+    const condemnation2Normal = Math.max(0, equipBonusDmgMult * (((rawWindmillDmg * weaknessAnalysisMult) * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const condemnation2Crit = condemnation2Normal * critMult;
 
     // [2.7] 단죄의 일격 3단계:
     const rawCondemnation3Arcana = res0 * 30.0 + finalDef * 18.0 + finalHp * 3.0;
-    const condemnation3Normal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
+    const condemnation3Normal = Math.max(0, equipBonusDmgMult * (((rawWindmillDmg * weaknessAnalysisMult) * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const condemnation3Crit = condemnation3Normal * critMult;
 
     // [3] 심판의 일격: (링크보너스 최종데미지 20% 증가 즉 1.2배 곱, 심판 유물레벨당 맥댐계수 +100% 합산)
     const rawJudgmentArcana = res0 * (35.0 + relicJudgment * 1.0) + finalDef * 20.0 + finalHp * 5.0;
-    const judgmentNormal = Math.max(0, equipBonusDmgMult * ((rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier * reflectionTraceMult;
+    const judgmentNormal = Math.max(0, equipBonusDmgMult * (((rawWindmillDmg * weaknessAnalysisMult) * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier * reflectionTraceMult;
     const judgmentCrit = judgmentNormal * critMult;
 
     // [4] 격돌:
     const rawClashArcana = res0 * 8.0 + finalDef * 6.0 + finalHp * 0.5;
-    const clashNormal = Math.max(0, equipBonusDmgMult * ((rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
+    const clashNormal = Math.max(0, equipBonusDmgMult * (((rawChargeDmg * weaknessAnalysisMult) * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * normalProtMult) * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult;
     const clashCrit = clashNormal * critMult;
 
     // [5] 희생의 응징: (링크보너스 최종데미지 15% 증가 즉 1.15배 곱, 성찰의 흔적 버프 기본 적용)
@@ -452,7 +458,8 @@ function calculate() {
 
     // 8. 데미지 공식 상세 분해 렌더링
     const formatArcanaMath = (rawTalent, talentFormula, talentMult, doubleProt, rawArcana, arcanaFormula, arcanaDmgMult, normalProt, equipMult, normalDef, finalVal, linkBonus = 1.0, reflectionMult = 1.0, relicRetLevel = 0) => {
-        const talentPartDmg = Math.floor(rawTalent * talentMult * doubleProt);
+        const talentPartBase = rawTalent * (buffWeaknessAnalysis ? 1.10 : 1.0);
+        const talentPartDmg = Math.floor(talentPartBase * talentMult * doubleProt);
         const arcanaPartDmg = Math.floor(rawArcana * normalProt);
         const baseFinalDmg = Math.max(0, equipMult * (talentPartDmg + arcanaPartDmg) * arcanaDmgMult - Math.floor(normalDef));
 
@@ -472,6 +479,9 @@ function calculate() {
         if (debuffMomo) {
             mults.push(`1.15 [모모]`);
         }
+        if (buffMasterAbrasive) {
+            mults.push(`1.03 [명장의 연마재]`);
+        }
 
         if (mults.length > 0) {
             step3Text += `<br>- 최종 데미지 = ${Math.floor(baseFinalDmg).toLocaleString()} &times; ${mults.join(' &times; ')} = <strong>${Math.floor(finalVal).toLocaleString()}</strong>`;
@@ -481,14 +491,14 @@ function calculate() {
             <div class="math-step">
                 <span class="math-step-num">1단계 계산</span>
                 <span class="math-step-text">
-                    - <strong>재능 파트:</strong> ${talentFormula} = <strong>${Math.floor(rawTalent).toLocaleString()}</strong> 데미지<br>
+                    - <strong>재능 파트:</strong> ${talentFormula} ${buffWeaknessAnalysis ? ' &times; 1.10 [약점분석]' : ''} = <strong>${Math.floor(talentPartBase).toLocaleString()}</strong> 데미지<br>
                     - <strong>아르카나 파트:</strong> ${arcanaFormula} = <strong>${Math.floor(rawArcana).toLocaleString()}</strong> 데미지
                 </span>
             </div>
             <div class="math-step">
                 <span class="math-step-num">2단계 피어싱 보댐 적용</span>
                 <span class="math-step-text">
-                    - 재능 파트: ${Math.floor(rawTalent).toLocaleString()} &times; ${talentMult.toFixed(4)} [일반보댐] &times; ${doubleProt.toFixed(4)} [이중피어싱 댐감율] = <strong>${talentPartDmg.toLocaleString()}</strong><br>
+                    - 재능 파트: ${Math.floor(talentPartBase).toLocaleString()} &times; ${talentMult.toFixed(4)} [일반보댐] &times; ${doubleProt.toFixed(4)} [이중피어싱 댐감율] = <strong>${talentPartDmg.toLocaleString()}</strong><br>
                     - 아르카나 파트: ${Math.floor(rawArcana).toLocaleString()} &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] = <strong>${arcanaPartDmg.toLocaleString()}</strong>
                 </span>
             </div>
@@ -524,6 +534,9 @@ function calculate() {
         if (debuffMomo) {
             mults.push(`1.15 [모모]`);
         }
+        if (buffMasterAbrasive) {
+            mults.push(`1.03 [명장의 연마재]`);
+        }
 
         if (mults.length > 0) {
             step3Text += `<br>- 최종 데미지 = ${Math.floor(baseFinalDmg).toLocaleString()} &times; ${mults.join(' &times; ')} = <strong>${Math.floor(finalVal).toLocaleString()}</strong>`;
@@ -555,9 +568,10 @@ function calculate() {
     };
 
     const formatTalentMath = (rawTalent, talentFormula, talentMult, normalProt, normalDef, finalVal) => {
-        const baseFinalDmg = Math.max(0, rawTalent * talentMult * normalProt - Math.floor(normalDef));
+        const talentPartBase = rawTalent * (buffWeaknessAnalysis ? 1.10 : 1.0);
+        const baseFinalDmg = Math.max(0, talentPartBase * talentMult * normalProt - Math.floor(normalDef));
 
-        let step2Text = `- 기본 최종 데미지 = ${Math.floor(rawTalent).toLocaleString()} &times; ${talentMult.toFixed(4)} [보너스대미지] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] - ${Math.floor(normalDef)} [적방어] = <strong>${Math.floor(baseFinalDmg).toLocaleString()}</strong>`;
+        let step2Text = `- 기본 최종 데미지 = ${Math.floor(talentPartBase).toLocaleString()} &times; ${talentMult.toFixed(4)} [보너스대미지] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] - ${Math.floor(normalDef)} [적방어] = <strong>${Math.floor(baseFinalDmg).toLocaleString()}</strong>`;
 
         let mults = [];
         if (debuffDeathmarker) {
@@ -565,6 +579,9 @@ function calculate() {
         }
         if (debuffMomo) {
             mults.push(`1.15 [모모]`);
+        }
+        if (buffMasterAbrasive) {
+            mults.push(`1.03 [명장의 연마재]`);
         }
 
         if (mults.length > 0) {
@@ -575,7 +592,7 @@ function calculate() {
             <div class="math-step">
                 <span class="math-step-num">1단계 계산</span>
                 <span class="math-step-text">
-                    - <strong>재능 파트:</strong> ${talentFormula} = <strong>${Math.floor(rawTalent).toLocaleString()}</strong> 데미지
+                    - <strong>재능 파트:</strong> ${talentFormula} ${buffWeaknessAnalysis ? ' &times; 1.10 [약점분석]' : ''} = <strong>${Math.floor(talentPartBase).toLocaleString()}</strong> 데미지
                 </span>
             </div>
             <div class="math-step">
