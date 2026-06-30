@@ -74,14 +74,11 @@
                         <div class="form-group">
                             <label for="stat-bonus-dmg">보너스 대미지 (%)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="stat-bonus-dmg" min="0" placeholder="0" value="5">
+                                <input type="number" id="stat-bonus-dmg" min="0" placeholder="0" value="3">
                                 <span class="unit">%</span>
                             </div>
                             <small class="helper-text">
-                                ※ 일반 보댐에 합산되는 항목:<br>
-                                · 이 입력값 (낭농 토템, 엑스트라 토템, 정령 옵션 등)<br>
-                                · 브레스 오브 라데카 (+5%)<br>
-                                · 약점 분석 (+10%)
+                                · (낭농, 토템, 엑스트라 토템)<br>
                             </small>
                         </div>
                         <div class="form-group">
@@ -326,16 +323,20 @@
                         </div>
                         <div class="form-group grid-span-2" style="display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 0.5rem; border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 0.8rem;">
                             <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
-                                <input type="checkbox" id="buff-weakness-analysis">
+                                <input type="checkbox" id="buff-weakness-analysis" checked>
                                 <span style="color: #ffd700; font-weight: 600;">약점 분석 보댐 (재능 계수 *1.10)</span>
                             </label>
                             <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
-                                <input type="checkbox" id="buff-master-abrasive">
+                                <input type="checkbox" id="buff-master-abrasive" checked>
                                 <span style="color: #ffd700; font-weight: 600;">명장의 연마재 (최종 데미지 *1.03)</span>
                             </label>
                             <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
-                                <input type="checkbox" id="buff-leim-magigraff">
+                                <input type="checkbox" id="buff-leim-magigraff" checked>
                                 <span style="color: #ffd700; font-weight: 600;">레임 마기그래프 (최종 데미지 *1.18)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
+                                <input type="checkbox" id="buff-pro-pack" checked>
+                                <span style="color: #ffd700; font-weight: 600;">프플팩 (최종 데미지 *1.01)</span>
                             </label>
                         </div>
                     </div>
