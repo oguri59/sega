@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initDropdowns();
     setupEventListeners();
     initAccordion();
+    setupSkillCardBreakdownToggles();
     calculate(); // 초기 연산 수행
 });
 
@@ -739,5 +740,55 @@ function updateComparisonUI(currentResults) {
         } else if (pct < -0.05) {
             badge.classList.add("negative");
         }
+    });
+}
+
+// 아르카나 스킬 카드 클릭 시 하단 데미지 공식 상세 분해 아코디언 토글 & 스크롤/하이라이트 연동
+let activeSkillBreakdown = null;
+function setupSkillCardBreakdownToggles() {
+    const breakdownToggle = document.getElementById("breakdown-toggle");
+    const breakdownContent = document.getElementById("breakdown-content");
+
+    document.querySelectorAll(".skill-result-card").forEach(card => {
+        card.addEventListener("click", () => {
+            const skill = card.getAttribute("data-skill");
+            if (!skill) return;
+
+            const isAccordionHidden = breakdownContent.classList.contains("hidden");
+
+            // 1. 아코디언이 이미 열려 있고, 현재 강조된 스킬과 동일한 카드를 다시 누른 경우 -> 아코디언 접기
+            if (!isAccordionHidden && activeSkillBreakdown === skill) {
+                breakdownToggle.click(); // 아코디언 접기
+                activeSkillBreakdown = null;
+                return;
+            }
+
+            // 2. 아코디언이 닫혀 있다면 -> 아코디언 열기
+            if (isAccordionHidden) {
+                breakdownToggle.click(); // 아코디언 열기
+            }
+
+            activeSkillBreakdown = skill;
+
+            // 3. 해당하는 수식 상세 항목 찾기 및 하이라이트/스크롤
+            const mathElement = document.getElementById(`math-${skill}`);
+            if (mathElement) {
+                const breakdownItem = mathElement.closest(".breakdown-item");
+                if (breakdownItem) {
+                    // 기존 하이라이트 제거
+                    document.querySelectorAll(".breakdown-item").forEach(item => {
+                        item.classList.remove("highlighted-item");
+                    });
+
+                    // 신규 하이라이트 추가
+                    breakdownItem.classList.add("highlighted-item");
+
+                    // 400ms 딜레이 후 (아코디언 오픈 애니메이션 대기) 스크롤 수행
+                    setTimeout(() => {
+                        breakdownItem.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }, 150);
+                }
+            }
+        });
     });
 }

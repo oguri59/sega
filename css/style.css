@@ -616,6 +616,7 @@ input:checked + .slider:before {
     position: relative;
     overflow: hidden;
     transition: all var(--transition-speed) ease;
+    cursor: pointer;
 }
 
 @media (min-width: 640px) {
@@ -940,4 +941,19 @@ footer .small {
     0% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.35)); }
     50% { transform: scale(1.03); filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6)); }
     100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.35)); }
+}
+
+/* breakdown-item 하이라이트 및 트랜지션 */
+.breakdown-item {
+    transition: all 0.4s ease;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem 1rem !important;
+    margin-bottom: 0.75rem;
+}
+
+.breakdown-item.highlighted-item {
+    border-color: rgba(212, 175, 55, 0.35) !important;
+    background: rgba(212, 175, 55, 0.06) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.12);
 }
