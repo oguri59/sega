@@ -2,14 +2,16 @@
  * 마비노기 세이크리드 가드 데미지 계산기 - 계산 및 UI 엔진
  */
 
-// 전역 상태 관리
-let savedBuild = null;
+// 로컬 스토리지 연동 빌드 데이터 목록
+let savedBuilds = JSON.parse(localStorage.getItem("sacred_guard_saved_builds") || "[]");
+let activeCompareBuildId = localStorage.getItem("sacred_guard_active_compare_id") || null;
 
 // DOM 요소 바인딩 및 초기화
 document.addEventListener("DOMContentLoaded", () => {
     initDropdowns();
     setupEventListeners();
     setupSkillCardBreakdownToggles();
+    renderSavedBuildsList();
     calculate(); // 초기 연산 수행
 });
 
@@ -659,16 +661,25 @@ function calculate() {
     updateComparisonUI(results);
 }
 
-// 현재 빌드 데이터를 전역 변수에 저장
+// 현재 입력값을 로컬 스토리지 빌드 스택에 저장
 function saveCurrentBuild() {
+    const buildName = document.getElementById("build-name-input").value.trim() || `빌드 #${savedBuilds.length + 1}`;
     const maxDmg = Math.floor(parseFloat(document.getElementById("summary-final-max-dmg").textContent.replace(/,/g, '')) || 0);
     const finalDef = Math.floor(parseFloat(document.getElementById("summary-final-defense").textContent.replace(/,/g, '')) || 0);
     const finalHp = Math.floor(parseFloat(document.getElementById("summary-final-hp").textContent.replace(/,/g, '')) || 0);
 
     const getVal = (id) => Math.floor(parseFloat(document.getElementById(id).textContent.replace(/,/g, '')) || 0);
 
-    savedBuild = {
-        meta: { maxDmg, finalDef, finalHp, timestamp: new Date().toLocaleTimeString() },
+    const newBuild = {
+        id: 'build_' + Date.now(),
+        name: buildName,
+        meta: {
+            maxDmg,
+            finalDef,
+            finalHp,
+            timestamp: new Date().toLocaleString("ko-KR", { hour12: false })
+        },
+        inputs: getBuildInputs(),
         skills: {
             "sanctuary": getVal("dmg-sanctuary-normal"),
             "ironwall": getVal("dmg-ironwall-normal"),
@@ -685,18 +696,27 @@ function saveCurrentBuild() {
         }
     };
 
-    document.getElementById("btn-reset-build").classList.remove("hidden");
-    document.getElementById("comparison-status-text").textContent = `비교 빌드 저장 완료! (${savedBuild.meta.timestamp})`;
-    document.getElementById("comparison-sub-text").textContent = `기준 스탯 - 맥댐: ${savedBuild.meta.maxDmg}, 방어: ${savedBuild.meta.finalDef}, 생명: ${savedBuild.meta.finalHp}`;
+    savedBuilds.push(newBuild);
+    localStorage.setItem("sacred_guard_saved_builds", JSON.stringify(savedBuilds));
 
-    calculate(); // 비교 배지를 띄우기 위해 다시 연산 트리거
+    // 입력 필드 초기화
+    document.getElementById("build-name-input").value = "";
+
+    // 새로 저장한 빌드를 비교 기준으로 자동 설정
+    activeCompareBuildId = newBuild.id;
+    localStorage.setItem("sacred_guard_active_compare_id", activeCompareBuildId);
+
+    renderSavedBuildsList();
+    calculate(); // 다시 계산하여 비교 수치 반영
 }
 
 // 빌드 비교 비활성화
 function resetBuildComparison() {
-    savedBuild = null;
+    activeCompareBuildId = null;
+    localStorage.removeItem("sacred_guard_active_compare_id");
+    
     document.getElementById("btn-reset-build").classList.add("hidden");
-    document.getElementById("comparison-status-text").textContent = "저장된 빌드가 없습니다. 현재 셋팅을 저장하여 비교해보세요!";
+    document.getElementById("comparison-status-text").textContent = "저장된 빌드가 없습니다. 아래 목록에서 불러오거나 비교 기준을 선택하세요.";
     document.getElementById("comparison-sub-text").textContent = "";
 
     // 비교 배지 전부 숨김
@@ -704,20 +724,35 @@ function resetBuildComparison() {
     badges.forEach(badge => {
         badge.classList.add("hidden");
     });
+
+    renderSavedBuildsList();
 }
 
 // 현재 계산값과 저장된 빌드 값을 대조하여 증감율 렌더링
 function updateComparisonUI(currentResults) {
-    if (!savedBuild) return;
+    const activeBuild = savedBuilds.find(b => b.id === activeCompareBuildId);
+    if (!activeBuild) {
+        document.querySelectorAll(".compare-badge").forEach(badge => {
+            badge.classList.add("hidden");
+        });
+        document.getElementById("btn-reset-build").classList.add("hidden");
+        document.getElementById("comparison-status-text").textContent = "저장된 빌드가 없습니다. 아래 목록에서 불러오거나 비교 기준을 선택하세요.";
+        document.getElementById("comparison-sub-text").textContent = "";
+        return;
+    }
+
+    document.getElementById("btn-reset-build").classList.remove("hidden");
+    document.getElementById("comparison-status-text").textContent = `기준 빌드: ${activeBuild.name}`;
+    document.getElementById("comparison-sub-text").textContent = `기준 스탯 - 맥댐: ${activeBuild.meta.maxDmg.toLocaleString()}, 방어: ${activeBuild.meta.finalDef.toLocaleString()}, 생명: ${activeBuild.meta.finalHp.toLocaleString()}`;
 
     Object.keys(currentResults).forEach(key => {
         const badge = document.getElementById(`compare-${key}`);
         if (!badge) return;
 
         const currentVal = currentResults[key].normal;
-        const savedVal = savedBuild.skills[key];
+        const savedVal = activeBuild.skills[key];
 
-        if (savedVal === 0) {
+        if (savedVal === undefined || savedVal === 0) {
             badge.classList.add("hidden");
             return;
         }
@@ -736,6 +771,125 @@ function updateComparisonUI(currentResults) {
         }
     });
 }
+
+// 입력 폼들의 설정 상태 수집
+function getBuildInputs() {
+    const inputsState = {};
+    document.querySelectorAll("input[type='number']").forEach(el => {
+        inputsState[el.id] = el.value;
+    });
+    document.querySelectorAll("input[type='checkbox']").forEach(el => {
+        inputsState[el.id] = el.checked;
+    });
+    document.querySelectorAll("select").forEach(el => {
+        inputsState[el.id] = el.value;
+    });
+    
+    // 라디오 버튼 그룹 수집
+    const radioNames = new Set();
+    document.querySelectorAll("input[type='radio']").forEach(el => {
+        radioNames.add(el.name);
+    });
+    radioNames.forEach(name => {
+        const checkedRadio = document.querySelector(`input[name='${name}']:checked`);
+        inputsState[name] = checkedRadio ? checkedRadio.value : null;
+    });
+    
+    return inputsState;
+}
+
+// 입력 폼들의 설정 상태 복원
+function restoreBuildInputs(inputsState) {
+    if (!inputsState) return;
+    Object.keys(inputsState).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.tagName === "INPUT") {
+                if (el.type === "checkbox") {
+                    el.checked = inputsState[id];
+                } else if (el.type === "number") {
+                    el.value = inputsState[id];
+                }
+            } else if (el.tagName === "SELECT") {
+                el.value = inputsState[id];
+            }
+        } else {
+            // 라디오 버튼 그룹 복원
+            const radios = document.querySelectorAll(`input[name='${id}']`);
+            if (radios.length > 0) {
+                radios.forEach(radio => {
+                    radio.checked = (radio.value === inputsState[id]);
+                });
+            }
+        }
+    });
+}
+
+// 로컬 스택 제어 전용 액션 함수들
+function loadBuild(id) {
+    const build = savedBuilds.find(b => b.id === id);
+    if (!build) return;
+    restoreBuildInputs(build.inputs);
+    calculate();
+}
+
+function setCompareBase(id) {
+    activeCompareBuildId = id;
+    localStorage.setItem("sacred_guard_active_compare_id", id);
+    renderSavedBuildsList();
+    calculate();
+}
+
+function deleteBuild(id) {
+    savedBuilds = savedBuilds.filter(b => b.id !== id);
+    localStorage.setItem("sacred_guard_saved_builds", JSON.stringify(savedBuilds));
+    
+    if (activeCompareBuildId === id) {
+        activeCompareBuildId = null;
+        localStorage.removeItem("sacred_guard_active_compare_id");
+    }
+    
+    renderSavedBuildsList();
+    calculate();
+}
+
+// 로컬 스토리지에 있는 빌드 목록 렌더링
+function renderSavedBuildsList() {
+    const listEl = document.getElementById("saved-builds-list");
+    if (!listEl) return;
+
+    listEl.innerHTML = "";
+
+    if (savedBuilds.length === 0) {
+        listEl.innerHTML = `<div style="text-align: center; color: var(--text-dark); padding: 1rem; font-size: 0.8rem; font-family: 'Noto Sans KR', sans-serif;">저장된 빌드가 없습니다. 현재 셋팅을 저장해 보세요!</div>`;
+        return;
+    }
+
+    savedBuilds.forEach(build => {
+        const isCompareBase = build.id === activeCompareBuildId;
+
+        const item = document.createElement("div");
+        item.className = `build-item ${isCompareBase ? 'compare-base' : ''}`;
+
+        item.innerHTML = `
+            <div class="build-item-info">
+                <span class="build-item-title">${build.name}</span>
+                <span class="build-item-meta">맥댐: ${build.meta.maxDmg.toLocaleString()} | 방어: ${build.meta.finalDef.toLocaleString()} | 생명: ${build.meta.finalHp.toLocaleString()} (${build.meta.timestamp})</span>
+            </div>
+            <div class="build-item-actions">
+                <button class="btn-xs btn-xs-secondary" onclick="loadBuild('${build.id}')">불러오기</button>
+                <button class="btn-xs ${isCompareBase ? 'btn-xs-primary' : 'btn-xs-secondary'}" onclick="setCompareBase('${build.id}')">비교기준</button>
+                <button class="btn-xs btn-xs-danger" onclick="deleteBuild('${build.id}')">삭제</button>
+            </div>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+// 전역 스코프에 노출하여 onclick 호출 가능하게 바인딩
+window.loadBuild = loadBuild;
+window.setCompareBase = setCompareBase;
+window.deleteBuild = deleteBuild;
 
 // 아르카나 및 재능 스킬 카드 클릭 시 카드 자체를 아래로 확장하여 상세 데미지 공식 분해 노출
 function setupSkillCardBreakdownToggles() {
