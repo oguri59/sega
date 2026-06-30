@@ -30,17 +30,17 @@ Use this file as a style guide and reference when modifying calculations, UI str
   - `Base = MaxDmg * 3.0 + Defense * 1.5 + HP * 0.20`
   - Arcana Link bonus: Final Damage is multiplied by `2.0` (100% increase).
 - **Ironwall Strike (철벽 강타)**:
-  - `Base = (WindmillDmg * 1.5) * NormalBonusDmg + (MaxDmg * 12.0 + Defense * 6.0 + HP * 1.0) * ArcanaBonusDmg`
+  - `Base = ( (WindmillDmg * 1.5) * NormalBonusDmg + (MaxDmg * 12.0 + Defense * 6.0 + HP * 1.0) ) * ArcanaBonusDmg`
 - **Condemnation (단죄의 일격)**:
-  - **1 Stage**: `Base = (WindmillDmg * 1.75) * NormalBonusDmg + (MaxDmg * 15.0 + Defense * 9.0 + HP * 1.5) * ArcanaBonusDmg`
-  - **2 Stage**: `Base = (WindmillDmg * 1.75) * NormalBonusDmg + (MaxDmg * 22.5 + Defense * 13.5 + HP * 2.25) * ArcanaBonusDmg`
-  - **3 Stage**: `Base = (WindmillDmg * 1.75) * NormalBonusDmg + (MaxDmg * 30.0 + Defense * 18.0 + HP * 3.0) * ArcanaBonusDmg`
+  - **1 Stage**: `Base = ( (WindmillDmg * 1.75) * NormalBonusDmg + (MaxDmg * 15.0 + Defense * 9.0 + HP * 1.5) ) * ArcanaBonusDmg`
+  - **2 Stage**: `Base = ( (WindmillDmg * 1.75) * NormalBonusDmg + (MaxDmg * 22.5 + Defense * 13.5 + HP * 2.25) ) * ArcanaBonusDmg`
+  - **3 Stage**: `Base = ( (WindmillDmg * 1.75) * NormalBonusDmg + (MaxDmg * 30.0 + Defense * 18.0 + HP * 3.0) ) * ArcanaBonusDmg`
 - **Judgment Strike (심판의 일격)**:
   - Max Damage coefficient increases by `+100%` per Relic Level (up to `+1000%` at Level 10, additive).
-  - `Base = (WindmillDmg * 2.0) * NormalBonusDmg + (MaxDmg * (35.0 + RelicLevel * 1.0) + Defense * 20.0 + HP * 5.0) * ArcanaBonusDmg`
+  - `Base = ( (WindmillDmg * 2.0) * NormalBonusDmg + (MaxDmg * (35.0 + RelicLevel * 1.0) + Defense * 20.0 + HP * 5.0) ) * ArcanaBonusDmg`
   - Arcana Link bonus: Final Damage is multiplied by `1.2` (20% increase).
 - **Clash (격돌)**:
-  - `Base = (ChargeDmg * 1.5) * NormalBonusDmg + (MaxDmg * 8.0 + Defense * 6.0 + HP * 0.5) * ArcanaBonusDmg`
+  - `Base = ( (ChargeDmg * 1.5) * NormalBonusDmg + (MaxDmg * 8.0 + Defense * 6.0 + HP * 0.5) ) * ArcanaBonusDmg`
 - **Retribution (희생의 응징)**:
   - `Base = (MaxDmg * 60.0 + Defense * 40.0 + HP * 15.0) * (1 + Shield_DRR / 100)`
   - Arcana Link bonus: Final Damage is multiplied by `1.15` (15% increase).
