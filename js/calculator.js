@@ -280,15 +280,13 @@ function calculate() {
 
     // 5. 베이스 스킬 데미지 연산
     // 윈드밀 데미지 공식 (구형 세트: 합산 +30% / 신형 세트: 곱산 *1.15)
-    let baseWindmillMult = windmillRankVal + 0.03 * windmillReforge;
+    let baseWindmillMult = windmillRankVal + 0.03 * windmillReforge + (windmillErg / 100) + (windmillDarkErg / 100);
     if (setWindmillOld) {
         baseWindmillMult += 0.30;
     }
     if (setWindmillNew) {
         baseWindmillMult *= 1.15;
     }
-    // 에르그 및 어둠의 에르그 합산 보정
-    baseWindmillMult += (windmillErg / 100) + (windmillDarkErg / 100);
 
     // 돌진 데미지 공식 (세공 + 에르그 및 어둠의 에르그 합산 보정)
     const baseChargeMult = chargeRankMult + 0.1 * chargeReforge + (chargeErg / 100) + (chargeDarkErg / 100);
