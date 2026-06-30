@@ -25,19 +25,7 @@
         <!-- 헤더 영역 -->
         <header>
             <div class="header-logo">
-                <svg class="shield-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L4 5V11C4 16.18 7.41 21.1 12 22C16.59 21.1 20 16.18 20 11V5L12 2Z"
-                        fill="url(#shield-grad)" stroke="#D4AF37" stroke-width="1.5" />
-                    <path d="M12 5V19M8 9H16M9 13H15" stroke="#FFFFFF" stroke-dasharray="1" stroke-width="1.5"
-                        stroke-linecap="round" />
-                    <defs>
-                        <linearGradient id="shield-grad" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#4A3B12" />
-                            <stop offset="50%" stop-color="#1A1813" />
-                            <stop offset="100%" stop-color="#0E0D0B" />
-                        </linearGradient>
-                    </defs>
-                </svg>
+                <img class="shield-icon" src="images/icon.png" alt="세이크리드 가드 아이콘" style="border-radius: 6px; border: 1.5px solid rgba(212, 175, 55, 0.35); box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);">
                 <h1>세이크리드 가드 <span>데미지 계산기</span></h1>
             </div>
             <p class="subtitle">Sacred Guard Damage Calculator</p>
@@ -50,7 +38,6 @@
                 <!-- 1. 캐릭터 기본 스탯 -->
                 <div class="card input-card">
                     <div class="card-header">
-                        <div class="card-icon">👤</div>
                         <h2>캐릭터 기본 스탯</h2>
                     </div>
                     <div class="card-body grid-2col">
@@ -114,7 +101,6 @@
                 <!-- 적 정보 설정 -->
                 <div class="card input-card">
                     <div class="card-header">
-                        <div class="card-icon">🎯</div>
                         <h2>대상 몬스터 설정</h2>
                     </div>
                     <div class="card-body">
@@ -133,7 +119,7 @@
                                 style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
                                 <h3
                                     style="font-size: 0.9rem; color: #ffd700; display: flex; align-items: center; gap: 0.3rem; font-family: 'Noto Sans KR', sans-serif; margin: 0;">
-                                    <span>🧪</span> 디버프 설정
+                                    디버프 설정
                                 </h3>
                                 <label
                                     style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 4px; padding: 0.2rem 0.5rem;">
@@ -197,7 +183,6 @@
                 <!-- 2. 무기 및 장비 세트 효과 -->
                 <div class="card input-card">
                     <div class="card-header">
-                        <div class="card-icon">⚔️</div>
                         <h2>무기 및 장비 세트</h2>
                     </div>
                     <div class="card-body">
@@ -248,7 +233,7 @@
                         </div>
                         <div class="relic-section" style="margin-top: 1rem; border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 1rem;">
                             <h3 style="font-size: 0.9rem; color: #ffd700; display: flex; align-items: center; gap: 0.3rem; font-family: 'Noto Sans KR', sans-serif; margin: 0 0 0.8rem 0;">
-                                <span>🏺</span> 유물 레벨 설정
+                                유물 레벨 설정
                             </h3>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
                                 <div class="form-group" style="margin: 0;">
@@ -291,7 +276,6 @@
                 <!-- 3. 도핑 및 버프 설정 -->
                 <div class="card input-card">
                     <div class="card-header">
-                        <div class="card-icon">🧪</div>
                         <h2>도핑 및 버프</h2>
                     </div>
                     <div class="card-body grid-2col">
@@ -340,7 +324,6 @@
                     <!-- 4. 베이스 스킬 랭크 및 세공 -->
                     <div class="card input-card">
                         <div class="card-header">
-                            <div class="card-icon">⚡</div>
                             <h2>재능 스킬 설정</h2>
                         </div>
                         <div class="card-body">
@@ -464,7 +447,6 @@
                 <!-- 1. 보정 스탯 요약 정보 -->
                 <div class="card summary-card">
                     <div class="card-header">
-                        <div class="card-icon">📊</div>
                         <h2>최종 보정 스탯 요약</h2>
                     </div>
                     <div class="card-body spec-summary-grid">
@@ -489,7 +471,7 @@
                 <!-- 2. 세이크리드 가드 액티브 스킬 결과 -->
                 <div class="results-group">
                     <div class="group-title" style="display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; padding-right: 0.5rem;">
-                        <span>🛡️ 세이크리드 가드 아르카나 스킬</span>
+                        <span>세이크리드 가드 아르카나 스킬</span>
                         <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; background: rgba(255, 215, 0, 0.1); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 4px; padding: 0.2rem 0.5rem; text-shadow: none; font-weight: normal; margin-left: auto;">
                             <input type="checkbox" id="buff-reflection-trace" checked>
                             <span style="color: #ffd700; font-weight: 600;">성찰의 흔적</span>
@@ -669,7 +651,7 @@
 
                 <!-- 3. 베이스 스킬 결과 -->
                 <div class="results-group">
-                    <div class="group-title">⚔️ 재능 스킬</div>
+                    <div class="group-title">재능 스킬</div>
 
                     <!-- 윈드밀 결과 카드 -->
                     <div class="skill-result-card theme-base">
@@ -759,7 +741,6 @@
                 <!-- 4. 빌드 비교 제어 센터 -->
                 <div class="card comparison-card">
                     <div class="card-header">
-                        <div class="card-icon">🔄</div>
                         <h2>실시간 빌드 비교 센터</h2>
                     </div>
                     <div class="card-body flex-row">
@@ -777,7 +758,6 @@
                 <!-- 5. 데미지 공식 상세 분해 보기 (Accordion) -->
                 <div class="card breakdown-card">
                     <div class="card-header collapse-trigger" id="breakdown-toggle">
-                        <div class="card-icon">🔍</div>
                         <h2>데미지 상세 연산 내역 보기 (공식 분해)</h2>
                         <span class="arrow-icon">▼</span>
                     </div>
