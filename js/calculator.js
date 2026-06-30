@@ -171,6 +171,8 @@ function calculate() {
     const debuffJack = document.getElementById("debuff-jack").checked;
     const debuffSonic = document.getElementById("debuff-sonic").checked;
     const sonicValue = parseFloat(document.getElementById("debuff-sonic-value").value) || 0;
+    const debuffDeathmarker = document.getElementById("debuff-deathmarker").checked;
+    const debuffMomo = document.getElementById("debuff-momo").checked;
 
     // 어퍼+급소 관통: 고정 -28 + 몬스터 보호의 11% 비율 감소
     let debuffProtPercent = 0;
@@ -185,7 +187,12 @@ function calculate() {
     if (debuffPraga) debuffProtFlat += 15;
     if (debuffUpper) debuffProtFlat += 28;
     if (debuffJack) debuffProtFlat += 4;
-    if (debuffSonic) debuffProtFlat += sonicValue;
+    if (debuffSonic) debuffProtFlat += sonicValue * 5;
+
+    // 증댐 디버프
+    let debuffgainFlat = 0;
+    if (debuffDeathmarker) debuffgainFlat += 58;
+    if (debuffMomo) debuffgainFlat += 15;
 
     // 무기 및 방패 효과
     const weaponKey = document.getElementById("equip-weapon").value;
