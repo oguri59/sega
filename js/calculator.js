@@ -101,6 +101,23 @@ function setupEventListeners() {
         elem.addEventListener("change", calculate);
     });
 
+    // ALL 디버프 토글 버튼
+    const allToggle = document.getElementById("debuff-all");
+    allToggle.addEventListener("change", () => {
+        const checked = allToggle.checked;
+        document.querySelectorAll(".debuff-item").forEach(cb => { cb.checked = checked; });
+        calculate();
+    });
+
+    // 개별 디버프 해제 시 ALL 동기화
+    document.querySelectorAll(".debuff-item").forEach(cb => {
+        cb.addEventListener("change", () => {
+            const all = document.querySelectorAll(".debuff-item");
+            const allChecked = [...all].every(c => c.checked);
+            document.getElementById("debuff-all").checked = allChecked;
+        });
+    });
+
     // 빌드 비교 제어 버튼 리스너
     document.getElementById("btn-save-build").addEventListener("click", saveCurrentBuild);
     document.getElementById("btn-reset-build").addEventListener("click", resetBuildComparison);
@@ -147,19 +164,25 @@ function calculate() {
     const debuffCart = document.getElementById("debuff-cart").checked;
     const debuffPraga = document.getElementById("debuff-praga").checked;
     const debuffUpper = document.getElementById("debuff-upper").checked;
+    const debuffJack = document.getElementById("debuff-jack").checked;
     const debuffExploit = document.getElementById("debuff-exploit").checked;
-    const debuffMarker = document.getElementById("debuff-marker").checked;
+    const debuffSonic = document.getElementById("debuff-sonic").checked;
+    const sonicStacks = parseInt(document.getElementById("debuff-sonic-stacks").value) || 0;
 
-    let debuffProtRed = 0;
-    if (debuffCorgi) debuffProtRed += 15;
-    if (debuffHades) debuffProtRed += 10;
-    if (debuffCart) debuffProtRed += 3;
-    if (debuffPraga) debuffProtRed += 15;
-    if (debuffUpper) debuffProtRed += 28;
+    // 급소 관통: 몬스터 보호의 11%를 감소 (비율 기반, 고정 깎기 전에 적용)
+    let debuffProtPercent = 0;
+    if (debuffExploit) debuffProtPercent += 0.11;
+    const protAfterPercent = Math.max(0, targetProt * (1 - debuffProtPercent));
 
-    let physicalDebuffMult = 1.0;
-    if (debuffExploit) physicalDebuffMult *= 1.11;
-    if (debuffMarker) physicalDebuffMult *= 1.3267;
+    // 고정 보호 감소 디버프
+    let debuffProtFlat = 0;
+    if (debuffCorgi) debuffProtFlat += 15;
+    if (debuffHades) debuffProtFlat += 10;
+    if (debuffCart) debuffProtFlat += 3;
+    if (debuffPraga) debuffProtFlat += 15;
+    if (debuffUpper) debuffProtFlat += 28;
+    if (debuffJack) debuffProtFlat += 4;
+    if (debuffSonic) debuffProtFlat += sonicStacks * 5;
 
     // 무기 및 방패 효과
     const weaponKey = document.getElementById("equip-weapon").value;
@@ -282,8 +305,8 @@ function calculate() {
     // 실적용 피어싱 레벨 계산 (캐릭터 피어싱 - 적 저항)
     const netPiercing = Math.max(0, charPiercing - targetPiercingRes);
 
-    // 디버프 적용 후 적의 보호 수치
-    const targetProtAfterDebuffs = Math.max(0, targetProt - debuffProtRed);
+    // 디버프 적용 후 적의 보호 수치 (비율감소 → 고정감소 순서)
+    const targetProtAfterDebuffs = Math.max(0, protAfterPercent - debuffProtFlat);
 
     // 1) 일반/표준 피어싱 (최대 9레벨 제한)
     const normalPiercingLevel = Math.min(9, netPiercing);
@@ -322,7 +345,7 @@ function calculate() {
         (1 + bashVal) * 
         ladecaMult;
     
-    const windmillDmg = Math.max(0, (rawWindmillDmg * talentBonusDmgMult * normalProtMult) * physicalDebuffMult - reducedDefNormal);
+    const windmillDmg = Math.max(0, rawWindmillDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal);
 
     // 기저 돌진 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawChargeDmg = res0 * 
@@ -330,7 +353,7 @@ function calculate() {
         (1 + bashVal) * 
         ladecaMult;
 
-    const chargeDmg = Math.max(0, (rawChargeDmg * talentBonusDmgMult * normalProtMult) * physicalDebuffMult - reducedDefNormal);
+    const chargeDmg = Math.max(0, rawChargeDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal);
 
     // 기저 스매시 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawSmashDmg = res0 * 
@@ -340,14 +363,14 @@ function calculate() {
         (1 + bashVal) * 
         ladecaMult;
 
-    const smashDmg = Math.max(0, (rawSmashDmg * talentBonusDmgMult * normalProtMult) * physicalDebuffMult - reducedDefNormal);
+    const smashDmg = Math.max(0, rawSmashDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal);
 
     // 기저 배쉬 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawBashSkillDmg = res0 * 
         baseBashMult * 
         ladecaMult;
 
-    const bashSkillDmg = Math.max(0, (rawBashSkillDmg * talentBonusDmgMult * normalProtMult) * physicalDebuffMult - reducedDefNormal);
+    const bashSkillDmg = Math.max(0, rawBashSkillDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal);
 
     // 6. 세이크리드 가드 5대 스킬 데미지 연산 (아르카나 곱연산보댐 공식 적용)
     // 크리티컬 배율 공통 정의
@@ -355,42 +378,42 @@ function calculate() {
 
     // [1] 성역 전개:
     const rawSanctuary = res0 * 3.0 + finalDef * 1.5 + finalHp * 0.2;
-    const sanctuaryNormal = Math.max(0, (equipBonusDmgMult * (rawSanctuary * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult) * physicalDebuffMult - reducedDefNormal);
+    const sanctuaryNormal = Math.max(0, equipBonusDmgMult * (rawSanctuary * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal);
     const sanctuaryCrit = sanctuaryNormal * critMult;
 
     // [2] 철벽 강타:
     const rawIronwallArcana = res0 * 12.0 + finalDef * 6.0 + finalHp * 1.0;
-    const ironwallNormal = Math.max(0, (equipBonusDmgMult * ( (rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult) * physicalDebuffMult - reducedDefNormal);
+    const ironwallNormal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const ironwallCrit = ironwallNormal * critMult;
 
     // [2.5] 단죄의 일격 1단계:
     const rawCondemnation1Arcana = res0 * 15.0 + finalDef * 9.0 + finalHp * 1.5;
-    const condemnation1Normal = Math.max(0, (equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult) * physicalDebuffMult - reducedDefNormal);
+    const condemnation1Normal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const condemnation1Crit = condemnation1Normal * critMult;
 
     // [2.6] 단죄의 일격 2단계:
     const rawCondemnation2Arcana = res0 * 22.5 + finalDef * 13.5 + finalHp * 2.25;
-    const condemnation2Normal = Math.max(0, (equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult) * physicalDebuffMult - reducedDefNormal);
+    const condemnation2Normal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const condemnation2Crit = condemnation2Normal * critMult;
 
     // [2.7] 단죄의 일격 3단계:
     const rawCondemnation3Arcana = res0 * 30.0 + finalDef * 18.0 + finalHp * 3.0;
-    const condemnation3Normal = Math.max(0, (equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult) * physicalDebuffMult - reducedDefNormal);
+    const condemnation3Normal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const condemnation3Crit = condemnation3Normal * critMult;
 
     // [3] 심판의 일격:
     const rawJudgmentArcana = res0 * 35.0 + finalDef * 20.0 + finalHp * 5.0;
-    const judgmentNormal = Math.max(0, (equipBonusDmgMult * ( (rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult) * physicalDebuffMult - reducedDefNormal);
+    const judgmentNormal = Math.max(0, equipBonusDmgMult * ( (rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const judgmentCrit = judgmentNormal * critMult;
 
     // [4] 격돌:
     const rawClashArcana = res0 * 8.0 + finalDef * 6.0 + finalHp * 0.5;
-    const clashNormal = Math.max(0, (equipBonusDmgMult * ( (rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult) * physicalDebuffMult - reducedDefNormal);
+    const clashNormal = Math.max(0, equipBonusDmgMult * ( (rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * arcanaBonusDmgMult * normalProtMult ) * arcanaBonusDmgMult - reducedDefNormal);
     const clashCrit = clashNormal * critMult;
 
     // [5] 희생의 응징:
     const rawRetributionArcana = (res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
-    const retributionNormal = Math.max(0, (equipBonusDmgMult * (rawRetributionArcana * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult) * physicalDebuffMult - reducedDefNormal);
+    const retributionNormal = Math.max(0, equipBonusDmgMult * (rawRetributionArcana * arcanaBonusDmgMult) * arcanaBonusDmgMult * normalProtMult - reducedDefNormal);
     const retributionCrit = retributionNormal * critMult;
 
     // 7. UI 결과값 업데이트
@@ -436,7 +459,7 @@ function calculate() {
             <div class="math-step">
                 <span class="math-step-num">3단계 최종 합산</span>
                 <span class="math-step-text">
-                    - 최종 데미지 = [ ${equipMult.toFixed(4)} [장비보댐] &times; [ ${talentPartDmg.toLocaleString()} (재능) + ${arcanaPartDmg.toLocaleString()} (아르카나) ] &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${physicalDebuffMult.toFixed(4)} [물리디버프] - ${Math.floor(normalDef)} [적방어]
+                    - 최종 데미지 = ${equipMult.toFixed(4)} [장비보댐] &times; [ ${talentPartDmg.toLocaleString()} (재능) + ${arcanaPartDmg.toLocaleString()} (아르카나) ] &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(normalDef)} [적방어]
                 </span>
             </div>
             <div class="math-final">
@@ -463,7 +486,7 @@ function calculate() {
             <div class="math-step">
                 <span class="math-step-num">3단계 최종 합산</span>
                 <span class="math-step-text">
-                    - 최종 데미지 = [ ${equipMult.toFixed(4)} [장비보댐] &times; ${arcanaPartDmg.toLocaleString()} &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${physicalDebuffMult.toFixed(4)} [물리디버프] - ${Math.floor(normalDef)} [적방어]
+                    - 최종 데미지 = ${equipMult.toFixed(4)} [장비보댐] &times; ${arcanaPartDmg.toLocaleString()} &times; ${arcanaDmgMult.toFixed(4)} [아르카나보댐] - ${Math.floor(normalDef)} [적방어]
                 </span>
             </div>
             <div class="math-final">
@@ -483,7 +506,7 @@ function calculate() {
             <div class="math-step">
                 <span class="math-step-num">2단계 피어싱 보댐 적용</span>
                 <span class="math-step-text">
-                    - 최종 데미지 = [ ${Math.floor(rawTalent).toLocaleString()} &times; ${talentMult.toFixed(4)} [보너스대미지] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] ] &times; ${physicalDebuffMult.toFixed(4)} [물리디버프] - ${Math.floor(normalDef)} [적방어]
+                    - 최종 데미지 = ${Math.floor(rawTalent).toLocaleString()} &times; ${talentMult.toFixed(4)} [보너스대미지] &times; ${normalProt.toFixed(4)} [기본피어싱 댐감율] - ${Math.floor(normalDef)} [적방어]
                 </span>
             </div>
             <div class="math-final">

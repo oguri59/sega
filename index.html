@@ -120,38 +120,56 @@
                             선택한 대상의 보호, 방어력, 피어싱 저항 수치가 데미지 계산에 자동 적용됩니다.
                         </div>
                         <div class="debuff-section" style="margin-top: 1.5rem; border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 1rem;">
-                            <h3 style="font-size: 0.9rem; margin-bottom: 0.8rem; color: #ffd700; display: flex; align-items: center; gap: 0.3rem; font-family: 'Noto Sans KR', sans-serif;">
-                                <span>🧪</span> 디버프 설정 (기본 활성화)
-                            </h3>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
+                                <h3 style="font-size: 0.9rem; color: #ffd700; display: flex; align-items: center; gap: 0.3rem; font-family: 'Noto Sans KR', sans-serif; margin: 0;">
+                                    <span>🧪</span> 디버프 설정
+                                </h3>
+                                <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 4px; padding: 0.2rem 0.5rem;">
+                                    <input type="checkbox" id="debuff-all" checked>
+                                    <span style="color: #ffd700; font-weight: 600;">ALL</span>
+                                </label>
+                            </div>
                             <div class="checkbox-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem; font-family: 'Noto Sans KR', sans-serif;">
                                 <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-                                    <input type="checkbox" id="debuff-corgi" checked>
-                                    <span>코기 (야옹) [보호 -15]</span>
+                                    <input type="checkbox" id="debuff-corgi" class="debuff-item" checked>
+                                    <span>야옹 [보호 -15]</span>
                                 </label>
                                 <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-                                    <input type="checkbox" id="debuff-hades" checked>
-                                    <span>하데스/미르 [보호 -10]</span>
+                                    <input type="checkbox" id="debuff-hades" class="debuff-item" checked>
+                                    <span>케라 [보호 -10]</span>
                                 </label>
                                 <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-                                    <input type="checkbox" id="debuff-cart" checked>
-                                    <span>카트 (물풍선) [보호 -3]</span>
+                                    <input type="checkbox" id="debuff-cart" class="debuff-item" checked>
+                                    <span>물풍선 [보호 -3]</span>
                                 </label>
                                 <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-                                    <input type="checkbox" id="debuff-praga" checked>
+                                    <input type="checkbox" id="debuff-praga" class="debuff-item" checked>
                                     <span>프라가라흐 [보호 -15]</span>
                                 </label>
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; grid-column: span 2;">
-                                    <input type="checkbox" id="debuff-upper" checked>
-                                    <span>스크류 어퍼 [보호 -28]</span>
+                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="debuff-upper" class="debuff-item" checked>
+                                    <span>어퍼 [보호 -28]</span>
                                 </label>
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; margin-top: 0.3rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem;">
-                                    <input type="checkbox" id="debuff-exploit" checked>
-                                    <span>급소 관통 [물리 +11%]</span>
+                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="debuff-jack" class="debuff-item" checked>
+                                    <span>잭 [보호 -4]</span>
                                 </label>
-                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; margin-top: 0.3rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem;">
-                                    <input type="checkbox" id="debuff-marker" checked>
-                                    <span>데스 마커 [물리 +32.67%]</span>
+                                <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="debuff-exploit" class="debuff-item" checked>
+                                    <span>급소 관통 [보호 -11%]</span>
                                 </label>
+                                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                    <input type="checkbox" id="debuff-sonic" class="debuff-item" checked>
+                                    <span>음파의 세례</span>
+                                    <select id="debuff-sonic-stacks" style="width: 52px; padding: 0.1rem 0.2rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px;">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5" selected>5</option>
+                                    </select>
+                                    <span style="font-size: 0.72rem; color: #aaa;">스택</span>
+                                </div>
                             </div>
                         </div>
                     </div>
