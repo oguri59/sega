@@ -630,7 +630,7 @@
                         <div class="breakdown-item">
                             <h3>성역 전개</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 맥댐 * 3.0 + 방어 * 1.5 + 생명 * 0.2</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (맥댐 * 3.0 + 방어 * 1.5 + 생명 * 0.2) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-sanctuary">
                                     0 * 3.0 + 0 * 1.5 + 0 * 0.2 = 0
                                 </div>
@@ -640,7 +640,7 @@
                         <div class="breakdown-item">
                             <h3>철벽 강타</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 윈드밀 * 1.5 + 맥댐 * 12.0 + 방어 * 6.0 + 생명 * 1.0</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.5) * 일반보댐 + (맥댐 * 12.0 + 방어 * 6.0 + 생명 * 1.0) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-ironwall">
                                     0 * 1.5 + 0 * 12.0 + 0 * 6.0 + 0 * 1.0 = 0
                                 </div>
@@ -650,7 +650,7 @@
                         <div class="breakdown-item">
                             <h3>단죄의 일격 1단계</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 윈드밀 * 1.75 + 맥댐 * 15.0 + 방어 * 9.0 + 생명 * 1.5</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 15.0 + 방어 * 9.0 + 생명 * 1.5) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-condemnation1">
                                     0 * 1.75 + 0 * 15.0 + 0 * 9.0 + 0 * 1.5 = 0
                                 </div>
@@ -660,7 +660,7 @@
                         <div class="breakdown-item">
                             <h3>단죄의 일격 2단계</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 윈드밀 * 1.75 + 맥댐 * 22.5 + 방어 * 13.5 + 생명 * 2.25</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 22.5 + 방어 * 13.5 + 생명 * 2.25) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-condemnation2">
                                     0 * 1.75 + 0 * 22.5 + 0 * 13.5 + 0 * 2.25 = 0
                                 </div>
@@ -670,7 +670,7 @@
                         <div class="breakdown-item">
                             <h3>단죄의 일격 3단계</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 윈드밀 * 1.75 + 맥댐 * 30.0 + 방어 * 18.0 + 생명 * 3.0</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 1.75) * 일반보댐 + (맥댐 * 30.0 + 방어 * 18.0 + 생명 * 3.0) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-condemnation3">
                                     0 * 1.75 + 0 * 30.0 + 0 * 18.0 + 0 * 3.0 = 0
                                 </div>
@@ -680,7 +680,7 @@
                         <div class="breakdown-item">
                             <h3>심판의 일격</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 윈드밀 * 2.0 + 맥댐 * 35.0 + 방어 * 20.0 + 생명 * 5.0</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (윈드밀 * 2.0) * 일반보댐 + (맥댐 * 35.0 + 방어 * 20.0 + 생명 * 5.0) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-judgment">
                                     0 * 2.0 + 0 * 35.0 + 0 * 20.0 + 0 * 5.0 = 0
                                 </div>
@@ -690,7 +690,7 @@
                         <div class="breakdown-item">
                             <h3>격돌</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 돌진 * 1.5 + 맥댐 * 8.0 + 방어 * 6.0 + 생명 * 0.5</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ (돌진 * 1.5) * 일반보댐 + (맥댐 * 8.0 + 방어 * 6.0 + 생명 * 0.5) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-clash">
                                     0 * 1.5 + 0 * 8.0 + 0 * 6.0 + 0 * 0.5 = 0
                                 </div>
@@ -700,7 +700,7 @@
                         <div class="breakdown-item">
                             <h3>희생의 응징</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = (맥댐 * 60.0 + 방어 * 40.0 + 생명 * 15.0) * 방패감소율 * 보너스대미지</span>
+                                <span class="formula-text">최종 대미지 = 장비보댐 * [ ((맥댐 * 60.0 + 방어 * 40.0 + 생명 * 15.0) * (1 + 방패감소율)) * 아르카나보댐 ] * 아르카나보댐</span>
                                 <div class="math-resolve" id="math-retribution">
                                     0 * 60.0 + 0 * 40.0 + 0 * 15.0 = 0
                                 </div>
@@ -710,7 +710,7 @@
                         <div class="breakdown-item">
                             <h3>스매시</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 맥댐 * 스매시배율 * 양손검보너스 * 스매강세트 * 배쉬 * 라데카 * 보너스대미지</span>
+                                <span class="formula-text">최종 대미지 = 맥댐 * 스매시배율 * 양손검보너스 * 스매강세트 * 배쉬 * 라데카 * 장비보댐 * 일반보댐</span>
                                 <div class="math-resolve" id="math-smash">
                                     0 * 6.2 * 1.0 * 1.0 * 1.0 * 1.0 * 1.0 = 0
                                 </div>
@@ -720,7 +720,7 @@
                         <div class="breakdown-item">
                             <h3>배쉬</h3>
                             <div class="formula-box">
-                                <span class="formula-text">최종 대미지 = 맥댐 * 배쉬배율 * 라데카 * 보너스대미지</span>
+                                <span class="formula-text">최종 대미지 = 맥댐 * 배쉬배율 * 라데카 * 장비보댐 * 일반보댐</span>
                                 <div class="math-resolve" id="math-bash">
                                     0 * 5.0 * 1.0 * 1.0 = 0
                                 </div>

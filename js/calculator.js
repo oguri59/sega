@@ -231,6 +231,14 @@ function calculate() {
     document.getElementById("smash-final-mult-label").textContent = `${Math.round(baseSmashMult * 100)}%`;
     document.getElementById("bash-final-mult-label").textContent = `${Math.round(baseBashMult * 100)}%`;
 
+    // 보너스 대미지 배율 상세 정의 (DC인사이드 분석글 기반 카테고리 분리 곱연산)
+    const equipBonusDmgMult = 1 + (weapon.bonusDmg + shieldBonusDmgApply) / 100; // 장비보댐효과
+    const normalBonusDmgMult = 1 + bonusDmg / 100; // 일반보댐효과
+    const arcanaBonusDmgMult = 1 + arcanaBonusDmg / 100; // 아르카나보댐효과
+
+    // 일반 재능 스킬용 보너스 대미지 최종 배율
+    const talentBonusDmgMult = equipBonusDmgMult * normalBonusDmgMult;
+
     // 기저 윈드밀 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawWindmillDmg = res0 * 
         baseWindmillMult * 
@@ -238,7 +246,7 @@ function calculate() {
         (1 + bashVal) * 
         ladecaMult;
     
-    const windmillDmg = rawWindmillDmg * (1 + totalBonusDmg / 100);
+    const windmillDmg = rawWindmillDmg * talentBonusDmgMult;
 
     // 기저 돌진 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawChargeDmg = res0 * 
@@ -246,7 +254,7 @@ function calculate() {
         (1 + bashVal) * 
         ladecaMult;
 
-    const chargeDmg = rawChargeDmg * (1 + totalBonusDmg / 100);
+    const chargeDmg = rawChargeDmg * talentBonusDmgMult;
 
     // 기저 스매시 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawSmashDmg = res0 * 
@@ -256,57 +264,57 @@ function calculate() {
         (1 + bashVal) * 
         ladecaMult;
 
-    const smashDmg = rawSmashDmg * (1 + totalBonusDmg / 100);
+    const smashDmg = rawSmashDmg * talentBonusDmgMult;
 
     // 기저 배쉬 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawBashSkillDmg = res0 * 
         baseBashMult * 
         ladecaMult;
 
-    const bashSkillDmg = rawBashSkillDmg * (1 + totalBonusDmg / 100);
+    const bashSkillDmg = rawBashSkillDmg * talentBonusDmgMult;
 
-    // 6. 세이크리드 가드 5대 스킬 데미지 연산
+    // 6. 세이크리드 가드 5대 스킬 데미지 연산 (아르카나 곱연산보댐 공식 적용)
     // 크리티컬 배율 공통 정의
     const critMult = 2.5 + (addCrit / 100);
 
-    // [1] 성역 전개: (맥댐 300% + 방어 150% + 생명 20%) * 보너스 대미지
+    // [1] 성역 전개:
     const rawSanctuary = res0 * 3.0 + finalDef * 1.5 + finalHp * 0.2;
-    const sanctuaryNormal = rawSanctuary * (1 + totalBonusDmg / 100);
+    const sanctuaryNormal = equipBonusDmgMult * (rawSanctuary * arcanaBonusDmgMult) * arcanaBonusDmgMult;
     const sanctuaryCrit = sanctuaryNormal * critMult;
 
-    // [2] 철벽 강타: (윈드밀 150% + 맥댐 1200% + 방어 600% + 생명 100%) * 보너스 대미지
-    const rawIronwall = rawWindmillDmg * 1.5 + res0 * 12.0 + finalDef * 6.0 + finalHp * 1.0;
-    const ironwallNormal = rawIronwall * (1 + totalBonusDmg / 100);
+    // [2] 철벽 강타:
+    const rawIronwallArcana = res0 * 12.0 + finalDef * 6.0 + finalHp * 1.0;
+    const ironwallNormal = equipBonusDmgMult * ( (rawWindmillDmg * 1.5) * normalBonusDmgMult + rawIronwallArcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
     const ironwallCrit = ironwallNormal * critMult;
 
-    // [2.5] 단죄의 일격 1단계: (윈드밀 175% + 맥댐 1500% + 방어 900% + 생명 150%) * 보너스 대미지
-    const rawCondemnation1 = rawWindmillDmg * 1.75 + res0 * 15.0 + finalDef * 9.0 + finalHp * 1.5;
-    const condemnation1Normal = rawCondemnation1 * (1 + totalBonusDmg / 100);
+    // [2.5] 단죄의 일격 1단계:
+    const rawCondemnation1Arcana = res0 * 15.0 + finalDef * 9.0 + finalHp * 1.5;
+    const condemnation1Normal = equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult + rawCondemnation1Arcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
     const condemnation1Crit = condemnation1Normal * critMult;
 
-    // [2.6] 단죄의 일격 2단계: (윈드밀 175% + 맥댐 2250% + 방어 1350% + 생명 225%) * 보너스 대미지
-    const rawCondemnation2 = rawWindmillDmg * 1.75 + res0 * 22.5 + finalDef * 13.5 + finalHp * 2.25;
-    const condemnation2Normal = rawCondemnation2 * (1 + totalBonusDmg / 100);
+    // [2.6] 단죄의 일격 2단계:
+    const rawCondemnation2Arcana = res0 * 22.5 + finalDef * 13.5 + finalHp * 2.25;
+    const condemnation2Normal = equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult + rawCondemnation2Arcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
     const condemnation2Crit = condemnation2Normal * critMult;
 
-    // [2.7] 단죄의 일격 3단계: (윈드밀 175% + 맥댐 3000% + 방어 1800% + 생명 300%) * 보너스 대미지
-    const rawCondemnation3 = rawWindmillDmg * 1.75 + res0 * 30.0 + finalDef * 18.0 + finalHp * 3.0;
-    const condemnation3Normal = rawCondemnation3 * (1 + totalBonusDmg / 100);
+    // [2.7] 단죄의 일격 3단계:
+    const rawCondemnation3Arcana = res0 * 30.0 + finalDef * 18.0 + finalHp * 3.0;
+    const condemnation3Normal = equipBonusDmgMult * ( (rawWindmillDmg * 1.75) * normalBonusDmgMult + rawCondemnation3Arcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
     const condemnation3Crit = condemnation3Normal * critMult;
 
-    // [3] 심판의 일격: (윈드밀 200% + 맥댐 3500% + 방어 2000% + 생명 500%) * 보너스 대미지
-    const rawJudgment = rawWindmillDmg * 2.0 + res0 * 35.0 + finalDef * 20.0 + finalHp * 5.0;
-    const judgmentNormal = rawJudgment * (1 + totalBonusDmg / 100);
+    // [3] 심판의 일격:
+    const rawJudgmentArcana = res0 * 35.0 + finalDef * 20.0 + finalHp * 5.0;
+    const judgmentNormal = equipBonusDmgMult * ( (rawWindmillDmg * 2.0) * normalBonusDmgMult + rawJudgmentArcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
     const judgmentCrit = judgmentNormal * critMult;
 
-    // [4] 격돌: (돌진 150% + 맥댐 800% + 방어 600% + 생명 50%) * 보너스 대미지
-    const rawClash = rawChargeDmg * 1.5 + res0 * 8.0 + finalDef * 6.0 + finalHp * 0.5;
-    const clashNormal = rawClash * (1 + totalBonusDmg / 100);
+    // [4] 격돌:
+    const rawClashArcana = res0 * 8.0 + finalDef * 6.0 + finalHp * 0.5;
+    const clashNormal = equipBonusDmgMult * ( (rawChargeDmg * 1.5) * normalBonusDmgMult + rawClashArcana * arcanaBonusDmgMult ) * arcanaBonusDmgMult;
     const clashCrit = clashNormal * critMult;
 
-    // [5] 희생의 응징: (맥댐 60.0 + 방어 40.0 + 생명력 15.0) * (1 + 방패 대미지 감소율 / 100) * 보너스 대미지
-    const rawRetribution = (res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
-    const retributionNormal = rawRetribution * (1 + totalBonusDmg / 100);
+    // [5] 희생의 응징:
+    const rawRetributionArcana = (res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
+    const retributionNormal = equipBonusDmgMult * (rawRetributionArcana * arcanaBonusDmgMult) * arcanaBonusDmgMult;
     const retributionCrit = retributionNormal * critMult;
 
     // 7. UI 결과값 업데이트
@@ -332,56 +340,46 @@ function calculate() {
 
     // 8. 데미지 공식 상세 분해 렌더링
     document.getElementById("math-sanctuary").innerHTML = 
-        `[(${Math.floor(res0).toLocaleString()} &times; 3.0) + (${Math.floor(finalDef).toLocaleString()} &times; 1.5) + (${Math.floor(finalHp).toLocaleString()} &times; 0.2)] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= [${Math.floor(res0 * 3.0).toLocaleString()} + ${Math.floor(finalDef * 1.5).toLocaleString()} + ${Math.floor(finalHp * 0.2).toLocaleString()}] &times; ${(1 + totalBonusDmg / 100).toFixed(2)}<br>` +
-        `= ${Math.floor(rawSanctuary).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(sanctuaryNormal).toLocaleString()}</strong>`;
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawSanctuary).toLocaleString()} [성역계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `= <strong>${Math.floor(sanctuaryNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-ironwall").innerHTML = 
-        `[(${Math.floor(rawWindmillDmg).toLocaleString()} &times; 1.5) + (${Math.floor(res0).toLocaleString()} &times; 12.0) + (${Math.floor(finalDef).toLocaleString()} &times; 6.0) + (${Math.floor(finalHp).toLocaleString()} &times; 1.0)] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= [${Math.floor(rawWindmillDmg * 1.5).toLocaleString()} + ${Math.floor(res0 * 12.0).toLocaleString()} + ${Math.floor(finalDef * 6.0).toLocaleString()} + ${Math.floor(finalHp * 1.0).toLocaleString()}] &times; ${(1 + totalBonusDmg / 100).toFixed(2)}<br>` +
-        `= ${Math.floor(rawIronwall).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(ironwallNormal).toLocaleString()}</strong>`;
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 1.5).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawIronwallArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `= <strong>${Math.floor(ironwallNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-condemnation1").innerHTML = 
-        `[(${Math.floor(rawWindmillDmg).toLocaleString()} &times; 1.75) + (${Math.floor(res0).toLocaleString()} &times; 15.0) + (${Math.floor(finalDef).toLocaleString()} &times; 9.0) + (${Math.floor(finalHp).toLocaleString()} &times; 1.5)] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= [${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} + ${Math.floor(res0 * 15.0).toLocaleString()} + ${Math.floor(finalDef * 9.0).toLocaleString()} + ${Math.floor(finalHp * 1.5).toLocaleString()}] &times; ${(1 + totalBonusDmg / 100).toFixed(2)}<br>` +
-        `= ${Math.floor(rawCondemnation1).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(condemnation1Normal).toLocaleString()}</strong>`;
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawCondemnation1Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `= <strong>${Math.floor(condemnation1Normal).toLocaleString()}</strong>`;
 
     document.getElementById("math-condemnation2").innerHTML = 
-        `[(${Math.floor(rawWindmillDmg).toLocaleString()} &times; 1.75) + (${Math.floor(res0).toLocaleString()} &times; 22.5) + (${Math.floor(finalDef).toLocaleString()} &times; 13.5) + (${Math.floor(finalHp).toLocaleString()} &times; 2.25)] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= [${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} + ${Math.floor(res0 * 22.5).toLocaleString()} + ${Math.floor(finalDef * 13.5).toLocaleString()} + ${Math.floor(finalHp * 2.25).toLocaleString()}] &times; ${(1 + totalBonusDmg / 100).toFixed(2)}<br>` +
-        `= ${Math.floor(rawCondemnation2).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(condemnation2Normal).toLocaleString()}</strong>`;
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawCondemnation2Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `= <strong>${Math.floor(condemnation2Normal).toLocaleString()}</strong>`;
 
     document.getElementById("math-condemnation3").innerHTML = 
-        `[(${Math.floor(rawWindmillDmg).toLocaleString()} &times; 1.75) + (${Math.floor(res0).toLocaleString()} &times; 30.0) + (${Math.floor(finalDef).toLocaleString()} &times; 18.0) + (${Math.floor(finalHp).toLocaleString()} &times; 3.0)] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= [${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} + ${Math.floor(res0 * 30.0).toLocaleString()} + ${Math.floor(finalDef * 18.0).toLocaleString()} + ${Math.floor(finalHp * 3.0).toLocaleString()}] &times; ${(1 + totalBonusDmg / 100).toFixed(2)}<br>` +
-        `= ${Math.floor(rawCondemnation3).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(condemnation3Normal).toLocaleString()}</strong>`;
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 1.75).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawCondemnation3Arcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `= <strong>${Math.floor(condemnation3Normal).toLocaleString()}</strong>`;
 
     document.getElementById("math-judgment").innerHTML = 
-        `[(${Math.floor(rawWindmillDmg).toLocaleString()} &times; 2.0) + (${Math.floor(res0).toLocaleString()} &times; 35.0) + (${Math.floor(finalDef).toLocaleString()} &times; 20.0) + (${Math.floor(finalHp).toLocaleString()} &times; 5.0)] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= [${Math.floor(rawWindmillDmg * 2.0).toLocaleString()} + ${Math.floor(res0 * 35.0).toLocaleString()} + ${Math.floor(finalDef * 20.0).toLocaleString()} + ${Math.floor(finalHp * 5.0).toLocaleString()}] &times; ${(1 + totalBonusDmg / 100).toFixed(2)}<br>` +
-        `= ${Math.floor(rawJudgment).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(judgmentNormal).toLocaleString()}</strong>`;
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawWindmillDmg * 2.0).toLocaleString()} [윈밀계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawJudgmentArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `= <strong>${Math.floor(judgmentNormal).toLocaleString()}</strong>`;
 
     document.getElementById("math-clash").innerHTML = 
-        `[(${Math.floor(rawChargeDmg).toLocaleString()} &times; 1.5) + (${Math.floor(res0).toLocaleString()} &times; 8.0) + (${Math.floor(finalDef).toLocaleString()} &times; 6.0) + (${Math.floor(finalHp).toLocaleString()} &times; 0.5)] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= [${Math.floor(rawChargeDmg * 1.5).toLocaleString()} + ${Math.floor(res0 * 8.0).toLocaleString()} + ${Math.floor(finalDef * 6.0).toLocaleString()} + ${Math.floor(finalHp * 0.5).toLocaleString()}] &times; ${(1 + totalBonusDmg / 100).toFixed(2)}<br>` +
-        `= ${Math.floor(rawClash).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(clashNormal).toLocaleString()}</strong>`;
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawChargeDmg * 1.5).toLocaleString()} [돌진계수]) &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐] + (${Math.floor(rawClashArcana).toLocaleString()} [아르카나계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `= <strong>${Math.floor(clashNormal).toLocaleString()}</strong>`;
 
-    const baseRetributionVal = res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0;
-    const retributionShieldFactor = 1 + shield.drr / 100;
     document.getElementById("math-retribution").innerHTML = 
-        `[(${Math.floor(res0).toLocaleString()} &times; 60.0) + (${Math.floor(finalDef).toLocaleString()} &times; 40.0) + (${Math.floor(finalHp).toLocaleString()} &times; 15.0)] &times; ${retributionShieldFactor.toFixed(2)} [방패감소율] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= [${Math.floor(res0 * 60.0).toLocaleString()} + ${Math.floor(finalDef * 40.0).toLocaleString()} + ${Math.floor(finalHp * 15.0).toLocaleString()}] &times; ${retributionShieldFactor.toFixed(2)} &times; ${(1 + totalBonusDmg / 100).toFixed(2)}<br>` +
-        `= ${Math.floor(baseRetributionVal * retributionShieldFactor).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(retributionNormal).toLocaleString()}</strong>`;
+        `${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; [ (${Math.floor(rawRetributionArcana).toLocaleString()} [응징계수]) &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐] ] &times; ${arcanaBonusDmgMult.toFixed(4)} [아르카나보댐]<br>` +
+        `= <strong>${Math.floor(retributionNormal).toLocaleString()}</strong>`;
 
     // 스매시 분해
     document.getElementById("math-smash").innerHTML = 
-        `[(${Math.floor(res0).toLocaleString()} &times; ${baseSmashMult.toFixed(2)}) &times; ${(1 + weaponSmashBonus).toFixed(2)} [양검보너스] &times; ${(1 + (setSmash ? 0.15 : 0) + weaponSetSmash).toFixed(2)} [스매강] &times; ${(1 + bashVal).toFixed(2)} [배쉬] &times; ${ladecaMult.toFixed(2)} [라데카]] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= ${Math.floor(rawSmashDmg).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(smashDmg).toLocaleString()}</strong>`;
+        `${Math.floor(rawSmashDmg).toLocaleString()} [기저데미지] &times; ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐]<br>` +
+        `= <strong>${Math.floor(smashDmg).toLocaleString()}</strong>`;
 
     // 배쉬 분해
     document.getElementById("math-bash").innerHTML = 
-        `[(${Math.floor(res0).toLocaleString()} &times; ${baseBashMult.toFixed(2)}) &times; ${ladecaMult.toFixed(2)} [라데카]] &times; (1 + ${totalBonusDmg / 100}) [보너스대미지]<br>` +
-        `= ${Math.floor(rawBashSkillDmg).toLocaleString()} &times; ${(1 + totalBonusDmg / 100).toFixed(2)} = <strong>${Math.floor(bashSkillDmg).toLocaleString()}</strong>`;
+        `${Math.floor(rawBashSkillDmg).toLocaleString()} [기저데미지] &times; ${equipBonusDmgMult.toFixed(4)} [장비보댐] &times; ${normalBonusDmgMult.toFixed(4)} [일반보댐]<br>` +
+        `= <strong>${Math.floor(bashSkillDmg).toLocaleString()}</strong>`;
 
     // 9. 빌드 비교 렌더링 수행
     updateComparisonUI(results);
