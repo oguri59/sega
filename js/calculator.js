@@ -320,11 +320,11 @@ function calculate() {
     // 엘프(none)는 곱연산 없음 (1.0)
 
     // 4. 최종 스탯 연산
-    // 최종 보정 맥댐 (물공포 + 전장의 서곡 적용)
+    // 최종 보정 맥댐 ((기본맥 * 물공포) * (1 + 전장 * 물공포) * (1 + 상지 * 물공포))
     const potionFactor = potionActive ? 1.2 : 1.0;
-    let res0 = maxDmg * potionFactor * (1 + (bfo / 100));
+    let res0 = maxDmg * potionFactor * (1 + (bfo / 100) * potionFactor);
     if (buffSangji) {
-        res0 = res0 * 1.12;
+        res0 = res0 * (1 + 0.12 * potionFactor);
     }
 
     // 최종 방어력 (기본 방어력 + 최종 맥댐의 3% 자동 합산)
