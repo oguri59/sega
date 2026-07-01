@@ -193,6 +193,7 @@ function calculate() {
     const debuffDeathmarkerSaren = document.getElementById("debuff-deathmarker-saren").checked;
     const debuffMomo = document.getElementById("debuff-momo").checked;
     const debuffMagigraffDefprot = document.getElementById("debuff-magigraff-defprot").checked;
+    const debuffKun = document.getElementById("debuff-kun").checked;
 
     // 데스 마커 및 어퍼 라벨 동적 갱신
     // 데스마커: 세공 1레벨당 0.25% 증가, 스아렌 체크 시 3% 추가
@@ -284,6 +285,23 @@ function calculate() {
     }
     const buffSpiritTransform = buffSpiritTransformEl ? buffSpiritTransformEl.checked : false;
     const buffSpiritTransformEnhance = buffSpiritTransformEnhanceEl ? buffSpiritTransformEnhanceEl.checked : false;
+
+    // 이면 및 이면 토템 파싱 및 상태 동기화
+    const debuffImenEl = document.getElementById("debuff-imen");
+    const debuffImenTotemEl = document.getElementById("debuff-imen-totem");
+    if (debuffImenEl && debuffImenTotemEl) {
+        debuffImenTotemEl.disabled = !debuffImenEl.checked;
+        if (!debuffImenEl.checked) {
+            debuffImenTotemEl.checked = false;
+        }
+    }
+    const debuffImen = debuffImenEl ? debuffImenEl.checked : false;
+    const debuffImenTotem = debuffImenTotemEl ? debuffImenTotemEl.checked : false;
+    
+    const imenTotalPctEl = document.getElementById("imen-total-pct");
+    if (imenTotalPctEl) {
+        imenTotalPctEl.textContent = debuffImenTotem ? "5" : "3";
+    }
 
     // 마기그래프 파싱
     const buffMagigraffCharge = document.getElementById("buff-magigraff-charge").checked;
@@ -445,11 +463,18 @@ function calculate() {
         spiritTransformDmg = buffSpiritTransformEnhance ? 25 : 10;
     }
 
+    // 쿤(Cwn Annwn) 디버프 적용 시 크리티컬 적중 시 보너스 대미지 +3%
+    const bonusDmgCrit = bonusDmg + (debuffKun ? 3 : 0);
+
     // 재능 파트 일반보댐: 입력값 + 세바보댐 + 브레스 + 약점분석 + 정령실체화 모두 합산
     const sebaBonusDmg = buffSebaBonus ? (bfo * 0.1) : 0;
     const normalBonusDmgMult = 1 + (bonusDmg + sebaBonusDmg + ladecaBreathBonus + (buffWeaknessAnalysis ? 10 : 0) + spiritTransformDmg) / 100;
     // 아르카나 파트 일반보댐: 입력값 + 세바보댐 (브레스/약분/정령실체화 제외)
     const arcanaNormalBonusDmgMult = 1 + (bonusDmg + sebaBonusDmg) / 100;
+
+    // 크리티컬 적중 시 재능 파트 및 아르카나 파트 보너스 대미지 최종 배율 (쿤 디버프 반영)
+    const normalBonusDmgMultCrit = 1 + (bonusDmgCrit + sebaBonusDmg + ladecaBreathBonus + (buffWeaknessAnalysis ? 10 : 0) + spiritTransformDmg) / 100;
+    const arcanaNormalBonusDmgMultCrit = 1 + (bonusDmgCrit + sebaBonusDmg) / 100;
 
     // 카드 breakdown용 레이블 (구성 항목 나열)
     const normalBonusDmgParts = [
@@ -475,6 +500,7 @@ function calculate() {
 
     // 일반 재능 스킬용 보너스 대미지 최종 배율 (equipBonusDmgMult * talentNormalBonusDmgMult)
     const talentBonusDmgMult = equipBonusDmgMult * normalBonusDmgMult;
+    const talentBonusDmgMultCrit = equipBonusDmgMult * normalBonusDmgMultCrit;
 
     // 최종데미지 증댐 디버프 배율 (곱연산)
     const masterAbrasiveMult = buffMasterAbrasive ? 1.03 : 1.0;
@@ -482,11 +508,15 @@ function calculate() {
     const proPackMult = buffProPack ? 1.01 : 1.0;
     const deathmarkerMultiplier = 1 + deathmarkerValueTotal / 100;
     const gupkwanMult = buffGupkwan ? 1.15 : 1.0;
-    const finalDmgMultiplier = (debuffDeathmarker ? deathmarkerMultiplier : 1.0) * (debuffMomo ? 1.15 : 1.0) * masterAbrasiveMult * leimMult * proPackMult * gupkwanMult;
+    const imenMult = debuffImen ? (debuffImenTotem ? 1.05 : 1.03) : 1.0;
+    const finalDmgMultiplier = (debuffDeathmarker ? deathmarkerMultiplier : 1.0) * (debuffMomo ? 1.15 : 1.0) * masterAbrasiveMult * leimMult * proPackMult * gupkwanMult * imenMult;
 
     // 성찰의 흔적 데미지 증가배율 (희생의 응징 유물 레벨당 *0.5% 증가, 기본 10%)
     const reflectionTracePct = 10 + relicRetribution * 0.5;
     const reflectionTraceMult = buffReflectionTrace ? (1 + reflectionTracePct / 100) : 1.0;
+
+    // 크리티컬 배율 공통 정의
+    const critMult = 2.5 + (addCrit / 100);
 
     // 윈드밀 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawWindmillDmg = res0 *
@@ -495,6 +525,7 @@ function calculate() {
         ladecaMult;
 
     const windmillDmg = Math.max(1, Math.floor(Math.max(0, rawWindmillDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier));
+    const windmillCrit = Math.max(1, Math.floor(Math.max(0, rawWindmillDmg * talentBonusDmgMultCrit * normalProtMult - reducedDefNormal) * finalDmgMultiplier * critMult));
 
     // 돌진 스킬 데미지 (보너스 대미지 곱연산 이전)
     const rawChargeDmg = res0 *
@@ -503,6 +534,7 @@ function calculate() {
         ladecaMult;
 
     const chargeDmg = Math.max(1, Math.floor(Math.max(0, rawChargeDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier));
+    const chargeCrit = Math.max(1, Math.floor(Math.max(0, rawChargeDmg * talentBonusDmgMultCrit * normalProtMult - reducedDefNormal) * finalDmgMultiplier * critMult));
 
     // 스매시 스킬 데미지 (보너스 대미지 곱연산 이전)
     // 무기/아이템 증가 % 적용: 양손무기보너스(1+weaponTwoHandedSmashBonus) * 무기스매시보너스(1+weaponSmashBonus)
@@ -515,6 +547,7 @@ function calculate() {
         ladecaMult;
 
     const smashDmg = Math.max(1, Math.floor(Math.max(0, rawSmashDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier));
+    const smashCrit = Math.max(1, Math.floor(Math.max(0, rawSmashDmg * talentBonusDmgMultCrit * normalProtMult - reducedDefNormal) * finalDmgMultiplier * critMult));
 
     // 배쉬 스킬 데미지 (보너스 대미지 곱연산 이전)
     // 무기 배쉬보너스 적용: (1 + weaponBashBonus)
@@ -524,51 +557,50 @@ function calculate() {
         ladecaMult;
 
     const bashSkillDmg = Math.max(1, Math.floor(Math.max(0, rawBashSkillDmg * talentBonusDmgMult * normalProtMult - reducedDefNormal) * finalDmgMultiplier));
+    const bashSkillCrit = Math.max(1, Math.floor(Math.max(0, rawBashSkillDmg * talentBonusDmgMultCrit * normalProtMult - reducedDefNormal) * finalDmgMultiplier * critMult));
 
     // 6. 세이크리드 가드 5대 스킬 데미지 연산 (아르카나 곱연산보댐 공식 적용)
-    // 크리티컬 배율 공통 정의
-    const critMult = 2.5 + (addCrit / 100);
 
     // [1] 성역 전개: (링크보너스 최종데미지 100% 증가 즉 2.0배 곱)
     const rawSanctuary = res0 * 3.0 + finalDef * 1.5 + finalHp * 0.2;
     const sanctuaryNormal = Math.max(1, Math.floor(Math.max(0, (rawSanctuary * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 2.0 * finalDmgMultiplier * reflectionTraceMult));
-    const sanctuaryCrit = Math.max(1, Math.floor(sanctuaryNormal * critMult));
+    const sanctuaryCrit = Math.max(1, Math.floor(Math.max(0, (rawSanctuary * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 2.0 * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [2] 철벽 강타:
     const rawIronwallArcana = res0 * 12.0 + finalDef * 6.0 + finalHp * 1.0;
     const ironwallNormal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
-    const ironwallCrit = Math.max(1, Math.floor(ironwallNormal * critMult));
+    const ironwallCrit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.5) * normalBonusDmgMultCrit * doubleProtMult + rawIronwallArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [2.5] 단죄의 일격 1단계:
     const rawCondemnation1Arcana = res0 * 15.0 + finalDef * 9.0 + finalHp * 1.5;
     const condemnation1Normal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
-    const condemnation1Crit = Math.max(1, Math.floor(condemnation1Normal * critMult));
+    const condemnation1Crit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMultCrit * doubleProtMult + rawCondemnation1Arcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [2.6] 단죄의 일격 2단계:
     const rawCondemnation2Arcana = res0 * 22.5 + finalDef * 13.5 + finalHp * 2.25;
     const condemnation2Normal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
-    const condemnation2Crit = Math.max(1, Math.floor(condemnation2Normal * critMult));
+    const condemnation2Crit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMultCrit * doubleProtMult + rawCondemnation2Arcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [2.7] 단죄의 일격 3단계:
     const rawCondemnation3Arcana = res0 * 30.0 + finalDef * 18.0 + finalHp * 3.0;
     const condemnation3Normal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
-    const condemnation3Crit = Math.max(1, Math.floor(condemnation3Normal * critMult));
+    const condemnation3Crit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMultCrit * doubleProtMult + rawCondemnation3Arcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [3] 심판의 일격: (링크보너스 최종데미지 20% 증가 즉 1.2배 곱, 심판 유물레벨당 맥댐계수 +100% 합산)
     const rawJudgmentArcana = res0 * (35.0 + relicJudgment * 1.0) + finalDef * 20.0 + finalHp * 5.0;
     const judgmentNormal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier * reflectionTraceMult));
-    const judgmentCrit = Math.max(1, Math.floor(judgmentNormal * critMult));
+    const judgmentCrit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 2.0) * normalBonusDmgMultCrit * doubleProtMult + rawJudgmentArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [4] 격돌:
     const rawClashArcana = res0 * 8.0 + finalDef * 6.0 + finalHp * 0.5;
     const clashNormal = Math.max(1, Math.floor(Math.max(0, ((rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
-    const clashCrit = Math.max(1, Math.floor(clashNormal * critMult));
+    const clashCrit = Math.max(1, Math.floor(Math.max(0, ((rawChargeDmg * 1.5) * normalBonusDmgMultCrit * doubleProtMult + rawClashArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [5] 희생의 응징: (링크보너스 최종데미지 15% 증가 즉 1.15배 곱, 성찰의 흔적 버프 기본 적용)
     const retributionReflectionMult = 1 + (10 + relicRetribution * 0.5) / 100;
     const rawRetributionArcana = (res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
     const retributionNormal = Math.max(1, Math.floor(Math.max(0, (rawRetributionArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * retributionReflectionMult));
-    const retributionCrit = Math.max(1, Math.floor(retributionNormal * critMult));
+    const retributionCrit = Math.max(1, Math.floor(Math.max(0, (rawRetributionArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * retributionReflectionMult * critMult));
 
     // 7. UI 결과값 업데이트
     const results = {
@@ -580,10 +612,10 @@ function calculate() {
         "judgment": { normal: judgmentNormal, crit: judgmentCrit },
         "clash": { normal: clashNormal, crit: clashCrit },
         "retribution": { normal: retributionNormal, crit: retributionCrit },
-        "windmill": { normal: windmillDmg, crit: windmillDmg * critMult },
-        "charge": { normal: chargeDmg, crit: chargeDmg * critMult },
-        "smash": { normal: smashDmg, crit: smashDmg * critMult },
-        "bash": { normal: bashSkillDmg, crit: bashSkillDmg * critMult }
+        "windmill": { normal: windmillDmg, crit: windmillCrit },
+        "charge": { normal: chargeDmg, crit: chargeCrit },
+        "smash": { normal: smashDmg, crit: smashCrit },
+        "bash": { normal: bashSkillDmg, crit: bashSkillCrit }
     };
 
     // 소수점 버림 및 최소 대미지 1 적용 (하한선)
@@ -630,6 +662,9 @@ function calculate() {
         }
         if (buffGupkwan) {
             mults.push(`1.15 [급소 관통]`);
+        }
+        if (debuffImen) {
+            mults.push(`${debuffImenTotem ? '1.05' : '1.03'} [이면${debuffImenTotem ? ' (토템)' : ''}]`);
         }
 
         if (mults.length > 0) {
@@ -695,6 +730,9 @@ function calculate() {
         if (buffGupkwan) {
             mults.push(`1.15 [급소 관통]`);
         }
+        if (debuffImen) {
+            mults.push(`${debuffImenTotem ? '1.05' : '1.03'} [이면${debuffImenTotem ? ' (토템)' : ''}]`);
+        }
 
         if (mults.length > 0) {
             step3Text += `<br>- 최종 데미지 = ${Math.floor(baseFinalDmg).toLocaleString()} &times; ${mults.join(' &times; ')} = <strong>${Math.floor(finalVal).toLocaleString()}</strong>`;
@@ -749,6 +787,9 @@ function calculate() {
         }
         if (buffGupkwan) {
             mults.push(`1.15 [급소 관통]`);
+        }
+        if (debuffImen) {
+            mults.push(`${debuffImenTotem ? '1.05' : '1.03'} [이면${debuffImenTotem ? ' (토템)' : ''}]`);
         }
 
         if (mults.length > 0) {

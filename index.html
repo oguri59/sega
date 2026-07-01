@@ -161,17 +161,34 @@
                                     <input type="checkbox" id="debuff-praga" class="debuff-item" checked>
                                     <span>프라가라흐 [보호 -15]</span>
                                 </label>
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="debuff-magigraff-defprot" class="debuff-item" checked>
+                                    <span>방보 마기 [방보 -10]</span>
+                                </label>
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="debuff-kun" class="debuff-item" checked>
+                                    <span>쿤 [크리 보댐 +3%]</span>
+                                </label>
                                 <div style="display: flex; align-items: center; gap: 0.4rem;">
                                     <input type="checkbox" id="debuff-sonic" class="debuff-item" checked>
                                     <span>음파의 세례 [보호 -<span id="sonic-total-flat">20</span>]</span>
                                     <input type="number" id="debuff-sonic-value" value="4" min="0" max="100" step="1"
                                         style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
                                 </div>
-                                <label class="checkbox-label"
-                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
-                                    <input type="checkbox" id="debuff-magigraff-defprot" class="debuff-item" checked>
-                                    <span>방보 마기 [방보 -10]</span>
-                                </label>
+                                <div style="display: flex; flex-direction: column; gap: 0.2rem; grid-column: span 1;">
+                                    <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; margin: 0;">
+                                        <input type="checkbox" id="debuff-imen" class="debuff-item" checked>
+                                        <span>이면 [최종딜 +<span id="imen-total-pct">3</span>%]</span>
+                                    </label>
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-left: 1.4rem;">
+                                        <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.2rem; cursor: pointer; margin: 0; font-size: 0.75rem; color: #a0a0ff;">
+                                            <input type="checkbox" id="debuff-imen-totem" disabled>
+                                            <span>이면 토템 (+2% 추가)</span>
+                                        </label>
+                                    </div>
+                                </div>
                                 <div style="display: flex; flex-direction: column; gap: 0.2rem; grid-column: span 1;">
                                     <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; margin: 0;">
                                         <input type="checkbox" id="debuff-upper" class="debuff-item" checked>
