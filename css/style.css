@@ -741,9 +741,9 @@ input:checked + .slider:before {
 
 /* 비교 뱃지 */
 .compare-badge {
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 0.15rem 0.35rem;
@@ -751,19 +751,23 @@ input:checked + .slider:before {
     font-size: 0.72rem;
     font-weight: 800;
     font-family: 'Outfit', sans-serif;
-    z-index: 5;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .compare-badge.positive {
     background: rgba(0, 229, 255, 0.08);
     border-color: rgba(0, 229, 255, 0.3);
     color: var(--normal-dmg);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
 }
 
 .compare-badge.negative {
     background: rgba(255, 46, 147, 0.08);
     border-color: rgba(255, 46, 147, 0.3);
     color: var(--crit-dmg);
+    box-shadow: 0 0 10px rgba(255, 46, 147, 0.15);
 }
 
 /* 7. 비교 센터 카드 */
@@ -1005,6 +1009,17 @@ footer .small {
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.08);
 }
 
+.build-item.loaded-build {
+    border-color: rgba(0, 229, 255, 0.35);
+    background: rgba(0, 229, 255, 0.04);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.05);
+}
+
+.build-item.compare-base.loaded-build {
+    border-color: rgba(0, 229, 255, 0.3);
+    border-left: 3px solid var(--gold);
+}
+
 .build-item-info {
     display: flex;
     flex-direction: column;
@@ -1049,6 +1064,17 @@ footer .small {
 
 .btn-xs-primary:hover {
     background: var(--gold);
+    color: #110d18;
+}
+
+.btn-xs-info {
+    background: rgba(0, 229, 255, 0.1);
+    color: #00e5ff;
+    border-color: rgba(0, 229, 255, 0.25);
+}
+
+.btn-xs-info:hover {
+    background: #00e5ff;
     color: #110d18;
 }
 

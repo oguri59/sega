@@ -5,6 +5,7 @@
 // 로컬 스토리지 연동 빌드 데이터 목록
 let savedBuilds = JSON.parse(localStorage.getItem("sacred_guard_saved_builds") || "[]");
 let activeCompareBuildId = localStorage.getItem("sacred_guard_active_compare_id") || null;
+let activeLoadedBuildId = null; // 현재 불러와 적용된 빌드 ID
 
 // DOM 요소 바인딩 및 초기화
 document.addEventListener("DOMContentLoaded", () => {
@@ -103,8 +104,16 @@ function setupEventListeners() {
         "input[type='number'], select, input[type='checkbox'], input[type='radio']"
     );
     inputElements.forEach(elem => {
-        elem.addEventListener("input", calculate);
-        elem.addEventListener("change", calculate);
+        elem.addEventListener("input", () => {
+            activeLoadedBuildId = null; // 수동 값 변경 시 적용된 빌드 상태 초기화
+            renderSavedBuildsList(); // 배지 업데이트를 위해 리스트 갱신
+            calculate();
+        });
+        elem.addEventListener("change", () => {
+            activeLoadedBuildId = null; // 수동 값 변경 시 적용된 빌드 상태 초기화
+            renderSavedBuildsList(); // 배지 업데이트를 위해 리스트 갱신
+            calculate();
+        });
     });
 
     // ALL 디버프 토글 버튼
@@ -851,8 +860,9 @@ function saveCurrentBuild() {
     // 입력 필드 초기화
     document.getElementById("build-name-input").value = "";
 
-    // 새로 저장한 빌드를 비교 기준으로 자동 설정
+    // 새로 저장한 빌드를 비교 기준 및 현재 적용 빌드로 자동 설정
     activeCompareBuildId = newBuild.id;
+    activeLoadedBuildId = newBuild.id;
     localStorage.setItem("sacred_guard_active_compare_id", activeCompareBuildId);
 
     renderSavedBuildsList();
@@ -865,7 +875,11 @@ function resetBuildComparison() {
     localStorage.removeItem("sacred_guard_active_compare_id");
     
     document.getElementById("btn-reset-build").classList.add("hidden");
-    document.getElementById("comparison-status-text").textContent = "저장된 빌드가 없습니다. 아래 목록에서 불러오거나 비교 기준을 선택하세요.";
+    if (savedBuilds.length === 0) {
+        document.getElementById("comparison-status-text").textContent = "저장된 빌드가 없습니다. 현재 세팅을 저장하거나 비교 기준을 선택하세요.";
+    } else {
+        document.getElementById("comparison-status-text").textContent = "비교 기준이 선택되지 않았습니다. 아래 목록에서 '비교기준'을 선택하세요.";
+    }
     document.getElementById("comparison-sub-text").textContent = "";
 
     // 비교 배지 전부 숨김
@@ -885,7 +899,11 @@ function updateComparisonUI(currentResults) {
             badge.classList.add("hidden");
         });
         document.getElementById("btn-reset-build").classList.add("hidden");
-        document.getElementById("comparison-status-text").textContent = "저장된 빌드가 없습니다. 아래 목록에서 불러오거나 비교 기준을 선택하세요.";
+        if (savedBuilds.length === 0) {
+            document.getElementById("comparison-status-text").textContent = "저장된 빌드가 없습니다. 현재 세팅을 저장하거나 비교 기준을 선택하세요.";
+        } else {
+            document.getElementById("comparison-status-text").textContent = "비교 기준이 선택되지 않았습니다. 아래 목록에서 '비교기준'을 선택하세요.";
+        }
         document.getElementById("comparison-sub-text").textContent = "";
         return;
     }
@@ -908,10 +926,17 @@ function updateComparisonUI(currentResults) {
 
         const pct = ((currentVal - savedVal) / savedVal) * 100;
 
+        // 차이가 0.05% 이하인 경우(거의 동일 또는 동일) 배지를 표시하지 않아 시각적 소음 줄임
+        if (Math.abs(pct) <= 0.05) {
+            badge.classList.add("hidden");
+            return;
+        }
+
         badge.classList.remove("hidden", "positive", "negative");
 
-        const sign = pct >= 0 ? "+" : "";
-        badge.querySelector(".compare-val").textContent = `${sign}${pct.toFixed(1)}%`;
+        const direction = pct > 0 ? "▲" : "▼";
+        const sign = pct > 0 ? "+" : "";
+        badge.querySelector(".compare-val").textContent = `${direction} ${sign}${pct.toFixed(1)}%`;
 
         if (pct > 0.05) {
             badge.classList.add("positive");
@@ -984,6 +1009,8 @@ function loadBuild(id) {
     const build = savedBuilds.find(b => b.id === id);
     if (!build) return;
     restoreBuildInputs(build.inputs);
+    activeLoadedBuildId = id; // 현재 적용 빌드로 설정
+    renderSavedBuildsList(); // 상태 하이라이트 반영을 위해 목록 갱신
     calculate();
 }
 
@@ -1001,6 +1028,9 @@ function deleteBuild(id) {
     if (activeCompareBuildId === id) {
         activeCompareBuildId = null;
         localStorage.removeItem("sacred_guard_active_compare_id");
+    }
+    if (activeLoadedBuildId === id) {
+        activeLoadedBuildId = null;
     }
     
     renderSavedBuildsList();
@@ -1021,17 +1051,22 @@ function renderSavedBuildsList() {
 
     savedBuilds.forEach(build => {
         const isCompareBase = build.id === activeCompareBuildId;
+        const isLoaded = build.id === activeLoadedBuildId;
 
         const item = document.createElement("div");
-        item.className = `build-item ${isCompareBase ? 'compare-base' : ''}`;
+        item.className = `build-item ${isCompareBase ? 'compare-base' : ''} ${isLoaded ? 'loaded-build' : ''}`;
+
+        const loadedBadge = isLoaded 
+            ? `<span class="badge-loaded" style="background: rgba(0, 229, 255, 0.12); color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.25); font-size: 0.65rem; padding: 0.05rem 0.3rem; border-radius: 3px; font-weight: bold; margin-left: 0.5rem; font-family: 'Noto Sans KR';">적용됨</span>` 
+            : '';
 
         item.innerHTML = `
             <div class="build-item-info">
-                <span class="build-item-title">${build.name}</span>
+                <span class="build-item-title">${build.name}${loadedBadge}</span>
                 <span class="build-item-meta">맥댐: ${build.meta.maxDmg.toLocaleString()} | 방어: ${build.meta.finalDef.toLocaleString()} | 생명: ${build.meta.finalHp.toLocaleString()} (${build.meta.timestamp})</span>
             </div>
             <div class="build-item-actions">
-                <button class="btn-xs btn-xs-secondary" onclick="loadBuild('${build.id}')">불러오기</button>
+                <button class="btn-xs ${isLoaded ? 'btn-xs-info' : 'btn-xs-secondary'}" onclick="loadBuild('${build.id}')">불러오기</button>
                 <button class="btn-xs ${isCompareBase ? 'btn-xs-primary' : 'btn-xs-secondary'}" onclick="setCompareBase('${build.id}')">비교기준</button>
                 <button class="btn-xs btn-xs-danger" onclick="deleteBuild('${build.id}')">삭제</button>
             </div>
