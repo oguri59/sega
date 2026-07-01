@@ -252,6 +252,18 @@ function calculate() {
     const buffLeimMagigraff = document.getElementById("buff-leim-magigraff").checked;
     const buffProPack = document.getElementById("buff-pro-pack").checked;
 
+    // 정령 실체화 및 실체화 강화 파싱 및 상태 동기화
+    const buffSpiritTransformEl = document.getElementById("buff-spirit-transform");
+    const buffSpiritTransformEnhanceEl = document.getElementById("buff-spirit-transform-enhance");
+    if (buffSpiritTransformEl && buffSpiritTransformEnhanceEl) {
+        buffSpiritTransformEnhanceEl.disabled = !buffSpiritTransformEl.checked;
+        if (!buffSpiritTransformEl.checked) {
+            buffSpiritTransformEnhanceEl.checked = false;
+        }
+    }
+    const buffSpiritTransform = buffSpiritTransformEl ? buffSpiritTransformEl.checked : false;
+    const buffSpiritTransformEnhance = buffSpiritTransformEnhanceEl ? buffSpiritTransformEnhanceEl.checked : false;
+
     // 베이스 스킬 입력
     const windmillRankVal = parseFloat(document.getElementById("skill-windmill-rank").value) || 0;
     const windmillReforge = parseFloat(document.getElementById("skill-windmill-reforge").value) || 0;
@@ -392,10 +404,16 @@ function calculate() {
     // 보너스 대미지 배율 상세 정의 (DC인사이드 분석글 기반 카테고리 분리 곱연산)
     const equipBonusDmgMult = 1 + (weapon.bonusDmg + shieldBonusDmgApply) / 100; // 장비보댐효과
 
-    // 재능 파트 일반보댐: 입력값 + 세바보댐 + 브레스 + 약점분석 모두 합산
+    // 정령 실체화 대미지 연산 (기본 10, 강화 시 25)
+    let spiritTransformDmg = 0;
+    if (buffSpiritTransform) {
+        spiritTransformDmg = buffSpiritTransformEnhance ? 25 : 10;
+    }
+
+    // 재능 파트 일반보댐: 입력값 + 세바보댐 + 브레스 + 약점분석 + 정령실체화 모두 합산
     const sebaBonusDmg = buffSebaBonus ? (bfo * 0.1) : 0;
-    const normalBonusDmgMult = 1 + (bonusDmg + sebaBonusDmg + ladecaBreathBonus + (buffWeaknessAnalysis ? 10 : 0)) / 100;
-    // 아르카나 파트 일반보댐: 입력값 + 세바보댐 (브레스/약분 제외)
+    const normalBonusDmgMult = 1 + (bonusDmg + sebaBonusDmg + ladecaBreathBonus + (buffWeaknessAnalysis ? 10 : 0) + spiritTransformDmg) / 100;
+    // 아르카나 파트 일반보댐: 입력값 + 세바보댐 (브레스/약분/정령실체화 제외)
     const arcanaNormalBonusDmgMult = 1 + (bonusDmg + sebaBonusDmg) / 100;
 
     // 카드 breakdown용 레이블 (구성 항목 나열)
@@ -403,7 +421,8 @@ function calculate() {
         bonusDmg > 0 ? `입력 ${bonusDmg}%` : null,
         sebaBonusDmg > 0 ? `세바보댐 ${sebaBonusDmg.toFixed(1)}%` : null,
         ladecaBreathBonus > 0 ? `브레스 ${ladecaBreathBonus}%` : null,
-        buffWeaknessAnalysis ? `약분 10%` : null
+        buffWeaknessAnalysis ? `약분 10%` : null,
+        spiritTransformDmg > 0 ? `정령실체화 ${spiritTransformDmg}%` : null
     ].filter(Boolean);
     const normalBonusDmgLabel = normalBonusDmgParts.length > 0
         ? `[일반보댐: ${normalBonusDmgParts.join(' + ')}]`
@@ -912,7 +931,10 @@ function getBuildInputs() {
         inputsState[el.id] = el.checked;
     });
     document.querySelectorAll("select").forEach(el => {
-        inputsState[el.id] = el.value;
+        // 몬스터 타입 설정은 빌드 정보에 포함시키지 않음
+        if (el.id !== "target-monster") {
+            inputsState[el.id] = el.value;
+        }
     });
     
     // 라디오 버튼 그룹 수집
@@ -932,6 +954,8 @@ function getBuildInputs() {
 function restoreBuildInputs(inputsState) {
     if (!inputsState) return;
     Object.keys(inputsState).forEach(id => {
+        // 기존 저장된 빌드에 몬스터 설정이 포함되어 있더라도 복원하지 않음
+        if (id === "target-monster") return;
         const el = document.getElementById(id);
         if (el) {
             if (el.tagName === "INPUT") {
