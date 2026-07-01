@@ -301,7 +301,7 @@ function calculate() {
     // 4. 최종 스탯 연산
     // 최종 보정 맥댐 (물공포 + 전장의 서곡 적용)
     const potionFactor = potionActive ? 1.2 : 1.0;
-    let res0 = maxDmg * potionFactor * (1 + (bfo / 100) * potionFactor);
+    let res0 = maxDmg * potionFactor * (1 + (bfo / 100));
     if (buffSangji) {
         res0 = res0 * 1.12;
     }
