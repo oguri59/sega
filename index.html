@@ -161,6 +161,17 @@
                                     <input type="checkbox" id="debuff-praga" class="debuff-item" checked>
                                     <span>프라가라흐 [보호 -15]</span>
                                 </label>
+                                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                    <input type="checkbox" id="debuff-sonic" class="debuff-item" checked>
+                                    <span>음파의 세례 [보호 -<span id="sonic-total-flat">20</span>]</span>
+                                    <input type="number" id="debuff-sonic-value" value="4" min="0" max="100" step="1"
+                                        style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
+                                </div>
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="debuff-magigraff-defprot" class="debuff-item" checked>
+                                    <span>방보 마기 [방보 -10]</span>
+                                </label>
                                 <div style="display: flex; flex-direction: column; gap: 0.2rem; grid-column: span 1;">
                                     <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; margin: 0;">
                                         <input type="checkbox" id="debuff-upper" class="debuff-item" checked>
@@ -186,12 +197,6 @@
                                             <span>스아렌 (+3%)</span>
                                         </label>
                                     </div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 0.4rem; grid-column: span 2;">
-                                    <input type="checkbox" id="debuff-sonic" class="debuff-item" checked>
-                                    <span>음파의 세례</span>
-                                    <input type="number" id="debuff-sonic-value" value="4" min="0" max="100" step="1"
-                                        style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
                                 </div>
                             </div>
                         </div>
@@ -380,6 +385,18 @@
                             <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
                                 <input type="checkbox" id="buff-gupkwan">
                                 <span style="color: #ff9d00; font-weight: 600;">급소 관통 (스킬댐 15%, 피어싱 +1)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
+                                <input type="checkbox" id="buff-magigraff-charge">
+                                <span style="color: #ffd700; font-weight: 600;">돌진 마기그래프 (+60% 배율)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
+                                <input type="checkbox" id="buff-magigraff-smash">
+                                <span style="color: #ffd700; font-weight: 600;">스매시 마기그래프 (+100% 배율)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;">
+                                <input type="checkbox" id="buff-magigraff-bash">
+                                <span style="color: #ffd700; font-weight: 600;">배쉬 마기그래프 (+40% 배율)</span>
                             </label>
                         </div>
                     </div>

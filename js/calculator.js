@@ -192,6 +192,7 @@ function calculate() {
     const debuffDeathmarkerValue = parseFloat(document.getElementById("debuff-deathmarker-value").value) || 0;
     const debuffDeathmarkerSaren = document.getElementById("debuff-deathmarker-saren").checked;
     const debuffMomo = document.getElementById("debuff-momo").checked;
+    const debuffMagigraffDefprot = document.getElementById("debuff-magigraff-defprot").checked;
 
     // 데스 마커 및 어퍼 라벨 동적 갱신
     // 데스마커: 세공 1레벨당 0.25% 증가, 스아렌 체크 시 3% 추가
@@ -208,6 +209,12 @@ function calculate() {
         upperTotalFlatEl.textContent = upperValueTotal;
     }
 
+    // 음파의 세례: 1단계당 5 감소
+    const sonicTotalFlatEl = document.getElementById("sonic-total-flat");
+    if (sonicTotalFlatEl) {
+        sonicTotalFlatEl.textContent = sonicValue * 5;
+    }
+
     // 어퍼+급소 관통: 고정 -(23 + debuffUpperValue) + 몬스터 보호의 11% 비율 감소
     let debuffProtPercent = 0;
     if (debuffUpper) debuffProtPercent += 0.11;
@@ -222,6 +229,11 @@ function calculate() {
     if (debuffUpper) debuffProtFlat += upperValueTotal;
     if (debuffJack) debuffProtFlat += 4;
     if (debuffSonic) debuffProtFlat += sonicValue * 5;
+    if (debuffMagigraffDefprot) debuffProtFlat += 10; // 방보 마기 보호 -10
+
+    // 고정 방어 감소 디버프
+    let debuffDefFlat = 0;
+    if (debuffMagigraffDefprot) debuffDefFlat += 10; // 방보 마기 방어 -10
 
     // 증댐 디버프
     let debuffgainFlat = 0;
@@ -272,6 +284,11 @@ function calculate() {
     }
     const buffSpiritTransform = buffSpiritTransformEl ? buffSpiritTransformEl.checked : false;
     const buffSpiritTransformEnhance = buffSpiritTransformEnhanceEl ? buffSpiritTransformEnhanceEl.checked : false;
+
+    // 마기그래프 파싱
+    const buffMagigraffCharge = document.getElementById("buff-magigraff-charge").checked;
+    const buffMagigraffSmash = document.getElementById("buff-magigraff-smash").checked;
+    const buffMagigraffBash = document.getElementById("buff-magigraff-bash").checked;
 
     // 베이스 스킬 입력
     const windmillRankVal = parseFloat(document.getElementById("skill-windmill-rank").value) || 0;
@@ -355,14 +372,23 @@ function calculate() {
         baseWindmillMult *= 1.15;
     }
 
-    // 돌진 데미지 공식 (세공 + 에르그 및 어둠의 에르그 합산 보정)
-    const baseChargeMult = chargeRankMult + 0.1 * chargeReforge + (chargeErg / 100) + (chargeDarkErg / 100);
+    // 돌진 데미지 공식 (세공 + 에르그 및 어둠의 에르그 합산 보정 + 마기그래프)
+    let baseChargeMult = chargeRankMult + 0.1 * chargeReforge + (chargeErg / 100) + (chargeDarkErg / 100);
+    if (buffMagigraffCharge) {
+        baseChargeMult += 0.60;
+    }
 
-    // 스매시 데미지 공식 (스매시 세공은 레벨당 +10%, 에르그 및 어둠의 에르그 합산 보정)
-    const baseSmashMult = smashRankVal + 0.1 * smashReforge + (smashErg / 100) + (smashDarkErg / 100);
+    // 스매시 데미지 공식 (스매시 세공은 레벨당 +10%, 에르그 및 어둠의 에르그 합산 보정 + 마기그래프)
+    let baseSmashMult = smashRankVal + 0.1 * smashReforge + (smashErg / 100) + (smashDarkErg / 100);
+    if (buffMagigraffSmash) {
+        baseSmashMult += 1.0;
+    }
 
-    // 배쉬 데미지 공식 (배쉬 세공은 레벨당 +10%, 에르그 및 어둠의 에르그 합산 보정)
-    const baseBashMult = bashSkillRankVal + 0.1 * bashSkillReforge + (bashSkillErg / 100) + (bashSkillDarkErg / 100);
+    // 배쉬 데미지 공식 (배쉬 세공은 레벨당 +10%, 에르그 및 어둠의 에르그 합산 보정 + 마기그래프)
+    let baseBashMult = bashSkillRankVal + 0.1 * bashSkillReforge + (bashSkillErg / 100) + (bashSkillDarkErg / 100);
+    if (buffMagigraffBash) {
+        baseBashMult += 0.40;
+    }
 
     // 실시간 UI 범례 배율 라벨 업데이트
     document.getElementById("windmill-final-mult-label").textContent = `${Math.round(baseWindmillMult * 100)}%`;
@@ -390,7 +416,7 @@ function calculate() {
     // 1) 일반/표준 피어싱 (최대 9레벨 제한)
     const normalPiercingLevel = Math.min(9, netPiercing);
     const reducedProtNormal = Math.max(0, targetProtAfterDebuffs - getProtReduction(normalPiercingLevel));
-    const reducedDefNormal = Math.max(0, targetDef - getDefReduction(normalPiercingLevel));
+    const reducedDefNormal = Math.max(0, targetDef - getDefReduction(normalPiercingLevel) - debuffDefFlat);
 
     // 보호에 따른 댐감율 공식: Y = 100/sqrt(2) * log10((x + 10*sqrt(2))/(10*sqrt(2))) / 100
     const sqrt2 = Math.sqrt(2);
@@ -406,7 +432,7 @@ function calculate() {
     // 2) 아르카나 스킬 내 일반재능계수 적용 피어싱 (이중 피어싱적용, 최대 18레벨 제한)
     const doublePiercingLevel = Math.min(18, 2 * netPiercing);
     const reducedProtDouble = Math.max(0, targetProtAfterDebuffs - getProtReduction(doublePiercingLevel));
-    const reducedDefDouble = Math.max(0, targetDef - getDefReduction(doublePiercingLevel));
+    const reducedDefDouble = Math.max(0, targetDef - getDefReduction(doublePiercingLevel) - debuffDefFlat);
 
     const doubleProtMult = 1 - getDmgRedFromProt(reducedProtDouble);
 

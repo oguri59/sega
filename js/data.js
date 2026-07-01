@@ -160,7 +160,7 @@ const CHARGE_RANK_DATA = [
 
 // 스매시 랭크별 계수 정의
 const SMASH_RANK_DATA = [
-    { "rank": "3단", "value": 6.2 },
+    { "rank": "3단", "value": 9.0 },
     { "rank": "2단", "value": 5.8 },
     { "rank": "1단", "value": 5.4 },
     { "rank": "1", "value": 5.0 },
@@ -183,7 +183,7 @@ const SMASH_RANK_DATA = [
 
 // 배쉬 랭크별 계수 정의
 const BASH_RANK_DATA = [
-    { "rank": "3단", "value": 5.0 },
+    { "rank": "3단", "value": 7.0 },
     { "rank": "2단", "value": 4.6 },
     { "rank": "1단", "value": 4.2 },
     { "rank": "1", "value": 3.8 },
