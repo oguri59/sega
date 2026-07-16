@@ -62,7 +62,7 @@ function updateOgeomSynergyUI() {
     }
 }
 
-// 특수 오검 착용 개수 강제 제환 함수 (시너지 활성화 시 최대 3개, 비활성화 시 최대 5개)
+// 특수 오검 착용 개수 강제 제한 함수 (조합 활성화 시 최대 3개, 비활성화 시 최대 5개)
 function enforceSpecialOgeomLimit(changedSlotIdx) {
     const synergySelect = document.getElementById("ogeom-synergy");
     if (!synergySelect) return;
@@ -993,7 +993,8 @@ function calculate() {
 
         let mults = [];
         if (linkBonus !== 1.0) {
-            mults.push(`${f(linkBonus, 2)} [링크 보너스]`);
+            const label = (linkBonus === condemnationSynergyMult) ? "오검 조합" : "링크 보너스";
+            mults.push(`${f(linkBonus, 2)} [${label}]`);
         }
         if (reflectionMult !== 1.0) {
             const pct = 10 + relicRetLevel * 0.5;
@@ -1176,13 +1177,14 @@ function calculate() {
     const ironwallArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(ironwallArcanaMaxDmgCoeff, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; ${f(ironwallArcanaDefCoeff, 2)} + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; ${f(ironwallArcanaHpCoeff, 2)}`;
 
     const condemnation1TalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 1.75 [단죄배율]`;
-    const condemnation1ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(condemnationBaseMaxDmg * condFactor1, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; ${f(condemnationBaseDef * condFactor1, 2)} + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; ${f(condemnationBaseHp * condFactor1, 2)}`;
+    const condSynText = condemnationSynergyMult !== 1.0 ? ` &times; ${f(condemnationSynergyMult, 2)} [오검 조합]` : "";
+    const condemnation1ArcanaFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 15 &times; ${f(condFactor1, 2)} [단죄 단계별 배수]${condSynText} ) + ( [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 9 &times; ${f(condFactor1, 2)} [단죄 단계별 배수]${condSynText} ) + ( [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 1.5 &times; ${f(condFactor1, 2)} [단죄 단계별 배수]${condSynText} )`;
 
     const condemnation2TalentFormula = condemnation1TalentFormula;
-    const condemnation2ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(condemnationBaseMaxDmg * condFactor2, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; ${f(condemnationBaseDef * condFactor2, 2)} + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; ${f(condemnationBaseHp * condFactor2, 2)}`;
+    const condemnation2ArcanaFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 15 &times; ${f(condFactor2, 2)} [단죄 단계별 배수]${condSynText} ) + ( [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 9 &times; ${f(condFactor2, 2)} [단죄 단계별 배수]${condSynText} ) + ( [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 1.5 &times; ${f(condFactor2, 2)} [단죄 단계별 배수]${condSynText} )`;
 
     const condemnation3TalentFormula = condemnation1TalentFormula;
-    const condemnation3ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(condemnationBaseMaxDmg * condFactor3, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; ${f(condemnationBaseDef * condFactor3, 2)} + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; ${f(condemnationBaseHp * condFactor3, 2)}`;
+    const condemnation3ArcanaFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 15 &times; ${f(condFactor3, 2)} [단죄 단계별 배수]${condSynText} ) + ( [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 9 &times; ${f(condFactor3, 2)} [단죄 단계별 배수]${condSynText} ) + ( [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 1.5 &times; ${f(condFactor3, 2)} [단죄 단계별 배수]${condSynText} )`;
 
     const judgmentTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 2.0 [심판배율]`;
     const judgmentArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(35.0 + relicJudgment * 1.0 + ogeomDmgJudgment / 100, 1)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 20.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 5.0`;
