@@ -1133,3 +1133,24 @@ footer .small {
 .results-section {
     min-width: 0;
 }
+
+/* 입력 카드 접기/펼치기 스타일 */
+.input-card .card-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.input-card.collapsed .card-body {
+    display: none;
+}
+
+.collapse-arrow {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--gold);
+    transition: transform 0.2s ease;
+}
+
+.input-card.collapsed .collapse-arrow {
+    transform: rotate(-90deg);
+}

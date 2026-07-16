@@ -273,6 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initDropdowns();
     setupEventListeners();
     setupSkillCardBreakdownToggles();
+    setupInputCardCollapse();
     renderSavedBuildsList();
     calculate(); // 초기 연산 수행
 });
@@ -1570,6 +1571,40 @@ function setupSkillCardBreakdownToggles() {
                     card.scrollIntoView({ behavior: "smooth", block: "nearest" });
                 }, 100);
             }
+        });
+    });
+}
+
+// 입력 카드 접기/펼치기 설정 함수
+function setupInputCardCollapse() {
+    const collapsedStates = JSON.parse(localStorage.getItem("sacred_guard_collapsed_input_cards") || "{}");
+
+    document.querySelectorAll(".input-card").forEach(card => {
+        const id = card.id;
+        if (!id) return;
+
+        const header = card.querySelector(".card-header");
+        if (!header) return;
+
+        // 로컬 스토리지에 저장된 접힘 상태 적용
+        if (collapsedStates[id] === true) {
+            card.classList.add("collapsed");
+        }
+
+        // 헤더에 접기/펼치기 지시 화살표 추가
+        const arrow = document.createElement("span");
+        arrow.className = "collapse-arrow";
+        arrow.innerHTML = "&#9660;"; // ▼ (다운 화살표)
+        header.appendChild(arrow);
+
+        header.addEventListener("click", () => {
+            card.classList.toggle("collapsed");
+            
+            // 상태 업데이트 및 로컬 스토리지 저장
+            const isCollapsed = card.classList.contains("collapsed");
+            const currentStates = JSON.parse(localStorage.getItem("sacred_guard_collapsed_input_cards") || "{}");
+            currentStates[id] = isCollapsed;
+            localStorage.setItem("sacred_guard_collapsed_input_cards", JSON.stringify(currentStates));
         });
     });
 }
