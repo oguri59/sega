@@ -538,6 +538,47 @@
                             </fieldset>
                         </div>
                     </div>
+
+                <!-- 5. 오검 설정 -->
+                <div class="card input-card" id="ogeom-settings-card">
+                    <div class="card-header">
+                        <h2>오검 설정 (Ogeom)</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- 오검 조합 설정 -->
+                        <div class="ogeom-synergy-wrapper" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                            <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+                                <div class="form-group" style="flex: 1; min-width: 180px; margin: 0;">
+                                    <label for="ogeom-synergy" style="font-size: 0.8rem; color: #ffd700; margin-bottom: 0.3rem;">오검 조합 선택</label>
+                                    <select id="ogeom-synergy" style="width: 100%;">
+                                        <option value="none">미선택</option>
+                                        <option value="fortress">철벽 강타: 요새</option>
+                                        <option value="execution">광휘의 단죄: 집행</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="width: 90px; margin: 0;">
+                                    <label for="ogeom-synergy-score" style="font-size: 0.8rem; color: #ffd700; margin-bottom: 0.3rem;">조합 점수</label>
+                                    <select id="ogeom-synergy-score" style="width: 100%;" disabled>
+                                        <option value="5">5 점</option>
+                                        <option value="6">6 점</option>
+                                        <option value="7">7 점</option>
+                                        <option value="8">8 점</option>
+                                        <option value="9" selected>9 점</option>
+                                    </select>
+                                </div>
+                                <div id="ogeom-synergy-img-container" style="display: none; align-items: center; justify-content: center; height: 48px; width: 48px; border-radius: 6px; border: 1.5px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.2); overflow: hidden; margin-top: 1.1rem;">
+                                    <img id="ogeom-synergy-img" src="" alt="조합 아이콘" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                                </div>
+                            </div>
+                            <div id="ogeom-synergy-desc-box" style="display: none; padding: 0.6rem 0.8rem; background: rgba(212, 175, 55, 0.05); border-left: 3px solid #ffd700; border-radius: 4px; font-size: 0.75rem; line-height: 1.4; color: #e0e0ff; white-space: pre-line;">
+                                <!-- 설명 문구가 동적으로 들어갑니다 -->
+                            </div>
+                        </div>
+                        <div id="ogeom-grid-container" style="display: flex; flex-direction: column; gap: 0.2rem;">
+                            <!-- JS가 동적으로 오검 슬롯 5개를 생성합니다 -->
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- 오른쪽: 출력 결과 섹션 -->
@@ -592,7 +633,7 @@
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">계수: 맥댐 300% + 방어 150% + 생명 20%</span>
+                                <span class="skill-formula-summary" id="summary-sanctuary-coeff">계수: 맥댐 300% + 방어 150% + 생명 20%</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -618,7 +659,7 @@
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">계수: 윈드밀 150% + 맥댐 1200% + 방어 600% + 생명 100%</span>
+                                <span class="skill-formula-summary" id="summary-ironwall-coeff">계수: 윈드밀 150% + 맥댐 1200% + 방어 600% + 생명 100%</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -634,17 +675,17 @@
                         <div class="card-breakdown hidden" id="card-math-ironwall"></div>
                     </div>
 
-                    <!-- 단죄의 일격 1단계 결과 카드 -->
+                    <!-- 광휘의 단죄 1단계 결과 카드 -->
                     <div class="skill-result-card theme-condemnation" data-skill="condemnation1">
                         <div class="card-main-content">
                             <div class="skill-info">
                                 <span class="skill-name">
-                                    단죄의 일격 1단계
+                                    광휘의 단죄 1단계
                                     <span class="compare-badge hidden" id="compare-condemnation1">
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">계수: 윈드밀 175% + 맥댐 1500% + 방어 900% + 생명 150%</span>
+                                <span class="skill-formula-summary" id="summary-condemnation1-coeff">계수: 윈드밀 175% + 맥댐 1500% + 방어 900% + 생명 150%</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -660,17 +701,17 @@
                         <div class="card-breakdown hidden" id="card-math-condemnation1"></div>
                     </div>
 
-                    <!-- 단죄의 일격 2단계 결과 카드 -->
+                    <!-- 광휘의 단죄 2단계 결과 카드 -->
                     <div class="skill-result-card theme-condemnation" data-skill="condemnation2">
                         <div class="card-main-content">
                             <div class="skill-info">
                                 <span class="skill-name">
-                                    단죄의 일격 2단계
+                                    광휘의 단죄 2단계
                                     <span class="compare-badge hidden" id="compare-condemnation2">
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">계수: 윈드밀 175% + 맥댐 2250% + 방어 1350% + 생명 225%</span>
+                                <span class="skill-formula-summary" id="summary-condemnation2-coeff">계수: 윈드밀 175% + 맥댐 2250% + 방어 1350% + 생명 225%</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -686,17 +727,17 @@
                         <div class="card-breakdown hidden" id="card-math-condemnation2"></div>
                     </div>
 
-                    <!-- 단죄의 일격 3단계 결과 카드 -->
+                    <!-- 광휘의 단죄 3단계 결과 카드 -->
                     <div class="skill-result-card theme-condemnation" data-skill="condemnation3">
                         <div class="card-main-content">
                             <div class="skill-info">
                                 <span class="skill-name">
-                                    단죄의 일격 3단계
+                                    광휘의 단죄 3단계
                                     <span class="compare-badge hidden" id="compare-condemnation3">
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">계수: 윈드밀 175% + 맥댐 3000% + 방어 1800% + 생명 300%</span>
+                                <span class="skill-formula-summary" id="summary-condemnation3-coeff">계수: 윈드밀 175% + 맥댐 3000% + 방어 1800% + 생명 300%</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -722,7 +763,7 @@
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">계수: 윈드밀 200% + 맥댐 3500% + 방어 2000% + 생명 500%</span>
+                                <span class="skill-formula-summary" id="summary-judgment-coeff">계수: 윈드밀 200% + 맥댐 3500% + 방어 2000% + 생명 500%</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -748,7 +789,7 @@
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">계수: 돌진 150% + 맥댐 800% + 방어 600% + 생명 50%</span>
+                                <span class="skill-formula-summary" id="summary-clash-coeff">계수: 돌진 150% + 맥댐 800% + 방어 600% + 생명 50%</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -774,7 +815,7 @@
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">계수: (맥댐 6000% + 방어 4000% + 생명 1500%) * (1 + 방패감소율)</span>
+                                <span class="skill-formula-summary" id="summary-retribution-coeff">계수: (맥댐 6000% + 방어 4000% + 생명 1500%) * (1 + 방패감소율)</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -805,7 +846,7 @@
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">윈드밀 대미지</span>
+                                <span class="skill-formula-summary" id="summary-windmill-coeff">윈드밀 대미지</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -831,7 +872,7 @@
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">돌진 대미지</span>
+                                <span class="skill-formula-summary" id="summary-charge-coeff">돌진 대미지</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -857,7 +898,7 @@
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">스매시 대미지</span>
+                                <span class="skill-formula-summary" id="summary-smash-coeff">스매시 대미지</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">
@@ -883,7 +924,7 @@
                                         <span class="compare-val">0%</span>
                                     </span>
                                 </span>
-                                <span class="skill-formula-summary">배쉬 대미지</span>
+                                <span class="skill-formula-summary" id="summary-bash-coeff">배쉬 대미지</span>
                             </div>
                             <div class="dmg-values">
                                 <div class="dmg-col">

@@ -7,6 +7,267 @@ let savedBuilds = JSON.parse(localStorage.getItem("sacred_guard_saved_builds") |
 let activeCompareBuildId = localStorage.getItem("sacred_guard_active_compare_id") || null;
 let activeLoadedBuildId = null; // 현재 불러와 적용된 빌드 ID
 
+// 오검 옵션 데이터베이스 정의
+const OGEOM_OPTIONS_DB = {
+    none: { text: "옵션 없음", scale: 0 },
+    charge: { text: "돌진 대미지 배율 (+3% / Lv)", scale: 3 },
+    windmill: { text: "윈드밀 대미지 배율 (+2% / Lv)", scale: 2 },
+    smash: { text: "스매시 대미지 배율 (+2.5% / Lv)", scale: 2.5 },
+    axemastery: { text: "액스 마스터리 최댐 (+1 / Lv)", scale: 1 },
+    sanctuary: { text: "성역 전개 대미지 배율 (+1% / Lv)", scale: 1 },
+    ironwall: { text: "철벽 강타 대미지 배율 (+5% / Lv)", scale: 5 },
+    condemnation: { text: "광휘의 단죄 단계당 대미지 배율 (+0.8% / Lv)", scale: 0.8 },
+    judgment: { text: "심판의 일격 대미지 배율 (+20% / Lv)", scale: 20 },
+    clash: { text: "격돌 대미지 배율 (+10% / Lv)", scale: 10 },
+    retribution: { text: "희생의 응징 대미지 배율 (+5% / Lv)", scale: 5 }
+};
+
+const OGEOM_NORMAL_KEYS = ["none", "charge", "windmill", "smash", "axemastery"];
+const OGEOM_SPECIAL_KEYS = ["none", "sanctuary", "ironwall", "condemnation", "judgment", "clash", "retribution", "charge", "windmill", "smash", "axemastery"];
+
+// 오검 조합 UI 및 설명 갱신 함수
+function updateOgeomSynergyUI() {
+    const synergySelect = document.getElementById("ogeom-synergy");
+    const scoreSelect = document.getElementById("ogeom-synergy-score");
+    const imgContainer = document.getElementById("ogeom-synergy-img-container");
+    const imgEl = document.getElementById("ogeom-synergy-img");
+    const descBox = document.getElementById("ogeom-synergy-desc-box");
+    if (!synergySelect || !scoreSelect || !imgContainer || !imgEl || !descBox) return;
+
+    const synergy = synergySelect.value;
+    const score = parseInt(scoreSelect.value) || 9;
+
+    if (synergy === "none") {
+        scoreSelect.disabled = true;
+        imgContainer.style.display = "none";
+        descBox.style.display = "none";
+    } else {
+        scoreSelect.disabled = false;
+        imgContainer.style.display = "flex";
+        descBox.style.display = "block";
+
+        if (synergy === "fortress") {
+            imgEl.src = "images/철.webp";
+            const wmBonus = 5 + 5 * (score - 5);
+            const baseDmgBonus = 200 + 100 * (score - 5);
+            const fortressBonus = 10 + 5 * (score - 5);
+            descBox.textContent = `[철벽 강타: 요새] 조합 적용 중 (${score}점)\n• 철벽 강타의 윈드밀 대미지 배율 +${wmBonus}% 증가\n• 철벽 강타의 아르카나 기본 대미지 배율 +${baseDmgBonus}%, 방어력 배율 +300%, 최대 생명력 배율 +50% 증가\n• 공격 범위: 6m, 공격 각도: 150도\n• 요새화 지속 시간: 15초 (중첩당 공격 스킬 희생 획득량 +${fortressBonus}% 증가, 최대 3중첩)\n• 누적 쿨타임 한계: 12초`;
+        } else if (synergy === "execution") {
+            imgEl.src = "images/단.webp";
+            const mult = 1.1 + 0.1 * (score - 5);
+            const condDist = 6 + 0.5 * (score - 5);
+            descBox.textContent = `[광휘의 단죄: 집행] 조합 적용 중 (${score}점)\n• 광휘의 단죄가 상시 3단계로 동작\n• 광휘의 단죄의 아르카나 기본 대미지, 방어력, 최대 생명력 배율 ${mult.toFixed(1)}배 증가\n• 스킬로 이동 가능한 거리 : 최대 ${condDist.toFixed(1)}m\n• 고결한 서약 활성화 상태일 경우 희생 4 획득\n• 재사용 대기 시간 2.5초`;
+        }
+    }
+}
+
+// 특수 오검 착용 개수 강제 제환 함수 (시너지 활성화 시 최대 3개, 비활성화 시 최대 5개)
+function enforceSpecialOgeomLimit(changedSlotIdx) {
+    const synergySelect = document.getElementById("ogeom-synergy");
+    if (!synergySelect) return;
+
+    const limit = (synergySelect.value === "none") ? 5 : 3;
+
+    let specialSlots = [];
+    for (let i = 1; i <= 5; i++) {
+        const typeSelect = document.getElementById(`ogeom-${i}-type`);
+        if (typeSelect && typeSelect.value === "special") {
+            specialSlots.push(i);
+        }
+    }
+
+    if (specialSlots.length > limit) {
+        let demotedCount = 0;
+        const targetDemoteCount = specialSlots.length - limit;
+        
+        // 사용자가 방금 변경한 슬롯(changedSlotIdx)을 제외하고 역순으로 강등 대상 탐색
+        const candidates = specialSlots.filter(idx => idx !== changedSlotIdx).reverse();
+        for (let idx of candidates) {
+            const typeSelect = document.getElementById(`ogeom-${idx}-type`);
+            if (typeSelect) {
+                typeSelect.value = "normal";
+                updateOgeomOptions(idx);
+                demotedCount++;
+                if (demotedCount >= targetDemoteCount) break;
+            }
+        }
+
+        // 그래도 더 강등해야 하는 극한 상황인 경우 자신을 강등
+        if (demotedCount < targetDemoteCount) {
+            const typeSelect = document.getElementById(`ogeom-${changedSlotIdx}-type`);
+            if (typeSelect) {
+                typeSelect.value = "normal";
+                updateOgeomOptions(changedSlotIdx);
+            }
+        }
+    }
+}
+
+// 오검 초기화 함수
+function initOgeom() {
+    // 오검 조합 드롭다운 리스너 추가
+    const synergySelect = document.getElementById("ogeom-synergy");
+    const scoreSelect = document.getElementById("ogeom-synergy-score");
+    if (synergySelect) {
+        synergySelect.addEventListener("change", () => {
+            enforceSpecialOgeomLimit(-1);
+            updateOgeomSynergyUI();
+            calculate();
+        });
+    }
+    if (scoreSelect) {
+        scoreSelect.addEventListener("change", () => {
+            updateOgeomSynergyUI();
+            calculate();
+        });
+    }
+
+    const container = document.getElementById("ogeom-grid-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+    for (let i = 1; i <= 5; i++) {
+        const isSpecialDefault = (i <= 3);
+        const stoneFieldset = document.createElement("fieldset");
+        stoneFieldset.className = "skill-fieldset ogeom-stone-fieldset";
+        stoneFieldset.style.cssText = "margin-bottom: 0.75rem; padding: 0.6rem 0.8rem; background: rgba(255, 255, 255, 0.01);";
+        
+        stoneFieldset.innerHTML = `
+            <legend style="display: flex; align-items: center; gap: 0.4rem; padding: 0 0.4rem; float: none;">
+                <span>오검 #${i}</span>
+                <select class="ogeom-type-select select-xs" id="ogeom-${i}-type" style="width: 78px; font-size: 0.65rem; padding: 0.1rem 0.2rem; background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15);">
+                    <option value="none">장착 해제</option>
+                    <option value="normal" ${!isSpecialDefault ? "selected" : ""}>일반 오검</option>
+                    <option value="special" ${isSpecialDefault ? "selected" : ""}>특수 오검</option>
+                </select>
+            </legend>
+            <div class="ogeom-options-container" id="ogeom-${i}-options-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; width: 100%;">
+                ${[1, 2, 3].map(j => `
+                    <div class="form-group" style="margin: 0; min-width: 0;">
+                        <label style="font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 0.15rem; display: block;">옵션 ${j}</label>
+                        <div style="display: flex; gap: 0.15rem; align-items: center; min-width: 0;">
+                            <select class="ogeom-opt-select select-xs" id="ogeom-${i}-opt-${j}" style="flex: 1; min-width: 0; font-size: 0.65rem; padding: 0.15rem 0.2rem;"></select>
+                            <select class="ogeom-level-select select-xs" id="ogeom-${i}-lv-${j}" style="width: 44px; flex-shrink: 0; font-size: 0.65rem; padding: 0.15rem 0.1rem; text-align: center;">
+                            </select>
+                        </div>
+                    </div>
+                `).join("")}
+            </div>
+        `;
+        container.appendChild(stoneFieldset);
+
+        // Populate options initially
+        updateOgeomOptions(i);
+
+        // Bind type select change
+        const typeSelect = document.getElementById(`ogeom-${i}-type`);
+        if (typeSelect) {
+            typeSelect.addEventListener("change", () => {
+                if (typeSelect.value === "special") {
+                    enforceSpecialOgeomLimit(i);
+                }
+                updateOgeomOptions(i);
+                calculate();
+            });
+        }
+
+        // Bind option and level selects change
+        for (let j = 1; j <= 3; j++) {
+            const optSel = document.getElementById(`ogeom-${i}-opt-${j}`);
+            const lvSel = document.getElementById(`ogeom-${i}-lv-${j}`);
+            if (optSel) {
+                optSel.addEventListener("change", () => {
+                    updateOgeomOptions(i, true);
+                    calculate();
+                });
+            }
+            if (lvSel) lvSel.addEventListener("change", calculate);
+        }
+    }
+}
+
+// 오검 타입 변경 시 하위 옵션 목록 필터링 및 동적 UI 토글
+function updateOgeomOptions(i, userTriggered = false) {
+    const typeSelect = document.getElementById(`ogeom-${i}-type`);
+    const optionsContainer = document.getElementById(`ogeom-${i}-options-container`);
+    if (!typeSelect || !optionsContainer) return;
+
+    const type = typeSelect.value;
+    if (type === "none") {
+        optionsContainer.style.display = "none";
+        // Reset option values to none
+        for (let j = 1; j <= 3; j++) {
+            const optSel = document.getElementById(`ogeom-${i}-opt-${j}`);
+            if (optSel) {
+                optSel.value = "none";
+            }
+        }
+    } else {
+        optionsContainer.style.display = "grid";
+        const baseKeys = (type === "special") ? OGEOM_SPECIAL_KEYS : OGEOM_NORMAL_KEYS;
+        
+        // 3개의 행에 대해 각각 필터링하여 드롭다운 구성 (동일 오검 내 중복 선택 금지)
+        for (let j = 1; j <= 3; j++) {
+            const optSel = document.getElementById(`ogeom-${i}-opt-${j}`);
+            const lvSel = document.getElementById(`ogeom-${i}-lv-${j}`);
+            if (!optSel || !lvSel) continue;
+
+            const currentVal = optSel.value || "none";
+            const currentLv = parseInt(lvSel.value) || 1;
+
+            // 다른 행에서 이미 선택한 값들을 제외 목록으로 수집
+            const selectedInOthers = [];
+            for (let k = 1; k <= 3; k++) {
+                if (k !== j) {
+                    const otherSel = document.getElementById(`ogeom-${i}-opt-${k}`);
+                    if (otherSel && otherSel.value && otherSel.value !== "none") {
+                        selectedInOthers.push(otherSel.value);
+                    }
+                }
+            }
+
+            // 중복 옵션을 필터링한 키 목록 구성 (none은 항상 허용)
+            const filteredKeys = baseKeys.filter(key => key === "none" || !selectedInOthers.includes(key));
+
+            optSel.innerHTML = "";
+            filteredKeys.forEach(key => {
+                const opt = document.createElement("option");
+                opt.value = key;
+                opt.textContent = OGEOM_OPTIONS_DB[key].text;
+                optSel.appendChild(opt);
+            });
+
+            // 선택 값 유지 및 복원 (필터링되어 목록에서 빠졌다면 none으로 리셋)
+            if (filteredKeys.includes(currentVal)) {
+                optSel.value = currentVal;
+            } else {
+                optSel.value = "none";
+            }
+
+            // [재능 스킬에 대한 20레벨 확장 처리 및 레벨 제한 동적 반영]
+            const isTalent = ["charge", "windmill", "smash", "bash"].includes(optSel.value);
+            const maxLv = isTalent ? 20 : 10;
+
+            lvSel.innerHTML = "";
+            for (let k = 1; k <= maxLv; k++) {
+                const opt = document.createElement("option");
+                opt.value = k;
+                opt.textContent = `${k}Lv`;
+                lvSel.appendChild(opt);
+            }
+
+            // 레벨값 복원 및 범위 제한 clamping (사용자 조작시 기본적으로 max레벨 할당)
+            if (userTriggered && optSel.value !== "none") {
+                lvSel.value = maxLv;
+            } else if (currentLv <= maxLv) {
+                lvSel.value = currentLv;
+            } else {
+                lvSel.value = maxLv;
+            }
+        }
+    }
+}
+
 // DOM 요소 바인딩 및 초기화
 document.addEventListener("DOMContentLoaded", () => {
     initDropdowns();
@@ -18,6 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 드롭다운 항목 바인딩
 function initDropdowns() {
+    initOgeom();
     // 1. 무기 목록 바인딩
     const weaponSelect = document.getElementById("equip-weapon");
     weaponSelect.innerHTML = "";
@@ -162,6 +424,55 @@ function calculate() {
     const f = (val, maxDec = 4) => parseFloat(val.toFixed(maxDec)).toString();
     // 1. 입력 수치 파싱
     const maxDmg = Math.max(0, parseFloat(document.getElementById("stat-max-dmg").value) || 0);
+
+    // 오검 조합 파싱
+    const ogeomSynergySelect = document.getElementById("ogeom-synergy");
+    const ogeomSynergy = ogeomSynergySelect ? ogeomSynergySelect.value : "none";
+    const ogeomSynergyScoreSelect = document.getElementById("ogeom-synergy-score");
+    const ogeomSynergyScore = ogeomSynergyScoreSelect ? (parseInt(ogeomSynergyScoreSelect.value) || 5) : 5;
+
+    // 오검 설정 파싱 및 수치 합산
+    let ogeomDmgWindmill = 0;
+    let ogeomDmgCharge = 0;
+    let ogeomDmgSmash = 0;
+    let ogeomDmgBash = 0;
+    let ogeomMaxDmg = 0;
+    let ogeomDmgSanctuary = 0;
+    let ogeomDmgIronwall = 0;
+    let ogeomDmgCondemnation = 0;
+    let ogeomDmgJudgment = 0;
+    let ogeomDmgClash = 0;
+    let ogeomDmgRetribution = 0;
+
+    for (let i = 1; i <= 5; i++) {
+        const typeSelect = document.getElementById(`ogeom-${i}-type`);
+        if (!typeSelect || typeSelect.value === "none") continue;
+
+        for (let j = 1; j <= 3; j++) {
+            const optSel = document.getElementById(`ogeom-${i}-opt-${j}`);
+            const lvSel = document.getElementById(`ogeom-${i}-lv-${j}`);
+            if (!optSel || !lvSel) continue;
+
+            const opt = optSel.value;
+            const lv = parseInt(lvSel.value) || 0;
+            if (opt === "none" || lv <= 0) continue;
+
+            const scale = OGEOM_OPTIONS_DB[opt].scale;
+            const val = scale * lv;
+
+            if (opt === "windmill") ogeomDmgWindmill += val;
+            else if (opt === "charge") ogeomDmgCharge += val;
+            else if (opt === "smash") ogeomDmgSmash += val;
+            else if (opt === "bash") ogeomDmgBash += val;
+            else if (opt === "axemastery") ogeomMaxDmg += val;
+            else if (opt === "sanctuary") ogeomDmgSanctuary += val;
+            else if (opt === "ironwall") ogeomDmgIronwall += val;
+            else if (opt === "condemnation") ogeomDmgCondemnation += val;
+            else if (opt === "judgment") ogeomDmgJudgment += val;
+            else if (opt === "clash") ogeomDmgClash += val;
+            else if (opt === "retribution") ogeomDmgRetribution += val;
+        }
+    }
     const baseDef = Math.max(0, parseFloat(document.getElementById("stat-defense").value) || 0);
     const maxHp = Math.max(0, parseFloat(document.getElementById("stat-max-hp").value) || 0);
     const addCrit = parseFloat(document.getElementById("stat-add-crit").value) || 0;
@@ -357,7 +668,7 @@ function calculate() {
     // 4. 최종 스탯 연산
     // 최종 보정 맥댐 ((기본맥 * 물공포) * (1 + 전장 * 물공포) * (1 + 상지 * 물공포))
     const potionFactor = potionActive ? 1.2 : 1.0;
-    let res0 = maxDmg * potionFactor * (1 + (bfo / 100) * potionFactor);
+    let res0 = (maxDmg + ogeomMaxDmg) * potionFactor * (1 + (bfo / 100) * potionFactor);
     if (buffSangji) {
         res0 = res0 * (1 + 0.12 * potionFactor);
     }
@@ -389,24 +700,28 @@ function calculate() {
     if (setWindmillNew) {
         baseWindmillMult *= 1.15;
     }
+    baseWindmillMult += (ogeomDmgWindmill / 100);
 
     // 돌진 데미지 공식 (세공 + 에르그 및 어둠의 에르그 합산 보정 + 마기그래프)
     let baseChargeMult = chargeRankMult + 0.1 * chargeReforge + (chargeErg / 100) + (chargeDarkErg / 100);
     if (buffMagigraffCharge) {
         baseChargeMult += 0.60;
     }
+    baseChargeMult += (ogeomDmgCharge / 100);
 
     // 스매시 데미지 공식 (스매시 세공은 레벨당 +10%, 에르그 및 어둠의 에르그 합산 보정 + 마기그래프)
     let baseSmashMult = smashRankVal + 0.1 * smashReforge + (smashErg / 100) + (smashDarkErg / 100);
     if (buffMagigraffSmash) {
         baseSmashMult += 1.0;
     }
+    baseSmashMult += (ogeomDmgSmash / 100);
 
     // 배쉬 데미지 공식 (배쉬 세공은 레벨당 +10%, 에르그 및 어둠의 에르그 합산 보정 + 마기그래프)
     let baseBashMult = bashSkillRankVal + 0.1 * bashSkillReforge + (bashSkillErg / 100) + (bashSkillDarkErg / 100);
     if (buffMagigraffBash) {
         baseBashMult += 0.40;
     }
+    baseBashMult += (ogeomDmgBash / 100);
 
     // 실시간 UI 범례 배율 라벨 업데이트
     document.getElementById("windmill-final-mult-label").textContent = `${Math.round(baseWindmillMult * 100)}%`;
@@ -560,45 +875,60 @@ function calculate() {
     const bashSkillCrit = Math.max(1, Math.floor(Math.max(0, rawBashSkillDmg * talentBonusDmgMultCrit * normalProtMult - reducedDefNormal) * finalDmgMultiplier * critMult));
 
     // 6. 세이크리드 가드 5대 스킬 데미지 연산 (아르카나 곱연산보댐 공식 적용)
+    // 오검 조합 효과 변수 정의
+    const ironwallWindmillFactor = 1.5 + (ogeomSynergy === "fortress" ? (0.05 + 0.05 * (ogeomSynergyScore - 5)) : 0);
+    const ironwallArcanaMaxDmgCoeff = 12.0 + (ogeomSynergy === "fortress" ? (2.0 + 1.0 * (ogeomSynergyScore - 5)) : 0) + (ogeomDmgIronwall / 100);
+    const ironwallArcanaDefCoeff = 6.0 + (ogeomSynergy === "fortress" ? 3.0 : 0);
+    const ironwallArcanaHpCoeff = 1.0 + (ogeomSynergy === "fortress" ? 0.5 : 0);
+
+    const condemnationSynergyMult = (ogeomSynergy === "execution") ? (1.1 + 0.1 * (ogeomSynergyScore - 5)) : 1.0;
+    const condemnationBaseMaxDmg = 15.0 * condemnationSynergyMult;
+    const condemnationBaseDef = 9.0 * condemnationSynergyMult;
+    const condemnationBaseHp = 1.5 * condemnationSynergyMult;
 
     // [1] 성역 전개: (링크보너스 최종데미지 100% 증가 즉 2.0배 곱)
-    const rawSanctuary = res0 * 3.0 + finalDef * 1.5 + finalHp * 0.2;
+    const rawSanctuary = res0 * (3.0 + (ogeomDmgSanctuary / 100)) + finalDef * 1.5 + finalHp * 0.2;
     const sanctuaryNormal = Math.max(1, Math.floor(Math.max(0, (rawSanctuary * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 2.0 * finalDmgMultiplier * reflectionTraceMult));
     const sanctuaryCrit = Math.max(1, Math.floor(Math.max(0, (rawSanctuary * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 2.0 * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [2] 철벽 강타:
-    const rawIronwallArcana = res0 * 12.0 + finalDef * 6.0 + finalHp * 1.0;
-    const ironwallNormal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
-    const ironwallCrit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.5) * normalBonusDmgMultCrit * doubleProtMult + rawIronwallArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
+    const rawIronwallArcana = res0 * ironwallArcanaMaxDmgCoeff + finalDef * ironwallArcanaDefCoeff + finalHp * ironwallArcanaHpCoeff;
+    const ironwallNormal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * ironwallWindmillFactor) * normalBonusDmgMult * doubleProtMult + rawIronwallArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
+    const ironwallCrit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * ironwallWindmillFactor) * normalBonusDmgMultCrit * doubleProtMult + rawIronwallArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
+
+    // [2.5] 단죄의 일격 단계 보정
+    const condFactor3 = 2.0 + 2 * (ogeomDmgCondemnation / 100);
+    const condFactor1 = (ogeomSynergy === "execution") ? condFactor3 : 1.0;
+    const condFactor2 = (ogeomSynergy === "execution") ? condFactor3 : (1.5 + (ogeomDmgCondemnation / 100));
 
     // [2.5] 단죄의 일격 1단계:
-    const rawCondemnation1Arcana = res0 * 15.0 + finalDef * 9.0 + finalHp * 1.5;
+    const rawCondemnation1Arcana = res0 * (condemnationBaseMaxDmg * condFactor1) + finalDef * (condemnationBaseDef * condFactor1) + finalHp * (condemnationBaseHp * condFactor1);
     const condemnation1Normal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation1Arcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
     const condemnation1Crit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMultCrit * doubleProtMult + rawCondemnation1Arcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [2.6] 단죄의 일격 2단계:
-    const rawCondemnation2Arcana = res0 * 22.5 + finalDef * 13.5 + finalHp * 2.25;
+    const rawCondemnation2Arcana = res0 * (condemnationBaseMaxDmg * condFactor2) + finalDef * (condemnationBaseDef * condFactor2) + finalHp * (condemnationBaseHp * condFactor2);
     const condemnation2Normal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation2Arcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
     const condemnation2Crit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMultCrit * doubleProtMult + rawCondemnation2Arcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [2.7] 단죄의 일격 3단계:
-    const rawCondemnation3Arcana = res0 * 30.0 + finalDef * 18.0 + finalHp * 3.0;
+    const rawCondemnation3Arcana = res0 * (condemnationBaseMaxDmg * condFactor3) + finalDef * (condemnationBaseDef * condFactor3) + finalHp * (condemnationBaseHp * condFactor3);
     const condemnation3Normal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMult * doubleProtMult + rawCondemnation3Arcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
     const condemnation3Crit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 1.75) * normalBonusDmgMultCrit * doubleProtMult + rawCondemnation3Arcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [3] 심판의 일격: (링크보너스 최종데미지 20% 증가 즉 1.2배 곱, 심판 유물레벨당 맥댐계수 +100% 합산)
-    const rawJudgmentArcana = res0 * (35.0 + relicJudgment * 1.0) + finalDef * 20.0 + finalHp * 5.0;
+    const rawJudgmentArcana = res0 * (35.0 + relicJudgment * 1.0 + (ogeomDmgJudgment / 100)) + finalDef * 20.0 + finalHp * 5.0;
     const judgmentNormal = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 2.0) * normalBonusDmgMult * doubleProtMult + rawJudgmentArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier * reflectionTraceMult));
     const judgmentCrit = Math.max(1, Math.floor(Math.max(0, ((rawWindmillDmg * 2.0) * normalBonusDmgMultCrit * doubleProtMult + rawJudgmentArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.2 * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [4] 격돌:
-    const rawClashArcana = res0 * 8.0 + finalDef * 6.0 + finalHp * 0.5;
+    const rawClashArcana = res0 * (8.0 + (ogeomDmgClash / 100)) + finalDef * 6.0 + finalHp * 0.5;
     const clashNormal = Math.max(1, Math.floor(Math.max(0, ((rawChargeDmg * 1.5) * normalBonusDmgMult * doubleProtMult + rawClashArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult));
     const clashCrit = Math.max(1, Math.floor(Math.max(0, ((rawChargeDmg * 1.5) * normalBonusDmgMultCrit * doubleProtMult + rawClashArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
 
     // [5] 희생의 응징: (링크보너스 최종데미지 15% 증가 즉 1.15배 곱, 성찰의 흔적 버프 기본 적용)
     const retributionReflectionMult = 1 + (10 + relicRetribution * 0.5) / 100;
-    const rawRetributionArcana = (res0 * 60.0 + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
+    const rawRetributionArcana = (res0 * (60.0 + (ogeomDmgRetribution / 100)) + finalDef * 40.0 + finalHp * 15.0) * (1 + shield.drr / 100);
     const retributionNormal = Math.max(1, Math.floor(Math.max(0, (rawRetributionArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * retributionReflectionMult));
     const retributionCrit = Math.max(1, Math.floor(Math.max(0, (rawRetributionArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * retributionReflectionMult * critMult));
 
@@ -625,9 +955,24 @@ function calculate() {
     });
 
     Object.keys(results).forEach(key => {
-        document.getElementById(`dmg-${key}-normal`).textContent = results[key].normal.toLocaleString();
-        document.getElementById(`dmg-${key}-crit`).textContent = results[key].crit.toLocaleString();
+        const normEl = document.getElementById(`dmg-${key}-normal`);
+        const critEl = document.getElementById(`dmg-${key}-crit`);
+        if (normEl) normEl.textContent = results[key].normal.toLocaleString();
+        if (critEl) critEl.textContent = results[key].crit.toLocaleString();
     });
+
+    // 광휘의 단죄 조합(집행) 활성화 시 1단계 및 2단계 카드 숨김 처리
+    const cardCond1 = document.querySelector('[data-skill="condemnation1"]');
+    const cardCond2 = document.querySelector('[data-skill="condemnation2"]');
+    if (cardCond1 && cardCond2) {
+        if (ogeomSynergy === "execution") {
+            cardCond1.style.display = "none";
+            cardCond2.style.display = "none";
+        } else {
+            cardCond1.style.display = "";
+            cardCond2.style.display = "";
+        }
+    }
 
     // 8. 데미지 공식 상세 분해 렌더링
     const formatArcanaMath = (rawTalent, talentFormula, talentMult, doubleProt, rawArcana, arcanaFormula, arcanaDmgMult, normalProt, equipMult, normalDef, finalVal, linkBonus = 1.0, reflectionMult = 1.0, relicRetLevel = 0) => {
@@ -816,27 +1161,27 @@ function calculate() {
     };
 
     // 각 스킬별 베이스데미지 수식 정의
-    const sanctuaryFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 3.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 1.5 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 0.2 )`;
+    const sanctuaryFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(3.0 + ogeomDmgSanctuary / 100, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 1.5 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 0.2 )`;
 
-    const ironwallTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 1.5 [철벽배율]`;
-    const ironwallArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 12.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 6.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 1.0`;
+    const ironwallTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; ${f(ironwallWindmillFactor, 2)} [철벽배율]`;
+    const ironwallArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(ironwallArcanaMaxDmgCoeff, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; ${f(ironwallArcanaDefCoeff, 2)} + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; ${f(ironwallArcanaHpCoeff, 2)}`;
 
     const condemnation1TalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 1.75 [단죄배율]`;
-    const condemnation1ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 15.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 9.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 1.5`;
+    const condemnation1ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(condemnationBaseMaxDmg * condFactor1, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; ${f(condemnationBaseDef * condFactor1, 2)} + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; ${f(condemnationBaseHp * condFactor1, 2)}`;
 
     const condemnation2TalentFormula = condemnation1TalentFormula;
-    const condemnation2ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 22.5 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 13.5 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 2.25`;
+    const condemnation2ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(condemnationBaseMaxDmg * condFactor2, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; ${f(condemnationBaseDef * condFactor2, 2)} + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; ${f(condemnationBaseHp * condFactor2, 2)}`;
 
     const condemnation3TalentFormula = condemnation1TalentFormula;
-    const condemnation3ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 30.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 18.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 3.0`;
+    const condemnation3ArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(condemnationBaseMaxDmg * condFactor3, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; ${f(condemnationBaseDef * condFactor3, 2)} + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; ${f(condemnationBaseHp * condFactor3, 2)}`;
 
     const judgmentTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseWindmillMult)} [윈밀계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 2.0 [심판배율]`;
-    const judgmentArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(35.0 + relicJudgment * 1.0, 1)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 20.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 5.0`;
+    const judgmentArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(35.0 + relicJudgment * 1.0 + ogeomDmgJudgment / 100, 1)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 20.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 5.0`;
 
     const clashTalentFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseChargeMult)} [돌진계수] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카] &times; 1.5 [격돌배율]`;
-    const clashArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 8.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 6.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 0.5`;
+    const clashArcanaFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(8.0 + ogeomDmgClash / 100, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 6.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 0.5`;
 
-    const retributionFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; 60.0 + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 40.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 15.0 ) &times; ${f(1 + shield.drr / 100, 2)} [방패감소율]`;
+    const retributionFormula = `( [최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(60.0 + ogeomDmgRetribution / 100, 2)} + [최종방어] ${Math.floor(finalDef).toLocaleString()} &times; 40.0 + [최종체력] ${Math.floor(finalHp).toLocaleString()} &times; 15.0 ) &times; ${f(1 + shield.drr / 100, 2)} [방패감소율]`;
 
     const smashFormula = `[최종맥댐] ${Math.floor(res0).toLocaleString()} &times; ${f(baseSmashMult)} [스매시배율] &times; ${f(1 + weaponTwoHandedSmashBonus, 2)} [양손보너스] &times; ${f(1 + weaponSmashBonus, 2)} [아이템 보너스] &times;  ${f(1 + (setSmash ? 0.15 : 0), 2)} [스매강] &times; ${f(1 + bashVal, 2)} [배쉬] &times; ${f(ladecaMult, 2)} [라데카]`;
 
@@ -881,6 +1226,20 @@ function calculate() {
 
     document.getElementById("card-math-bash").innerHTML =
         formatTalentMath(rawBashSkillDmg, bashFormula, talentBonusDmgMult, normalProtMult, reducedDefNormal, bashSkillDmg);
+
+    // 8.5. 우측 데미지 리포트 카드 계수 텍스트 동적 업데이트
+    document.getElementById("summary-sanctuary-coeff").textContent = `계수: 맥댐 ${f((3.0 + ogeomDmgSanctuary / 100) * 100, 1)}% + 방어 150% + 생명 20%`;
+    document.getElementById("summary-ironwall-coeff").textContent = `계수: 윈드밀 ${f(ironwallWindmillFactor * 100, 1)}% + 맥댐 ${f(ironwallArcanaMaxDmgCoeff * 100, 1)}% + 방어 ${f(ironwallArcanaDefCoeff * 100, 1)}% + 생명 ${f(ironwallArcanaHpCoeff * 100, 1)}%`;
+    document.getElementById("summary-condemnation1-coeff").textContent = `계수: 윈드밀 175% + 맥댐 ${f(condemnationBaseMaxDmg * condFactor1 * 100, 1)}% + 방어 ${f(condemnationBaseDef * condFactor1 * 100, 1)}% + 생명 ${f(condemnationBaseHp * condFactor1 * 100, 1)}%`;
+    document.getElementById("summary-condemnation2-coeff").textContent = `계수: 윈드밀 175% + 맥댐 ${f(condemnationBaseMaxDmg * condFactor2 * 100, 1)}% + 방어 ${f(condemnationBaseDef * condFactor2 * 100, 1)}% + 생명 ${f(condemnationBaseHp * condFactor2 * 100, 1)}%`;
+    document.getElementById("summary-condemnation3-coeff").textContent = `계수: 윈드밀 175% + 맥댐 ${f(condemnationBaseMaxDmg * condFactor3 * 100, 1)}% + 방어 ${f(condemnationBaseDef * condFactor3 * 100, 1)}% + 생명 ${f(condemnationBaseHp * condFactor3 * 100, 1)}%`;
+    document.getElementById("summary-judgment-coeff").textContent = `계수: 윈드밀 200% + 맥댐 ${f((35.0 + relicJudgment * 1.0 + ogeomDmgJudgment / 100) * 100, 1)}% + 방어 2000% + 생명 500%`;
+    document.getElementById("summary-clash-coeff").textContent = `계수: 돌진 150% + 맥댐 ${f((8.0 + ogeomDmgClash / 100) * 100, 1)}% + 방어 600% + 생명 50%`;
+    document.getElementById("summary-retribution-coeff").textContent = `계수: (맥댐 ${f((60.0 + ogeomDmgRetribution / 100) * 100, 1)}% + 방어 4000% + 생명 1500%) * (1 + 방패감소율)`;
+    document.getElementById("summary-windmill-coeff").textContent = `계수: 윈드밀 ${f(baseWindmillMult * 100, 1)}%`;
+    document.getElementById("summary-charge-coeff").textContent = `계수: 돌진 ${f(baseChargeMult * 100, 1)}%`;
+    document.getElementById("summary-smash-coeff").textContent = `계수: 스매시 ${f(baseSmashMult * (1 + weaponTwoHandedSmashBonus) * (1 + weaponSmashBonus) * (1 + (setSmash ? 0.15 : 0)) * 100, 1)}%`;
+    document.getElementById("summary-bash-coeff").textContent = `계수: 배쉬 ${f(baseBashMult * (1 + weaponBashBonus) * 100, 1)}%`;
 
     // 9. 빌드 비교 렌더링 수행
     updateComparisonUI(results);
@@ -1045,6 +1404,31 @@ function getBuildInputs() {
 // 입력 폼들의 설정 상태 복원
 function restoreBuildInputs(inputsState) {
     if (!inputsState) return;
+
+    // 0단계: 오검 조합 및 조합 점수부터 먼저 복원하여 제한개수(3개/5개) 설정을 마침
+    const synSelect = document.getElementById("ogeom-synergy");
+    const scoreSelect = document.getElementById("ogeom-synergy-score");
+    if (synSelect && inputsState["ogeom-synergy"] !== undefined) {
+        synSelect.value = inputsState["ogeom-synergy"];
+    }
+    if (scoreSelect && inputsState["ogeom-synergy-score"] !== undefined) {
+        scoreSelect.value = inputsState["ogeom-synergy-score"];
+    }
+    updateOgeomSynergyUI(); // UI 및 설명 및 활성 상태 업데이트
+
+    // 1단계: 오검 타입부터 먼저 복원하여 옵션 드롭다운을 올바르게 채워둠
+    for (let i = 1; i <= 5; i++) {
+        const typeId = `ogeom-${i}-type`;
+        if (inputsState[typeId] !== undefined) {
+            const el = document.getElementById(typeId);
+            if (el) {
+                el.value = inputsState[typeId];
+                updateOgeomOptions(i); // 옵션 리스트 갱신
+            }
+        }
+    }
+
+    // 2단계: 나머지 모든 입력값 복원
     Object.keys(inputsState).forEach(id => {
         // 기존 저장된 빌드에 몬스터 설정이 포함되어 있더라도 복원하지 않음
         if (id === "target-monster") return;
@@ -1057,7 +1441,10 @@ function restoreBuildInputs(inputsState) {
                     el.value = inputsState[id];
                 }
             } else if (el.tagName === "SELECT") {
-                el.value = inputsState[id];
+                // 이미 위에서 복원한 오검 타입은 건너뜀
+                if (!id.startsWith("ogeom-") || !id.endsWith("-type")) {
+                    el.value = inputsState[id];
+                }
             }
         } else {
             // 라디오 버튼 그룹 복원

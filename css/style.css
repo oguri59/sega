@@ -1098,3 +1098,38 @@ footer .small {
     background: #ff4b4b;
     color: #ffffff;
 }
+
+/* 오검 스타일 */
+.select-xs {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--border-radius-sm);
+    color: #ffffff;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+}
+
+.select-xs option {
+    background-color: #1a1525;
+    color: #ffffff;
+}
+
+.ogeom-opt-select {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.inputs-section {
+    min-width: 0;
+    max-width: 520px;
+}
+
+.results-section {
+    min-width: 0;
+}
