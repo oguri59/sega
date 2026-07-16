@@ -20,11 +20,10 @@ const OGEOM_OPTIONS_DB = {
     condemnation: { text: "광휘의 단죄 단계당 대미지 배율 (+0.8% / Lv)", scale: 0.8 },
     judgment: { text: "심판의 일격 대미지 배율 (+20% / Lv)", scale: 20 },
     clash: { text: "격돌 대미지 배율 (+10% / Lv)", scale: 10 },
-    retribution: { text: "희생의 응징 대미지 배율 (+5% / Lv)", scale: 5 }
 };
 
 const OGEOM_NORMAL_KEYS = ["none", "charge", "windmill", "smash", "axemastery"];
-const OGEOM_SPECIAL_KEYS = ["none", "sanctuary", "ironwall", "condemnation", "judgment", "clash", "retribution", "charge", "windmill", "smash", "axemastery"];
+const OGEOM_SPECIAL_KEYS = ["none", "sanctuary", "ironwall", "condemnation", "judgment", "clash", "charge", "windmill", "smash", "axemastery"];
 
 // 오검 조합 UI 및 설명 갱신 함수
 function updateOgeomSynergyUI() {
