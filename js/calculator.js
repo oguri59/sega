@@ -230,31 +230,37 @@ function updateOgeomOptions(i, userTriggered = false) {
             // 중복 옵션을 필터링한 키 목록 구성 (none은 항상 허용)
             const filteredKeys = baseKeys.filter(key => key === "none" || !selectedInOthers.includes(key));
 
-            optSel.innerHTML = "";
-            filteredKeys.forEach(key => {
-                const opt = document.createElement("option");
-                opt.value = key;
-                opt.textContent = OGEOM_OPTIONS_DB[key].text;
-                optSel.appendChild(opt);
-            });
+            const existingKeys = Array.from(optSel.options).map(o => o.value);
+            const keysMatch = (existingKeys.length === filteredKeys.length) && existingKeys.every((v, idx) => v === filteredKeys[idx]);
 
-            // 선택 값 유지 및 복원 (필터링되어 목록에서 빠졌다면 none으로 리셋)
-            if (filteredKeys.includes(currentVal)) {
-                optSel.value = currentVal;
-            } else {
-                optSel.value = "none";
+            if (!keysMatch) {
+                optSel.innerHTML = "";
+                filteredKeys.forEach(key => {
+                    const opt = document.createElement("option");
+                    opt.value = key;
+                    opt.textContent = OGEOM_OPTIONS_DB[key].text;
+                    optSel.appendChild(opt);
+                });
+
+                if (filteredKeys.includes(currentVal)) {
+                    optSel.value = currentVal;
+                } else {
+                    optSel.value = "none";
+                }
             }
 
             // [재능 스킬에 대한 20레벨 확장 처리 및 레벨 제한 동적 반영]
             const isTalent = ["charge", "windmill", "smash", "bash"].includes(optSel.value);
             const maxLv = isTalent ? 20 : 10;
 
-            lvSel.innerHTML = "";
-            for (let k = 1; k <= maxLv; k++) {
-                const opt = document.createElement("option");
-                opt.value = k;
-                opt.textContent = `${k}Lv`;
-                lvSel.appendChild(opt);
+            if (lvSel.options.length !== maxLv) {
+                lvSel.innerHTML = "";
+                for (let k = 1; k <= maxLv; k++) {
+                    const opt = document.createElement("option");
+                    opt.value = k;
+                    opt.textContent = `${k}Lv`;
+                    lvSel.appendChild(opt);
+                }
             }
 
             // 레벨값 복원 및 범위 제한 clamping (사용자 조작시 기본적으로 max레벨 할당)
@@ -964,10 +970,11 @@ function calculate() {
     });
 
     // 광휘의 단죄 조합(집행) 활성화 시 1단계 및 2단계 카드 숨김 처리
+    // 단, 빌드 비교가 활성화된 상태(activeCompareBuildId가 존재하는 경우)에는 비교를 위해 1, 2단계를 모두 노출
     const cardCond1 = document.querySelector('[data-skill="condemnation1"]');
     const cardCond2 = document.querySelector('[data-skill="condemnation2"]');
     if (cardCond1 && cardCond2) {
-        if (ogeomSynergy === "execution") {
+        if (ogeomSynergy === "execution" && !activeCompareBuildId) {
             cardCond1.style.display = "none";
             cardCond2.style.display = "none";
         } else {
@@ -1509,15 +1516,33 @@ function restoreBuildInputs(inputsState) {
     }
     updateOgeomSynergyUI(); // UI 및 설명 및 활성 상태 업데이트
 
-    // 1단계: 오검 타입부터 먼저 복원하여 옵션 드롭다운을 올바르게 채워둠
+    // 1단계: 오검 타입 복원 및 옵션 초기 바인딩
     for (let i = 1; i <= 5; i++) {
         const typeId = `ogeom-${i}-type`;
         if (inputsState[typeId] !== undefined) {
             const el = document.getElementById(typeId);
             if (el) {
                 el.value = inputsState[typeId];
-                updateOgeomOptions(i); // 옵션 리스트 갱신
+                updateOgeomOptions(i); // 타입에 따른 옵션 구성
             }
+        }
+    }
+
+    // 1.5단계: 오검 옵션 선택값 복원 및 그에 맞는 레벨 스펙(1~20Lv 등) 재바인딩
+    for (let i = 1; i <= 5; i++) {
+        let optionsChanged = false;
+        for (let j = 1; j <= 3; j++) {
+            const optId = `ogeom-${i}-opt-${j}`;
+            if (inputsState[optId] !== undefined) {
+                const el = document.getElementById(optId);
+                if (el) {
+                    el.value = inputsState[optId];
+                    optionsChanged = true;
+                }
+            }
+        }
+        if (optionsChanged) {
+            updateOgeomOptions(i); // 윈드밀/돌진/스매시 선택에 따른 20레벨 범위 확장 적용
         }
     }
 
@@ -1534,8 +1559,9 @@ function restoreBuildInputs(inputsState) {
                     el.value = inputsState[id];
                 }
             } else if (el.tagName === "SELECT") {
-                // 이미 위에서 복원한 오검 타입은 건너뜀
-                if (!id.startsWith("ogeom-") || !id.endsWith("-type")) {
+                // 이미 위에서 복원한 오검 타입 및 옵션 셀렉트는 건너뜀
+                const isOgeomTypeOrOpt = id.startsWith("ogeom-") && (id.endsWith("-type") || id.includes("-opt-"));
+                if (!isOgeomTypeOrOpt) {
                     el.value = inputsState[id];
                 }
             }
