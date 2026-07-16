@@ -6,6 +6,7 @@
 let savedBuilds = JSON.parse(localStorage.getItem("sacred_guard_saved_builds") || "[]");
 let activeCompareBuildId = localStorage.getItem("sacred_guard_active_compare_id") || null;
 let activeLoadedBuildId = null; // 현재 불러와 적용된 빌드 ID
+let isCalculatingBase = false; // 빌드 비교용 기저 계산 수행 여부 플래그
 
 // 오검 옵션 데이터베이스 정의
 const OGEOM_OPTIONS_DB = {
@@ -1242,8 +1243,60 @@ function calculate() {
     document.getElementById("summary-smash-coeff").textContent = `계수: 스매시 ${f(baseSmashMult * (1 + weaponTwoHandedSmashBonus) * (1 + weaponSmashBonus) * (1 + (setSmash ? 0.15 : 0)) * 100, 1)}%`;
     document.getElementById("summary-bash-coeff").textContent = `계수: 배쉬 ${f(baseBashMult * (1 + weaponBashBonus) * 100, 1)}%`;
 
+    if (isCalculatingBase) {
+        // 기저 비교 빌드 계산 도중이면 무한 루프 방지를 위해 조기 리턴
+        return;
+    }
+
     // 9. 빌드 비교 렌더링 수행
-    updateComparisonUI(results);
+    let baseBuildData = null;
+    const activeBuild = savedBuilds.find(b => b.id === activeCompareBuildId);
+    if (activeBuild) {
+        isCalculatingBase = true;
+        
+        // 현재 화면 세팅 백업
+        const backupInputs = getBuildInputs();
+        
+        // 비교 기준 빌드로 화면 세팅 임시 전환 (몬스터 타입 제외)
+        restoreBuildInputs(activeBuild.inputs);
+        
+        // 동기식으로 다시 연산 수행하여 DOM에 기준 빌드 결과 출력
+        calculate();
+        
+        // 기준 빌드 수치 읽어오기
+        const getVal = (id) => Math.floor(parseFloat(document.getElementById(id).textContent.replace(/,/g, '')) || 0);
+        baseBuildData = {
+            meta: {
+                maxDmg: getVal("summary-final-max-dmg"),
+                finalDef: getVal("summary-final-defense"),
+                finalHp: getVal("summary-final-hp")
+            },
+            skills: {
+                "sanctuary": getVal("dmg-sanctuary-normal"),
+                "ironwall": getVal("dmg-ironwall-normal"),
+                "condemnation1": getVal("dmg-condemnation1-normal"),
+                "condemnation2": getVal("dmg-condemnation2-normal"),
+                "condemnation3": getVal("dmg-condemnation3-normal"),
+                "judgment": getVal("dmg-judgment-normal"),
+                "clash": getVal("dmg-clash-normal"),
+                "retribution": getVal("dmg-retribution-normal"),
+                "windmill": getVal("dmg-windmill-normal"),
+                "charge": getVal("dmg-charge-normal"),
+                "smash": getVal("dmg-smash-normal"),
+                "bash": getVal("dmg-bash-normal")
+            }
+        };
+        
+        // 원본 화면 세팅 복원
+        restoreBuildInputs(backupInputs);
+        
+        // 원본 화면 기준 최종 연산 수행
+        calculate();
+        
+        isCalculatingBase = false;
+    }
+
+    updateComparisonUI(results, { maxDmg: res0, finalDef: finalDef, finalHp: finalHp }, baseBuildData);
 }
 
 // 현재 입력값을 로컬 스토리지 빌드 스택에 저장
@@ -1319,7 +1372,7 @@ function resetBuildComparison() {
 }
 
 // 현재 계산값과 저장된 빌드 값을 대조하여 증감율 렌더링
-function updateComparisonUI(currentResults) {
+function updateComparisonUI(currentResults, currentStats, baseBuildData) {
     const activeBuild = savedBuilds.find(b => b.id === activeCompareBuildId);
     if (!activeBuild) {
         document.querySelectorAll(".compare-badge").forEach(badge => {
@@ -1335,16 +1388,55 @@ function updateComparisonUI(currentResults) {
         return;
     }
 
+    const baseMeta = baseBuildData ? baseBuildData.meta : activeBuild.meta;
+    const baseSkills = baseBuildData ? baseBuildData.skills : activeBuild.skills;
+
     document.getElementById("btn-reset-build").classList.remove("hidden");
     document.getElementById("comparison-status-text").textContent = `기준 빌드: ${activeBuild.name}`;
-    document.getElementById("comparison-sub-text").textContent = `기준 스탯 - 맥댐: ${activeBuild.meta.maxDmg.toLocaleString()}, 방어: ${activeBuild.meta.finalDef.toLocaleString()}, 생명: ${activeBuild.meta.finalHp.toLocaleString()}`;
+    document.getElementById("comparison-sub-text").textContent = `기준 스탯 - 맥댐: ${baseMeta.maxDmg.toLocaleString()}, 방어: ${baseMeta.finalDef.toLocaleString()}, 생명: ${baseMeta.finalHp.toLocaleString()}`;
+
+    // 최종 보정 스탯 비교 반영
+    if (currentStats) {
+        const statsToCompare = [
+            { id: "compare-stat-max-dmg", currentVal: currentStats.maxDmg, savedVal: baseMeta.maxDmg },
+            { id: "compare-stat-defense", currentVal: currentStats.finalDef, savedVal: baseMeta.finalDef },
+            { id: "compare-stat-hp", currentVal: currentStats.finalHp, savedVal: baseMeta.finalHp }
+        ];
+
+        statsToCompare.forEach(item => {
+            const badge = document.getElementById(item.id);
+            if (!badge) return;
+
+            if (item.savedVal === undefined || item.savedVal === 0) {
+                badge.classList.add("hidden");
+                return;
+            }
+
+            const pct = ((item.currentVal - item.savedVal) / item.savedVal) * 100;
+
+            if (Math.abs(pct) <= 0.05) {
+                badge.classList.add("hidden");
+                return;
+            }
+
+            badge.classList.remove("hidden", "positive", "negative");
+            const direction = pct > 0 ? "▲" : "▼";
+            const sign = pct > 0 ? "+" : "";
+            badge.querySelector(".compare-val").textContent = `${sign}${pct.toFixed(1)}% ${direction}`;
+            if (pct > 0.05) {
+                badge.classList.add("positive");
+            } else if (pct < -0.05) {
+                badge.classList.add("negative");
+            }
+        });
+    }
 
     Object.keys(currentResults).forEach(key => {
         const badge = document.getElementById(`compare-${key}`);
         if (!badge) return;
 
         const currentVal = currentResults[key].normal;
-        const savedVal = activeBuild.skills[key];
+        const savedVal = baseSkills[key];
 
         if (savedVal === undefined || savedVal === 0) {
             badge.classList.add("hidden");
@@ -1521,7 +1613,8 @@ function renderSavedBuildsList() {
                 <span class="build-item-meta">맥댐: ${build.meta.maxDmg.toLocaleString()} | 방어: ${build.meta.finalDef.toLocaleString()} | 생명: ${build.meta.finalHp.toLocaleString()} (${build.meta.timestamp})</span>
             </div>
             <div class="build-item-actions">
-                <button class="btn-xs ${isLoaded ? 'btn-xs-info' : 'btn-xs-secondary'}" onclick="loadBuild('${build.id}')">불러오기</button>
+                <button class="btn-xs btn-xs-secondary" onclick="loadBuild('${build.id}')">불러오기</button>
+                ${isLoaded ? `<button class="btn-xs" style="background: rgba(0, 230, 118, 0.12); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.25); cursor: pointer;" onclick="updateBuild('${build.id}')">덮어쓰기</button>` : ''}
                 <button class="btn-xs ${isCompareBase ? 'btn-xs-primary' : 'btn-xs-secondary'}" onclick="setCompareBase('${build.id}')">비교기준</button>
                 <button class="btn-xs btn-xs-danger" onclick="deleteBuild('${build.id}')">삭제</button>
             </div>
@@ -1530,10 +1623,105 @@ function renderSavedBuildsList() {
     });
 }
 
+// 빌드 덮어쓰기 기능
+function updateBuild(id) {
+    const build = savedBuilds.find(b => b.id === id);
+    if (!build) return;
+
+    if (!confirm(`'${build.name}' 빌드를 현재 화면의 세팅으로 덮어쓰시겠습니까?`)) return;
+
+    const maxDmg = Math.floor(parseFloat(document.getElementById("summary-final-max-dmg").textContent.replace(/,/g, '')) || 0);
+    const finalDef = Math.floor(parseFloat(document.getElementById("summary-final-defense").textContent.replace(/,/g, '')) || 0);
+    const finalHp = Math.floor(parseFloat(document.getElementById("summary-final-hp").textContent.replace(/,/g, '')) || 0);
+
+    const getVal = (id) => Math.floor(parseFloat(document.getElementById(id).textContent.replace(/,/g, '')) || 0);
+
+    build.meta = {
+        maxDmg,
+        finalDef,
+        finalHp,
+        timestamp: new Date().toLocaleString("ko-KR", { hour12: false })
+    };
+    build.inputs = getBuildInputs();
+    build.skills = {
+        "sanctuary": getVal("dmg-sanctuary-normal"),
+        "ironwall": getVal("dmg-ironwall-normal"),
+        "condemnation1": getVal("dmg-condemnation1-normal"),
+        "condemnation2": getVal("dmg-condemnation2-normal"),
+        "condemnation3": getVal("dmg-condemnation3-normal"),
+        "judgment": getVal("dmg-judgment-normal"),
+        "clash": getVal("dmg-clash-normal"),
+        "retribution": getVal("dmg-retribution-normal"),
+        "windmill": getVal("dmg-windmill-normal"),
+        "charge": getVal("dmg-charge-normal"),
+        "smash": getVal("dmg-smash-normal"),
+        "bash": getVal("dmg-bash-normal")
+    };
+
+    localStorage.setItem("sacred_guard_saved_builds", JSON.stringify(savedBuilds));
+    renderSavedBuildsList();
+    calculate();
+    alert("빌드가 현재 세팅으로 덮어써졌습니다.");
+}
+
+// 빌드 목록 클립보드 복사 내보내기 기능
+function exportBuilds() {
+    if (savedBuilds.length === 0) {
+        alert("저장된 빌드가 없습니다.");
+        return;
+    }
+    const jsonStr = JSON.stringify(savedBuilds, null, 2);
+    navigator.clipboard.writeText(jsonStr).then(() => {
+        alert("저장된 모든 빌드 데이터가 클립보드에 JSON 형식으로 복사되었습니다.\n메모장 등에 붙여넣어 백업하거나 공유할 수 있습니다.");
+    }).catch(err => {
+        console.error("복사 실패:", err);
+        window.prompt("아래 코드를 복사하여 저장하세요:", jsonStr);
+    });
+}
+
+// 빌드 목록 외부 텍스트에서 불러오기 가져오기 기능
+function importBuilds() {
+    const jsonStr = window.prompt("내보내기 했던 빌드 JSON 데이터를 아래 입력창에 붙여넣어 주세요.");
+    if (!jsonStr) return;
+
+    try {
+        const imported = JSON.parse(jsonStr);
+        if (!Array.isArray(imported)) {
+            throw new Error("올바른 빌드 데이터 형식이 아닙니다. (배열 구조 필요)");
+        }
+
+        for (let build of imported) {
+            if (!build.id || !build.name || !build.meta || !build.inputs || !build.skills) {
+                throw new Error("빌드 데이터의 일부 형식이 누락되었습니다.");
+            }
+        }
+
+        if (confirm(`기존에 저장된 빌드 ${savedBuilds.length}개 외에 추가로 ${imported.length}개의 빌드를 가져오시겠습니까?`)) {
+            imported.forEach(build => {
+                const exists = savedBuilds.some(b => b.id === build.id);
+                if (exists) {
+                    build.id = 'build_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                }
+                savedBuilds.push(build);
+            });
+
+            localStorage.setItem("sacred_guard_saved_builds", JSON.stringify(savedBuilds));
+            renderSavedBuildsList();
+            calculate();
+            alert(`성공적으로 ${imported.length}개의 빌드를 추가로 가져왔습니다.`);
+        }
+    } catch (e) {
+        alert(`빌드 가져오기에 실패했습니다:\n${e.message}`);
+    }
+}
+
 // 전역 스코프에 노출하여 onclick 호출 가능하게 바인딩
 window.loadBuild = loadBuild;
 window.setCompareBase = setCompareBase;
 window.deleteBuild = deleteBuild;
+window.updateBuild = updateBuild;
+window.exportBuilds = exportBuilds;
+window.importBuilds = importBuilds;
 
 // 아르카나 및 재능 스킬 카드 클릭 시 카드 자체를 아래로 확장하여 상세 데미지 공식 분해 노출
 function setupSkillCardBreakdownToggles() {

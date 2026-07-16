@@ -590,18 +590,31 @@
                     </div>
                     <div class="card-body spec-summary-grid">
                         <div class="spec-item">
-                            <span class="spec-label">최종 보정 맥댐</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <span class="spec-label">최종 보정 맥댐</span>
+                                <span class="compare-badge hidden" id="compare-stat-max-dmg" style="font-size: 0.65rem; padding: 0.05rem 0.25rem;">
+                                    <span class="compare-val">0%</span>
+                                </span>
+                            </div>
                             <span class="spec-value" id="summary-final-max-dmg">0</span>
                         </div>
                         <div class="spec-item highlighted-spec">
-                            <div class="spec-label-row">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                 <span class="spec-label">최종 방어력 (링크 보너스 합산)</span>
+                                <span class="compare-badge hidden" id="compare-stat-defense" style="font-size: 0.65rem; padding: 0.05rem 0.25rem;">
+                                    <span class="compare-val">0%</span>
+                                </span>
                             </div>
                             <span class="spec-value" id="summary-final-defense">0</span>
                             <span class="spec-sub" id="summary-defense-breakdown">(기본 0 + 보너스 0)</span>
                         </div>
                         <div class="spec-item">
-                            <span class="spec-label">최종 최대 생명력</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <span class="spec-label">최종 최대 생명력</span>
+                                <span class="compare-badge hidden" id="compare-stat-hp" style="font-size: 0.65rem; padding: 0.05rem 0.25rem;">
+                                    <span class="compare-val">0%</span>
+                                </span>
+                            </div>
                             <span class="spec-value" id="summary-final-hp">0</span>
                         </div>
                     </div>
@@ -960,9 +973,15 @@
                         </div>
 
                         <div class="saved-builds-container" style="width: 100%; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 1rem;">
-                            <h3 style="font-size: 0.9rem; color: #ffd700; margin-bottom: 0.8rem; font-family: 'Noto Sans KR', sans-serif; display: flex; align-items: center; gap: 0.3rem;">
-                                💾 저장된 빌드 목록
-                            </h3>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <h3 style="font-size: 0.9rem; color: #ffd700; margin: 0; font-family: 'Noto Sans KR', sans-serif; display: flex; align-items: center; gap: 0.3rem;">
+                                    💾 저장된 빌드 목록
+                                </h3>
+                                <div style="display: flex; gap: 0.4rem;">
+                                    <button class="btn-xs" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; background: rgba(255, 215, 0, 0.1); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.25); cursor: pointer;" onclick="exportBuilds()">내보내기 (복사)</button>
+                                    <button class="btn-xs" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; background: rgba(0, 229, 255, 0.1); color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.25); cursor: pointer;" onclick="importBuilds()">가져오기</button>
+                                </div>
+                            </div>
                             <div id="saved-builds-list" style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 250px; overflow-y: auto; padding-right: 0.5rem;">
                                 <!-- JavaScript가 로컬 스토리지의 빌드들을 바인딩합니다. -->
                             </div>
