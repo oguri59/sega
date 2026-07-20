@@ -141,7 +141,7 @@ function initOgeom() {
                     <option value="special" ${isSpecialDefault ? "selected" : ""}>특수 오검</option>
                 </select>
             </legend>
-            <div class="ogeom-options-container" id="ogeom-${i}-options-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; width: 100%;">
+            <div class="ogeom-options-container" id="ogeom-${i}-options-container">
                 ${[1, 2, 3].map(j => `
                     <div class="form-group" style="margin: 0; min-width: 0;">
                         <label style="font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 0.15rem; display: block;">옵션 ${j}</label>
@@ -203,7 +203,7 @@ function updateOgeomOptions(i, userTriggered = false) {
             }
         }
     } else {
-        optionsContainer.style.display = "grid";
+        optionsContainer.style.display = "";
         const baseKeys = (type === "special") ? OGEOM_SPECIAL_KEYS : OGEOM_NORMAL_KEYS;
         
         // 3개의 행에 대해 각각 필터링하여 드롭다운 구성 (동일 오검 내 중복 선택 금지)

@@ -1125,6 +1125,19 @@ footer .small {
     overflow: hidden;
 }
 
+.ogeom-options-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .ogeom-options-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 .inputs-section {
     min-width: 0;
     max-width: 520px;
