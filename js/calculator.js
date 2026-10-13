@@ -590,6 +590,7 @@ function calculate() {
     const bfo = parseFloat(document.getElementById("buff-bfo").value) || 0;
     const buffSebaBonus = document.getElementById("buff-seba-bonus").checked;
     const buffSangji = document.getElementById("buff-sangji").checked;
+    const buffBondOfStrength = document.getElementById("buff-bond-of-strength").checked;
     const buffGupkwan = document.getElementById("buff-gupkwan").checked;
 
     // 물공포 체크
@@ -703,6 +704,11 @@ function calculate() {
     let res0 = (maxDmg + ogeomMaxDmg) * potionFactor * (1 + (bfo / 100) * potionFactor);
     if (buffSangji) {
         res0 = res0 * (1 + 0.12 * potionFactor);
+    }
+
+    // 힘의 결속의 15% 증가분에도 물공포 보정 적용
+    if (buffBondOfStrength) {
+        res0 *= 1 + 0.15 * potionFactor;
     }
 
     // 최종 방어력 (기본 방어력 + 최종 맥댐의 3% 자동 합산)
