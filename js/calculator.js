@@ -159,6 +159,17 @@ function initOgeom() {
         // Populate options initially
         updateOgeomOptions(i);
 
+        const defaultOptions = isSpecialDefault
+            ? [["windmill", 20], ["condemnation", 10], ["judgment", 10]]
+            : [["windmill", 20], ["charge", 20], ["axemastery", 10]];
+        defaultOptions.forEach(([option], index) => {
+            document.getElementById(`ogeom-${i}-opt-${index + 1}`).value = option;
+        });
+        updateOgeomOptions(i);
+        defaultOptions.forEach(([, level], index) => {
+            document.getElementById(`ogeom-${i}-lv-${index + 1}`).value = level;
+        });
+
         // Bind type select change
         const typeSelect = document.getElementById(`ogeom-${i}-type`);
         if (typeSelect) {
@@ -511,6 +522,7 @@ function calculate() {
     const debuffDeathmarkerSaren = document.getElementById("debuff-deathmarker-saren").checked;
     const debuffMomo = document.getElementById("debuff-momo").checked;
     const debuffMagigraffDefprot = document.getElementById("debuff-magigraff-defprot").checked;
+    const debuffCollapseWave = document.getElementById("debuff-collapse-wave").checked;
     const debuffKun = document.getElementById("debuff-kun").checked;
 
     // 데스 마커 및 어퍼 라벨 동적 갱신
@@ -551,7 +563,10 @@ function calculate() {
     if (debuffMagigraffDefprot) debuffProtFlat += 10; // 방보 마기 보호 -10
 
     // 고정 방어 감소 디버프
+    if (debuffCollapseWave) debuffProtFlat += 25; // 붕괴의 파동 보호 -25
+
     let debuffDefFlat = 0;
+    if (debuffCollapseWave) debuffDefFlat += 75; // 붕괴의 파동 방어 -75
     if (debuffMagigraffDefprot) debuffDefFlat += 10; // 방보 마기 방어 -10
 
     // 증댐 디버프
@@ -565,6 +580,7 @@ function calculate() {
     const shieldKey = document.getElementById("equip-shield").value;
     const shield = SHIELD_DATA[shieldKey];
 
+    const setBonusDmg = document.getElementById("equip-set-bonus-dmg").checked ? 5 : 0;
     const setSmash = document.getElementById("equip-set-smash").checked;
     const setWindmillOld = document.getElementById("equip-set-windmill-old").checked;
     const setWindmillNew = document.getElementById("equip-set-windmill-new").checked;
@@ -626,26 +642,35 @@ function calculate() {
     const buffMagigraffSmash = document.getElementById("buff-magigraff-smash").checked;
     const buffMagigraffBash = document.getElementById("buff-magigraff-bash").checked;
 
+    // 50레벨 기준 수치를 레벨당 환산 (0~50레벨)
+    const readErgLevel = id => {
+        const input = document.getElementById(id);
+        const level = Math.max(0, Math.min(50, Math.floor(Number(input.value) || 0)));
+        input.value = level;
+        return level;
+    };
+    const ergLevel = readErgLevel("equip-erg");
+    const darkErgLevel = readErgLevel("equip-darkerg");
+    const windmillErg = weapon.type === "axe" ? ergLevel * 2 : 0;
+    const windmillDarkErg = weapon.type === "axe" ? darkErgLevel * 2 : 0;
+    const smashDarkErg = weapon.type === "twohanded" ? darkErgLevel * 3 : 0;
+    document.getElementById("equip-erg-desc").textContent = weapon.type === "axe"
+        ? `도끼: 윈드밀 일반·어둠 에르그 각각 레벨당 +2% (현재 +${windmillErg}% / +${windmillDarkErg}%)`
+        : weapon.type === "twohanded"
+            ? `양손검: 일반 에르그 대미지 효과 없음, 어둠 에르그 스매시 레벨당 +3% (현재 +${smashDarkErg}%)`
+            : "해당 무기에는 적용되는 에르그 대미지 효과가 없습니다.";
+
     // 베이스 스킬 입력
     const windmillRankVal = parseFloat(document.getElementById("skill-windmill-rank").value) || 0;
     const windmillReforge = parseFloat(document.getElementById("skill-windmill-reforge").value) || 0;
-    const windmillErg = parseFloat(document.getElementById("skill-windmill-erg").value) || 0;
-    const windmillDarkErg = parseFloat(document.getElementById("skill-windmill-darkerg").value) || 0;
 
     const chargeRankMult = parseFloat(document.getElementById("skill-charge-rank").value) || 0;
     const chargeReforge = parseFloat(document.getElementById("skill-charge-reforge").value) || 0;
-    const chargeErg = parseFloat(document.getElementById("skill-charge-erg").value) || 0;
-    const chargeDarkErg = parseFloat(document.getElementById("skill-charge-darkerg").value) || 0;
 
     const smashRankVal = parseFloat(document.getElementById("skill-smash-rank").value) || 0;
     const smashReforge = parseFloat(document.getElementById("skill-smash-reforge").value) || 0;
-    const smashErg = parseFloat(document.getElementById("skill-smash-erg").value) || 0;
-    const smashDarkErg = parseFloat(document.getElementById("skill-smash-darkerg").value) || 0;
 
     const bashSkillRankVal = parseFloat(document.getElementById("skill-bash-rank").value) || 0;
-    const bashSkillReforge = parseFloat(document.getElementById("skill-bash-reforge").value) || 0;
-    const bashSkillErg = parseFloat(document.getElementById("skill-bash-erg").value) || 0;
-    const bashSkillDarkErg = parseFloat(document.getElementById("skill-bash-darkerg").value) || 0;
 
     // 2. 무기 및 방패 옵션 해석
     const weaponTwoHandedSmashBonus = weapon.twoHandedSmashBonus; // 양손검 20% 보너스
@@ -689,7 +714,7 @@ function calculate() {
 
     // 최종 보너스 대미지 합산 (기본보너스대미지 + 아르카나보너스대미지 + 무기보너스대미지 + 방패보너스대미지 [양손검일 경우 제외])
     const shieldBonusDmgApply = (weapon.type === "twohanded") ? 0.0 : shield.bonusDmg;
-    const totalBonusDmg = bonusDmg + arcanaBonusDmg + weapon.bonusDmg + shieldBonusDmgApply;
+    const totalBonusDmg = bonusDmg + arcanaBonusDmg + weapon.bonusDmg + shieldBonusDmgApply + setBonusDmg;
 
     // UI에 스탯 요약 업데이트
     document.getElementById("summary-final-max-dmg").textContent = Math.floor(res0).toLocaleString();
@@ -709,22 +734,22 @@ function calculate() {
     }
     baseWindmillMult += (ogeomDmgWindmill / 100);
 
-    // 돌진 데미지 공식 (세공 + 에르그 및 어둠의 에르그 합산 보정 + 마기그래프)
-    let baseChargeMult = chargeRankMult + 0.1 * chargeReforge + (chargeErg / 100) + (chargeDarkErg / 100);
+    // 돌진 데미지 공식 (세공 + 마기그래프)
+    let baseChargeMult = chargeRankMult + 0.1 * chargeReforge;
     if (buffMagigraffCharge) {
         baseChargeMult += 0.60;
     }
     baseChargeMult += (ogeomDmgCharge / 100);
 
-    // 스매시 데미지 공식 (스매시 세공은 레벨당 +10%, 에르그 및 어둠의 에르그 합산 보정 + 마기그래프)
-    let baseSmashMult = smashRankVal + 0.1 * smashReforge + (smashErg / 100) + (smashDarkErg / 100);
+    // 스매시 데미지 공식 (스매시 세공은 레벨당 +10%, 양손검 어둠 에르그 합산 보정 + 마기그래프)
+    let baseSmashMult = smashRankVal + 0.1 * smashReforge + (smashDarkErg / 100);
     if (buffMagigraffSmash) {
         baseSmashMult += 1.0;
     }
     baseSmashMult += (ogeomDmgSmash / 100);
 
-    // 배쉬 데미지 공식 (배쉬 세공은 레벨당 +10%, 에르그 및 어둠의 에르그 합산 보정 + 마기그래프)
-    let baseBashMult = bashSkillRankVal + 0.1 * bashSkillReforge + (bashSkillErg / 100) + (bashSkillDarkErg / 100);
+    // 배쉬 데미지 공식 (랭크 배율 + 마기그래프)
+    let baseBashMult = bashSkillRankVal;
     if (buffMagigraffBash) {
         baseBashMult += 0.40;
     }
@@ -777,7 +802,7 @@ function calculate() {
     const doubleProtMult = 1 - getDmgRedFromProt(reducedProtDouble);
 
     // 보너스 대미지 배율 상세 정의 (DC인사이드 분석글 기반 카테고리 분리 곱연산)
-    const equipBonusDmgMult = 1 + (weapon.bonusDmg + shieldBonusDmgApply) / 100; // 장비보댐효과
+    const equipBonusDmgMult = 1 + (weapon.bonusDmg + shieldBonusDmgApply + setBonusDmg) / 100; // 장비 및 세트 보너스 대미지 합산
 
     // 정령 실체화 대미지 연산 (기본 10, 강화 시 25)
     let spiritTransformDmg = 0;
@@ -939,6 +964,10 @@ function calculate() {
     const retributionNormal = Math.max(1, Math.floor(Math.max(0, (rawRetributionArcana * normalProtMult * arcanaNormalBonusDmgMult) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * retributionReflectionMult));
     const retributionCrit = Math.max(1, Math.floor(Math.max(0, (rawRetributionArcana * normalProtMult * arcanaNormalBonusDmgMultCrit) * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * 1.15 * finalDmgMultiplier * retributionReflectionMult * critMult));
 
+    // [6] 참회: 아르카나 각성 스킬, 확정 크리티컬
+    const rawRepentanceArcana = res0 * 350.0 + finalDef * 100.0 + finalHp * 40.0;
+    const repentanceCrit = Math.max(1, Math.floor(Math.max(0, rawRepentanceArcana * normalProtMult * arcanaNormalBonusDmgMultCrit * equipBonusDmgMult * arcanaBonusDmgMult - reducedDefNormal) * finalDmgMultiplier * reflectionTraceMult * critMult));
+
     // 7. UI 결과값 업데이트
     const results = {
         "sanctuary": { normal: sanctuaryNormal, crit: sanctuaryCrit },
@@ -949,6 +978,7 @@ function calculate() {
         "judgment": { normal: judgmentNormal, crit: judgmentCrit },
         "clash": { normal: clashNormal, crit: clashCrit },
         "retribution": { normal: retributionNormal, crit: retributionCrit },
+        "repentance": { normal: repentanceCrit, crit: repentanceCrit },
         "windmill": { normal: windmillDmg, crit: windmillCrit },
         "charge": { normal: chargeDmg, crit: chargeCrit },
         "smash": { normal: smashDmg, crit: smashCrit },
@@ -1222,6 +1252,18 @@ function calculate() {
     document.getElementById("card-math-clash").innerHTML =
         formatArcanaMath(rawChargeDmg * 1.5, clashTalentFormula, normalBonusDmgMult, doubleProtMult, rawClashArcana, clashArcanaFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, clashNormal, 1.0, reflectionTraceMult, relicRetribution);
 
+    document.getElementById("card-math-repentance").innerHTML = `
+        <div class="math-step">
+            <span class="math-step-num">기본 대미지</span>
+            <span class="math-step-text">[최종맥댐] ${res0.toLocaleString()} &times; 350 + [최종방어] ${finalDef.toLocaleString()} &times; 100 + [최종체력] ${finalHp.toLocaleString()} &times; 40 = ${rawRepentanceArcana.toLocaleString()}</span>
+        </div>
+        <div class="math-step">
+            <span class="math-step-num">확정 크리티컬 적용</span>
+            <span class="math-step-text">보호 및 보너스 적용: &times; ${f(normalProtMult)} &times; ${f(arcanaNormalBonusDmgMultCrit)} &times; ${f(equipBonusDmgMult)} &times; ${f(arcanaBonusDmgMult)}<br>적 방어 ${reducedDefNormal.toLocaleString()} 차감 후 최종 배율 ${f(finalDmgMultiplier)}, 성찰의 흔적 ${f(reflectionTraceMult)}, 크리티컬 배율 ${f(critMult)} 적용</span>
+        </div>
+        <div class="math-final">결과 = <strong>${repentanceCrit.toLocaleString()}</strong></div>
+    `;
+
     document.getElementById("card-math-retribution").innerHTML =
         formatArcanaOnlyMath(rawRetributionArcana, retributionFormula, arcanaBonusDmgMult, normalProtMult, equipBonusDmgMult, reducedDefNormal, retributionNormal, 1.15, retributionReflectionMult, relicRetribution);
 
@@ -1265,7 +1307,8 @@ function calculate() {
         // 현재 화면 세팅 백업
         const backupInputs = getBuildInputs();
         
-        // 비교 기준 빌드로 화면 세팅 임시 전환 (몬스터 타입 제외)
+        try {
+        // 현재 몬스터·디버프를 유지한 채 비교 기준 장비 세팅 적용
         restoreBuildInputs(activeBuild.inputs);
         
         // 동기식으로 다시 연산 수행하여 DOM에 기준 빌드 결과 출력
@@ -1288,6 +1331,7 @@ function calculate() {
                 "judgment": getVal("dmg-judgment-normal"),
                 "clash": getVal("dmg-clash-normal"),
                 "retribution": getVal("dmg-retribution-normal"),
+            "repentance": getVal("dmg-repentance-crit"),
                 "windmill": getVal("dmg-windmill-normal"),
                 "charge": getVal("dmg-charge-normal"),
                 "smash": getVal("dmg-smash-normal"),
@@ -1295,13 +1339,15 @@ function calculate() {
             }
         };
         
-        // 원본 화면 세팅 복원
-        restoreBuildInputs(backupInputs);
-        
-        // 원본 화면 기준 최종 연산 수행
-        calculate();
-        
-        isCalculatingBase = false;
+        } finally {
+            try {
+                // 비교 중에도 원본 장비 세팅과 계산 결과를 반드시 복원
+                restoreBuildInputs(backupInputs);
+                calculate();
+            } finally {
+                isCalculatingBase = false;
+            }
+        }
     }
 
     updateComparisonUI(results, { maxDmg: res0, finalDef: finalDef, finalHp: finalHp }, baseBuildData);
@@ -1335,6 +1381,7 @@ function saveCurrentBuild() {
             "judgment": getVal("dmg-judgment-normal"),
             "clash": getVal("dmg-clash-normal"),
             "retribution": getVal("dmg-retribution-normal"),
+            "repentance": getVal("dmg-repentance-crit"),
             "windmill": getVal("dmg-windmill-normal"),
             "charge": getVal("dmg-charge-normal"),
             "smash": getVal("dmg-smash-normal"),
@@ -1401,7 +1448,7 @@ function updateComparisonUI(currentResults, currentStats, baseBuildData) {
 
     document.getElementById("btn-reset-build").classList.remove("hidden");
     document.getElementById("comparison-status-text").textContent = `기준 빌드: ${activeBuild.name}`;
-    document.getElementById("comparison-sub-text").textContent = `기준 스탯 - 맥댐: ${baseMeta.maxDmg.toLocaleString()}, 방어: ${baseMeta.finalDef.toLocaleString()}, 생명: ${baseMeta.finalHp.toLocaleString()}`;
+    document.getElementById("comparison-sub-text").textContent = `현재 몬스터·디버프 조건으로 비교 | 기준 스탯 - 맥댐: ${baseMeta.maxDmg.toLocaleString()}, 방어: ${baseMeta.finalDef.toLocaleString()}, 생명: ${baseMeta.finalHp.toLocaleString()}`;
 
     // 최종 보정 스탯 비교 반영
     if (currentStats) {
@@ -1473,19 +1520,24 @@ function updateComparisonUI(currentResults, currentStats, baseBuildData) {
     });
 }
 
+// 몬스터와 디버프는 장비 빌드가 아닌 공통 전투 조건
+function isCombatConditionInput(id) {
+    return id.startsWith("target-") || id.startsWith("debuff-");
+}
+
 // 입력 폼들의 설정 상태 수집
 function getBuildInputs() {
     const inputsState = {};
     document.querySelectorAll("input[type='number']").forEach(el => {
-        inputsState[el.id] = el.value;
+        if (!isCombatConditionInput(el.id)) inputsState[el.id] = el.value;
     });
     document.querySelectorAll("input[type='checkbox']").forEach(el => {
-        inputsState[el.id] = el.checked;
+        if (!isCombatConditionInput(el.id)) inputsState[el.id] = el.checked;
     });
     document.querySelectorAll("select").forEach(el => {
-        // 몬스터 타입 설정은 빌드 정보에 포함시키지 않음
-        if (el.id !== "target-monster") {
-            inputsState[el.id] = el.value;
+        // 현재 몬스터 및 디버프 조건은 빌드에 저장하지 않음
+        if (!isCombatConditionInput(el.id)) {
+            if (!isCombatConditionInput(el.id)) inputsState[el.id] = el.value;
         }
     });
     
@@ -1505,6 +1557,15 @@ function getBuildInputs() {
 // 입력 폼들의 설정 상태 복원
 function restoreBuildInputs(inputsState) {
     if (!inputsState) return;
+
+    // 이전 빌드의 스킬별 에르그 값을 무기 공통 설정으로 변환
+    inputsState = { ...inputsState };
+    if (inputsState["equip-erg"] === undefined) {
+        inputsState["equip-erg"] = Number(inputsState["skill-windmill-erg"]) >= 100 ? "50" : "0";
+    }
+    if (inputsState["equip-darkerg"] === undefined) {
+        inputsState["equip-darkerg"] = Number(inputsState["skill-windmill-darkerg"]) >= 100 || Number(inputsState["skill-smash-darkerg"]) >= 150 ? "50" : "0";
+    }
 
     // 0단계: 오검 조합 및 조합 점수부터 먼저 복원하여 제한개수(3개/5개) 설정을 마침
     const synSelect = document.getElementById("ogeom-synergy");
@@ -1549,8 +1610,8 @@ function restoreBuildInputs(inputsState) {
 
     // 2단계: 나머지 모든 입력값 복원
     Object.keys(inputsState).forEach(id => {
-        // 기존 저장된 빌드에 몬스터 설정이 포함되어 있더라도 복원하지 않음
-        if (id === "target-monster") return;
+        // 기존 빌드에 저장된 몬스터 및 디버프도 복원하지 않음
+        if (isCombatConditionInput(id)) return;
         const el = document.getElementById(id);
         if (el) {
             if (el.tagName === "INPUT") {
@@ -1679,6 +1740,7 @@ function updateBuild(id) {
         "judgment": getVal("dmg-judgment-normal"),
         "clash": getVal("dmg-clash-normal"),
         "retribution": getVal("dmg-retribution-normal"),
+            "repentance": getVal("dmg-repentance-crit"),
         "windmill": getVal("dmg-windmill-normal"),
         "charge": getVal("dmg-charge-normal"),
         "smash": getVal("dmg-smash-normal"),

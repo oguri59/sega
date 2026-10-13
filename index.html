@@ -168,13 +168,18 @@
                                 </label>
                                 <label class="checkbox-label"
                                     style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                                    <input type="checkbox" id="debuff-collapse-wave" class="debuff-item" checked>
+                                    <span>붕괴의 파동 [방어·마법 방어 -75 / 보호·마법 보호 -25]</span>
+                                </label>
+                                <label class="checkbox-label"
+                                    style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
                                     <input type="checkbox" id="debuff-kun" class="debuff-item" checked>
                                     <span>쿤 [크리 보댐 +3%]</span>
                                 </label>
                                 <div style="display: flex; align-items: center; gap: 0.4rem;">
                                     <input type="checkbox" id="debuff-sonic" class="debuff-item" checked>
                                     <span>음파의 세례 [보호 -<span id="sonic-total-flat">20</span>]</span>
-                                    <input type="number" id="debuff-sonic-value" value="4" min="0" max="100" step="1"
+                                    <input type="number" id="debuff-sonic-value" value="4" min="0" max="100" step="any"
                                         style="width: 48px; padding: 0.1rem 0.3rem; font-size: 0.75rem; background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; text-align: center;">
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 0.2rem; grid-column: span 1;">
@@ -248,7 +253,29 @@
                             선택한 방패에 대한 감소율 및 보너스 대미지 가 계산에 자동 연동됩니다.
                         </div>
 
+                        <fieldset class="skill-fieldset">
+                            <legend>무기 에르그</legend>
+                            <div class="grid-2col">
+                                <div class="form-group">
+                                    <label for="equip-erg">일반 에르그 Lv</label>
+                                    <input type="number" id="equip-erg" min="0" max="50" step="1" value="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="equip-darkerg">어둠 에르그 Lv</label>
+                                    <input type="number" id="equip-darkerg" min="0" max="50" step="1" value="50">
+                                </div>
+                            </div>
+                            <small class="helper-text" id="equip-erg-desc"></small>
+                        </fieldset>
+
                         <div class="set-effects-grid">
+                            <div class="toggle-group">
+                                <label class="toggle-label" for="equip-set-bonus-dmg">보너스 대미지 증가 (+5%):</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="equip-set-bonus-dmg">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
                             <div class="toggle-group">
                                 <span class="toggle-label">스매강 (*1.15):</span>
                                 <label class="switch">
@@ -429,7 +456,7 @@
                             <fieldset class="skill-fieldset">
                                 <legend>윈드밀 (Windmill) <span class="legend-badge"
                                         id="windmill-final-mult-label">500%</span></legend>
-                                <div class="grid-4col">
+                                <div class="talent-fields">
                                     <div class="form-group">
                                         <label for="skill-windmill-rank">스킬 랭크</label>
                                         <select id="skill-windmill-rank">
@@ -440,16 +467,6 @@
                                         <label for="skill-windmill-reforge">세공 Lv</label>
                                         <input type="number" id="skill-windmill-reforge" min="0" max="32" value="16">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="skill-windmill-erg">에르그 강화 (%)</label>
-                                        <input type="number" id="skill-windmill-erg" min="0" max="100" value="100"
-                                            placeholder="0">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="skill-windmill-darkerg">어둠의 에르그 (%)</label>
-                                        <input type="number" id="skill-windmill-darkerg" min="0" max="100" value="100"
-                                            placeholder="0">
-                                    </div>
                                 </div>
                             </fieldset>
 
@@ -457,7 +474,7 @@
                             <fieldset class="skill-fieldset">
                                 <legend>돌진 (Charge) <span class="legend-badge" id="charge-final-mult-label">300%</span>
                                 </legend>
-                                <div class="grid-4col">
+                                <div class="talent-fields">
                                     <div class="form-group">
                                         <label for="skill-charge-rank">스킬 랭크</label>
                                         <select id="skill-charge-rank">
@@ -468,16 +485,6 @@
                                         <label for="skill-charge-reforge">세공 Lv</label>
                                         <input type="number" id="skill-charge-reforge" min="0" max="32" value="0">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="skill-charge-erg">에르그 강화 (%)</label>
-                                        <input type="number" id="skill-charge-erg" min="0" max="500" value="0"
-                                            placeholder="0">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="skill-charge-darkerg">어둠의 에르그 (%)</label>
-                                        <input type="number" id="skill-charge-darkerg" min="0" max="500" value="0"
-                                            placeholder="0">
-                                    </div>
                                 </div>
                             </fieldset>
 
@@ -485,7 +492,7 @@
                             <fieldset class="skill-fieldset">
                                 <legend>스매시 (Smash) <span class="legend-badge" id="smash-final-mult-label">620%</span>
                                 </legend>
-                                <div class="grid-4col">
+                                <div class="talent-fields">
                                     <div class="form-group">
                                         <label for="skill-smash-rank">스킬 랭크</label>
                                         <select id="skill-smash-rank">
@@ -496,16 +503,6 @@
                                         <label for="skill-smash-reforge">세공 Lv</label>
                                         <input type="number" id="skill-smash-reforge" min="0" max="32" value="20">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="skill-smash-erg">에르그 강화 (%)</label>
-                                        <input type="number" id="skill-smash-erg" min="0" max="500" value="0"
-                                            placeholder="0">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="skill-smash-darkerg">어둠의 에르그 (%)</label>
-                                        <input type="number" id="skill-smash-darkerg" min="0" max="500" value="0"
-                                            placeholder="0">
-                                    </div>
                                 </div>
                             </fieldset>
 
@@ -513,26 +510,12 @@
                             <fieldset class="skill-fieldset">
                                 <legend>배쉬 (Bash) <span class="legend-badge" id="bash-final-mult-label">500%</span>
                                 </legend>
-                                <div class="grid-4col">
+                                <div class="talent-fields">
                                     <div class="form-group">
                                         <label for="skill-bash-rank">스킬 랭크</label>
                                         <select id="skill-bash-rank">
                                             <!-- JavaScript 바인딩 -->
                                         </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="skill-bash-reforge">세공 Lv</label>
-                                        <input type="number" id="skill-bash-reforge" min="0" max="25" value="20">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="skill-bash-erg">에르그 강화 (%)</label>
-                                        <input type="number" id="skill-bash-erg" min="0" max="500" value="0"
-                                            placeholder="0">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="skill-bash-darkerg">어둠의 에르그 (%)</label>
-                                        <input type="number" id="skill-bash-darkerg" min="0" max="500" value="0"
-                                            placeholder="0">
                                     </div>
                                 </div>
                             </fieldset>
@@ -842,6 +825,26 @@
                             </div>
                         </div>
                         <div class="card-breakdown hidden" id="card-math-retribution"></div>
+                    </div>
+                    <!-- 참회: 확정 크리티컬 -->
+                    <div class="skill-result-card theme-judgment" data-skill="repentance">
+                        <div class="card-main-content">
+                            <div class="skill-info">
+                                <span class="skill-name">
+                                    참회
+                                    <span class="compare-badge hidden" id="compare-repentance"><span class="compare-val">0%</span></span>
+                                </span>
+                                <span class="skill-formula-summary" id="summary-repentance-coeff">계수: 맥댐 35000% + 방어 10000% + 생명 4000%</span>
+                                <span class="skill-formula-summary">아르카나 각성 · 크리티컬 확정 발동</span>
+                            </div>
+                            <div class="dmg-values">
+                                <div class="dmg-col">
+                                    <span class="dmg-label text-crit-label">확정 크리티컬</span>
+                                    <span class="dmg-val text-crit" id="dmg-repentance-crit">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-breakdown hidden" id="card-math-repentance"></div>
                     </div>
                 </div>
 
